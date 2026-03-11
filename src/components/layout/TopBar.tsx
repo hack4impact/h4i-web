@@ -98,7 +98,7 @@ function UserMenu() {
     <Popover.Root>
       <Popover.Trigger
         className={cn(
-          "flex cursor-pointer items-center gap-1.5 rounded-sm px-2 py-1",
+          "flex h-8 cursor-pointer items-center gap-1.5 rounded-sm px-2",
           "bg-[#EAE8E2] transition-opacity hover:opacity-80",
           "focus-visible:outline-brand focus-visible:outline-2 focus-visible:outline-offset-2"
         )}
@@ -108,7 +108,7 @@ function UserMenu() {
             {initials}
           </Avatar.Fallback>
         </Avatar.Root>
-        <span className="text-[12px] text-text-primary">{name}</span>
+        <span className="text-sm text-text-primary">{name}</span>
         <span className="text-text-meta">
           <ChevronDownIcon />
         </span>
@@ -150,7 +150,7 @@ export function TopBar() {
 
       <div className="flex items-center gap-3">
         <button
-          className="text-text-meta hover:bg-surface hover:text-text-secondary focus-visible:outline-brand flex h-7 w-7 items-center justify-center rounded-sm transition-colors focus-visible:outline-2"
+          className="text-text-meta hover:bg-surface hover:text-text-secondary focus-visible:outline-brand flex h-8 w-8 items-center justify-center rounded-sm transition-colors focus-visible:outline-2"
           aria-label="Notifications"
         >
           <BellIcon />

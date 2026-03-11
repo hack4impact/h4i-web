@@ -79,7 +79,7 @@ function Breadcrumb() {
 
   return (
     <div className="flex items-center gap-2 text-sm">
-      <span className="text-text-primary font-semibold">hack for impact</span>
+      <span className="text-text-primary font-semibold">Hack for Impact</span>
       <span className="text-text-meta">/</span>
       <span className="text-text-secondary">Admin</span>
       <span className="text-text-meta">/</span>
@@ -99,7 +99,7 @@ function UserMenu() {
       <Popover.Trigger
         className={cn(
           "flex h-8 cursor-pointer items-center gap-1.5 rounded-sm px-2",
-          "bg-[#EAE8E2] transition-opacity hover:opacity-80",
+          "bg-canvas transition-opacity hover:opacity-80",
           "focus-visible:outline-brand focus-visible:outline-2 focus-visible:outline-offset-2"
         )}
       >
@@ -124,7 +124,7 @@ function UserMenu() {
             )}
           >
             <Popover.Close
-              className="text-text-secondary hover:bg-surface hover:text-text-primary flex w-full cursor-pointer items-center rounded-sm px-3 py-1.5 text-sm focus-visible:outline-none"
+              className="text-text-secondary hover:bg-surface hover:text-text-primary focus-visible:outline-brand flex w-full cursor-pointer items-center rounded-sm px-3 py-1.5 text-sm focus-visible:outline-2 focus-visible:outline-offset-2"
               onClick={() => credentialsSignOut()}
             >
               Sign out
@@ -140,7 +140,7 @@ function UserMenu() {
 
 export function TopBar() {
   return (
-    <header className="border-border bg-topbar flex h-10 shrink-0 items-center justify-between border-b px-4">
+    <header className="border-border bg-topbar flex h-12 shrink-0 items-center justify-between border-b px-4">
       <div className="flex items-center gap-2.5">
         <span className="text-text-meta">
           <LogoIcon />

@@ -36,10 +36,7 @@ export function FormLabel({
 }: WithStringClassName<ComponentPropsWithoutRef<typeof Field.Label>>) {
   return (
     <Field.Label
-      className={cn(
-        "text-text-meta text-sm",
-        className
-      )}
+      className={cn("text-text-meta text-xs uppercase", className)}
       {...props}
     />
   );

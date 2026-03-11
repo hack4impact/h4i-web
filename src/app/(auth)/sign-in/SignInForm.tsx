@@ -80,7 +80,7 @@ export default function SignInForm() {
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
 
-  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+  function handleSubmit(e: React.SubmitEvent<HTMLFormElement>) {
     e.preventDefault();
     setError(null);
     const formData = new FormData(e.currentTarget);
@@ -91,7 +91,7 @@ export default function SignInForm() {
   }
 
   return (
-    <Card className="w-[400px]">
+    <Card className="w-100">
       <div className="mb-5">
         <p className="text-text-primary mb-1 text-sm font-semibold tracking-tight">
           Hack for Impact
@@ -122,7 +122,7 @@ export default function SignInForm() {
           <FormInput
             type="email"
             name="email"
-            placeholder="you@hack4impact.org"
+            placeholder="you@email.com"
             autoComplete="email"
             disabled={isPending}
           />

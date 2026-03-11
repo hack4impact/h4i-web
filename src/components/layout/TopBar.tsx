@@ -103,12 +103,12 @@ function UserMenu() {
           "focus-visible:outline-brand focus-visible:outline-2 focus-visible:outline-offset-2"
         )}
       >
-        <Avatar.Root className="flex h-[18px] w-[18px] shrink-0 items-center justify-center rounded-full bg-[#DBEAFE]">
+        <Avatar.Root className="flex h-4.5 w-4.5 shrink-0 items-center justify-center rounded-full bg-[#DBEAFE]">
           <Avatar.Fallback className="text-[9px] leading-none text-[#1E40AF]">
             {initials}
           </Avatar.Fallback>
         </Avatar.Root>
-        <span className="text-sm text-text-primary">{name}</span>
+        <span className="text-text-primary text-sm">{name}</span>
         <span className="text-text-meta">
           <ChevronDownIcon />
         </span>
@@ -118,8 +118,8 @@ function UserMenu() {
         <Popover.Positioner align="end" sideOffset={4}>
           <Popover.Popup
             className={cn(
-              "border-border bg-card min-w-[140px] rounded-md border p-1 shadow-md",
-              "origin-top-right data-[starting-style]:scale-95 data-[starting-style]:opacity-0",
+              "border-border bg-card min-w-35 rounded-md border p-1 shadow-md",
+              "origin-top-right data-starting-scale:scale-95 data-starting-style:opacity-0",
               "transition-[transform,opacity] duration-100"
             )}
           >

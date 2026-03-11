@@ -1,3 +1,8 @@
-export default function DashboardPage() {
-  return <div>Dashboard</div>;
+import { PageHeader } from "@/components/ui/PageHeader";
+export default function SettingsPage() {
+  return (
+    <div>
+      <PageHeader title="Dashboard" />
+    </div>
+  );
 }

@@ -1,6 +1,6 @@
 "use server";
 
-import { signIn } from "@/lib/auth";
+import { signIn, signOut } from "@/lib/auth";
 import { AuthError } from "next-auth";
 
 export async function credentialsSignIn(formData: FormData) {
@@ -16,4 +16,8 @@ export async function credentialsSignIn(formData: FormData) {
     }
     throw error; // re-throw redirect
   }
+}
+
+export async function credentialsSignOut() {
+  await signOut({ redirectTo: "/sign-in" });
 }

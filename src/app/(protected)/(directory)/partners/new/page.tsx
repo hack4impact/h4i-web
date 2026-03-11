@@ -1,3 +1,13 @@
+import { PageHeader } from "@/components/ui/PageHeader";
+import { Button } from "@/components/ui/Button";
+
 export default function NewPartnerPage() {
-  return <div>New Partner</div>;
+  return (
+    <div>
+      <PageHeader title="Add Partner">
+        <Button variant="secondary">Cancel</Button>
+        <Button>+ Add Partner</Button>
+      </PageHeader>
+    </div>
+  );
 }

@@ -4,7 +4,7 @@ import { Button as BaseButton } from "@base-ui/react/button";
 import { cn } from "@/lib/utils";
 import type { ComponentPropsWithoutRef } from "react";
 
-type Variant = "primary" | "secondary" | "ghost";
+type Variant = "primary" | "secondary" | "ghost" | "dark";
 
 type ButtonProps = Omit<
   ComponentPropsWithoutRef<typeof BaseButton>,
@@ -21,6 +21,8 @@ const variants: Record<Variant, string> = {
     "bg-card border border-border text-text-primary hover:bg-surface active:bg-canvas disabled:opacity-50 disabled:cursor-not-allowed",
   ghost:
     "text-brand hover:underline underline-offset-2 disabled:opacity-50 disabled:cursor-not-allowed",
+  dark:
+    "bg-text-primary text-white hover:opacity-90 active:opacity-80 disabled:opacity-50 disabled:cursor-not-allowed",
 };
 
 export function Button({

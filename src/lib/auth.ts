@@ -1,9 +1,11 @@
 import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
-import bcrypt from "bcryptjs";
 import { z } from "zod";
-import { db } from "./db";
 import type { AppRole } from "@/types";
+
+// TODO: replace with real database auth
+const DEV_EMAIL = "admin@hack4impact.org";
+const DEV_PASSWORD = "password";
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   session: { strategy: "jwt" },
@@ -20,16 +22,18 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 
         if (!parsed.success) return null;
 
-        const user = await db.user.findUnique({
-          where: { email: parsed.data.email },
-        });
+        if (
+          parsed.data.email !== DEV_EMAIL ||
+          parsed.data.password !== DEV_PASSWORD
+        )
+          return null;
 
-        if (!user || !user.password) return null;
-
-        const valid = await bcrypt.compare(parsed.data.password, user.password);
-        if (!valid) return null;
-
-        return user;
+        return {
+          id: "dev-admin",
+          name: "Admin",
+          email: DEV_EMAIL,
+          role: "ADMIN",
+        };
       },
     }),
   ],

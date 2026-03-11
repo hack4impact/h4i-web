@@ -1,8 +1,18 @@
+import { PageHeader } from "@/components/ui/PageHeader";
+import { Button } from "@/components/ui/Button";
+
 export default async function EditChapterPage({
   params,
 }: {
   params: Promise<{ id: string }>;
 }) {
-  const { id } = await params;
-  return <div>Edit Chapter: {id}</div>;
+  await params;
+  return (
+    <div>
+      <PageHeader title="Chapter">
+        <Button variant="secondary">Cancel</Button>
+        <Button variant="dark">Save Changes</Button>
+      </PageHeader>
+    </div>
+  );
 }

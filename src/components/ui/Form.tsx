@@ -8,9 +8,7 @@ import type { ComponentPropsWithoutRef } from "react";
 
 type WithStringClassName<T> = Omit<T, "className"> & { className?: string };
 
-// ---------------------------------------------------------------------------
 // Form
-// ---------------------------------------------------------------------------
 
 export function Form({
   className,
@@ -21,9 +19,7 @@ export function Form({
   );
 }
 
-// ---------------------------------------------------------------------------
 // Field
-// ---------------------------------------------------------------------------
 
 export function FormField({
   className,

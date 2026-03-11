@@ -75,8 +75,6 @@ function GoogleIcon() {
   );
 }
 
-// Forms
-
 export default function SignInForm() {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -94,7 +92,6 @@ export default function SignInForm() {
 
   return (
     <Card className="w-[400px]">
-      {/* Header */}
       <div className="mb-5">
         <p className="text-text-primary mb-1 text-sm font-semibold tracking-tight">
           Hack for Impact
@@ -104,7 +101,6 @@ export default function SignInForm() {
 
       <CardDivider className="mb-5" />
 
-      {/* Heading */}
       <h1 className="text-text-primary mb-1 text-[17px] font-semibold">
         Sign in to your account
       </h1>
@@ -112,7 +108,6 @@ export default function SignInForm() {
         Admin access only. Contact your administrator if you need help.
       </p>
 
-      {/* Credentials form */}
       <Form onSubmit={handleSubmit} noValidate className="flex flex-col gap-3">
         <FormField
           name="email"
@@ -176,14 +171,12 @@ export default function SignInForm() {
         </Button>
       </Form>
 
-      {/* Divider */}
       <div className="my-4 flex items-center gap-3">
         <hr className="border-divider flex-1 border-t" />
         <span className="text-text-disabled text-xs">or</span>
         <hr className="border-divider flex-1 border-t" />
       </div>
 
-      {/* Google */}
       <Button variant="secondary" className="w-full gap-2" type="button">
         <GoogleIcon />
         Continue with Google

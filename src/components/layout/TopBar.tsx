@@ -16,7 +16,7 @@ function LogoIcon() {
       viewBox="0 0 24 24"
       fill="none"
       stroke="currentColor"
-      strokeWidth="2.5"
+      strokeWidth="1.5"
       strokeLinecap="round"
       strokeLinejoin="round"
     >
@@ -33,7 +33,7 @@ function BellIcon() {
       viewBox="0 0 24 24"
       fill="none"
       stroke="currentColor"
-      strokeWidth="2"
+      strokeWidth="1.5"
       strokeLinecap="round"
       strokeLinejoin="round"
     >
@@ -51,7 +51,7 @@ function ChevronDownIcon() {
       viewBox="0 0 24 24"
       fill="none"
       stroke="currentColor"
-      strokeWidth="2.5"
+      strokeWidth="1.5"
       strokeLinecap="round"
       strokeLinejoin="round"
     >
@@ -109,7 +109,7 @@ function UserMenu() {
           </Avatar.Fallback>
         </Avatar.Root>
         <span className="text-text-primary text-sm">{name}</span>
-        <span className="text-text-meta">
+        <span>
           <ChevronDownIcon />
         </span>
       </Popover.Trigger>
@@ -142,7 +142,7 @@ export function TopBar() {
   return (
     <header className="border-border bg-topbar flex h-12 shrink-0 items-center justify-between border-b px-4">
       <div className="flex items-center gap-2.5">
-        <span className="text-text-meta">
+        <span className="text-text-primary">
           <LogoIcon />
         </span>
         <Breadcrumb />

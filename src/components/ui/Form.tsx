@@ -37,7 +37,7 @@ export function FormLabel({
   return (
     <Field.Label
       className={cn(
-        "text-text-meta text-[10px] font-semibold tracking-[0.07em] uppercase",
+        "text-text-meta text-sm",
         className
       )}
       {...props}

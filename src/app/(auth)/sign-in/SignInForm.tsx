@@ -101,7 +101,7 @@ export default function SignInForm() {
 
       <CardDivider className="mb-5" />
 
-      <h1 className="text-text-primary mb-1 text-[17px] font-semibold">
+      <h1 className="text-text-primary mb-1 text-lg font-semibold">
         Sign in to your account
       </h1>
       <p className="text-text-secondary mb-5 text-xs leading-relaxed">
@@ -137,7 +137,7 @@ export default function SignInForm() {
             <FormLabel>Password</FormLabel>
             <a
               href="#"
-              className="text-brand text-[10px] hover:underline"
+              className="text-brand text-xs hover:underline"
               tabIndex={-1}
             >
               Forgot password?

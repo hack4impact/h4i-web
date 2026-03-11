@@ -9,7 +9,6 @@ export default auth((req) => {
     return NextResponse.redirect(new URL("/sign-in", req.url));
   }
 
-  // Volunteers cannot access write routes
   if (user.role === "VOLUNTEER") {
     if (pathname.endsWith("/new") || pathname.includes("/edit")) {
       return NextResponse.redirect(new URL("/dashboard", req.url));

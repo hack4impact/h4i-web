@@ -1,16 +1,13 @@
 import NextAuth from "next-auth";
-import { PrismaAdapter } from "@auth/prisma-adapter";
 import Credentials from "next-auth/providers/credentials";
-import Google from "next-auth/providers/google";
 import bcrypt from "bcryptjs";
 import { z } from "zod";
 import { db } from "./db";
+import type { AppRole } from "@/types";
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
-  adapter: PrismaAdapter(db),
   session: { strategy: "jwt" },
   providers: [
-    Google,
     Credentials({
       credentials: {
         email: { label: "Email", type: "email" },
@@ -27,7 +24,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           where: { email: parsed.data.email },
         });
 
-        if (!user?.password) return null;
+        if (!user || !user.password) return null;
 
         const valid = await bcrypt.compare(parsed.data.password, user.password);
         if (!valid) return null;
@@ -39,14 +36,12 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   callbacks: {
     jwt({ token, user }) {
       if (user) {
-        token.role = (user as { role?: string }).role;
-        token.chapterId = (user as { chapterId?: string | null }).chapterId ?? null;
+        token.role = (user as { role?: AppRole }).role ?? "ADMIN";
       }
       return token;
     },
     session({ session, token }) {
-      session.user.role = token.role as string;
-      session.user.chapterId = token.chapterId as string | null;
+      session.user.role = token.role as AppRole;
       return session;
     },
   },

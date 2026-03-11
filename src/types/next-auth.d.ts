@@ -1,23 +1,20 @@
 import { DefaultSession } from "next-auth";
-import { Role } from "./index";
+import type { AppRole } from "./index";
 
 declare module "next-auth" {
   interface Session {
     user: {
-      role: Role;
-      chapterId: string | null;
+      role: AppRole;
     } & DefaultSession["user"];
   }
 
   interface User {
-    role: Role;
-    chapterId: string | null;
+    role: AppRole;
   }
 }
 
 declare module "next-auth/jwt" {
   interface JWT {
-    role: Role;
-    chapterId: string | null;
+    role: AppRole;
   }
 }

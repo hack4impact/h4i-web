@@ -17,6 +17,7 @@ type SortState = { key: string; dir: "asc" | "desc" } | null;
 
 type DataTableProps = {
   data: Record<string, string>[];
+  columns?: string[];
   rowKey?: string;
   noun?: string;
   filterFields?: FilterField[];
@@ -78,6 +79,7 @@ function FilterIcon() {
 
 export function DataTable({
   data,
+  columns: columnsProp,
   rowKey = "id",
   noun = "row",
   filterFields,
@@ -103,11 +105,12 @@ export function DataTable({
     return () => document.removeEventListener("mousedown", onMouseDown);
   }, []);
 
-  // Derive columns from data keys, excluding the row key
   const columns = useMemo(() => {
-    const keys = Object.keys(data[0] ?? {}).filter((k) => k !== rowKey);
+    const keys = columnsProp?.length
+      ? columnsProp.filter((k) => k !== rowKey)
+      : Object.keys(data[0] ?? {}).filter((k) => k !== rowKey);
     return keys.map((key) => ({ key, label: key }));
-  }, [data, rowKey]);
+  }, [columnsProp, data, rowKey]);
 
   const filterOptions = useMemo(() => {
     if (!filterFields?.length) return {} as Record<string, string[]>;
@@ -181,7 +184,7 @@ export function DataTable({
   return (
     <div className="border-border bg-card flex flex-1 flex-col overflow-hidden rounded-md border">
       {/* Toolbar */}
-      <div className="border-divider flex flex-shrink-0 items-center gap-2 border-b px-3 py-2">
+      <div className="border-divider flex shrink-0 items-center gap-2 border-b px-3 py-2">
         <span className="text-text-secondary text-sm whitespace-nowrap">
           {countLabel}
         </span>

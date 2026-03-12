@@ -9,6 +9,11 @@ import {
   VOLUNTEERS_DATA_SOURCE_ID,
 } from "./client";
 
+export type NotionData = {
+  rows: Record<string, string>[];
+  columns: string[];
+};
+
 async function fetchAllPages(dataSourceId: string): Promise<any[]> {
   const allResults: any[] = [];
   let cursor: string | undefined;
@@ -24,58 +29,42 @@ async function fetchAllPages(dataSourceId: string): Promise<any[]> {
   return allResults;
 }
 
-export const getChapters = unstable_cache(
-  async () => {
-    try {
-      const results = await fetchAllPages(PROGRAMS_DATA_SOURCE_ID);
-      return results.map(flattenNotionPage);
-    } catch (error) {
-      console.error("Failed to fetch programs from Notion:", error);
-      return [];
-    }
-  },
-  ["notion-chapters"],
-  { revalidate: 3600 }
-);
+function createGetter(name: string, sourceId: string, cacheKey: string) {
+  return unstable_cache(
+    async (): Promise<NotionData> => {
+      try {
+        const results = await fetchAllPages(sourceId);
+        return {
+          rows: results.map(flattenNotionPage),
+          columns: Object.keys(results[0]?.properties ?? {}),
+        };
+      } catch (error) {
+        console.error(`Failed to fetch ${name} from Notion:`, error);
+        return { rows: [], columns: [] };
+      }
+    },
+    [cacheKey],
+    { revalidate: 3600 }
+  );
+}
 
-export const getPartners = unstable_cache(
-  async () => {
-    try {
-      const results = await fetchAllPages(PARTNERS_DATA_SOURCE_ID);
-      return results.map(flattenNotionPage);
-    } catch (error) {
-      console.error("Failed to fetch partners from Notion:", error);
-      return [];
-    }
-  },
-  ["notion-partners"],
-  { revalidate: 3600 }
+export const getChapters = createGetter(
+  "chapters",
+  PROGRAMS_DATA_SOURCE_ID,
+  "notion-chapters"
 );
-
-export const getProjects = unstable_cache(
-  async () => {
-    try {
-      const results = await fetchAllPages(PROJECTS_DATA_SOURCE_ID);
-      return results.map(flattenNotionPage);
-    } catch (error) {
-      console.error("Failed to fetch projects from Notion:", error);
-      return [];
-    }
-  },
-  ["notion-projects"],
-  { revalidate: 3600 }
+export const getPartners = createGetter(
+  "partners",
+  PARTNERS_DATA_SOURCE_ID,
+  "notion-partners"
 );
-
-export const getVolunteers = unstable_cache(
-  async () => {
-    try {
-      const results = await fetchAllPages(VOLUNTEERS_DATA_SOURCE_ID);
-      return results.map(flattenNotionPage);
-    } catch (error) {
-      console.error("Failed to fetch volunteers from Notion:", error);
-      return [];
-    }
-  },
-  ["notion-volunteers"],
-  { revalidate: 3600 }
+export const getProjects = createGetter(
+  "projects",
+  PROJECTS_DATA_SOURCE_ID,
+  "notion-projects"
+);
+export const getVolunteers = createGetter(
+  "volunteers",
+  VOLUNTEERS_DATA_SOURCE_ID,
+  "notion-volunteers"
 );

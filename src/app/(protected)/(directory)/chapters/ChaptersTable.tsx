@@ -3,7 +3,7 @@
 import { DataTable } from "@/components/ui/DataTable";
 import { StatusBadge, BadgeColor } from "@/components/ui/StatusBadge";
 
-type Row = Record<string, string>;
+type Props = { data: Record<string, string>[]; columns: string[] };
 
 const statusColors: Record<string, BadgeColor> = {
   Active: "green",
@@ -13,10 +13,11 @@ const statusColors: Record<string, BadgeColor> = {
   Hiatus: "orange",
 };
 
-export function ChaptersTable({ data }: { data: Row[] }) {
+export function ChaptersTable({ data, columns }: Props) {
   return (
     <DataTable
       data={data}
+      columns={columns}
       rowKey="id"
       noun="chapter"
       filterFields={[{ key: "Status", label: "Status" }]}

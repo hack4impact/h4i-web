@@ -31,7 +31,13 @@ export default async function ChaptersPage() {
         <Button>+ Add Chapter</Button>
       </PageHeader>
       <div className="flex min-h-0 flex-1 px-4 pb-4">
-        <DataTable columns={columns} data={chapters} rowKey="id" />
+        <DataTable
+          columns={columns}
+          data={chapters}
+          rowKey="id"
+          noun="chapter"
+          filterFields={[{ key: "status", label: "Status" }]}
+        />
       </div>
     </div>
   );

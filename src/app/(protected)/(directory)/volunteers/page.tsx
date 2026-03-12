@@ -27,7 +27,16 @@ export default async function VolunteersPage() {
         <Button>+ Add Volunteer</Button>
       </PageHeader>
       <div className="flex min-h-0 flex-1 px-4 pb-4">
-        <DataTable columns={columns} data={volunteers} rowKey="id" />
+        <DataTable
+          columns={columns}
+          data={volunteers}
+          rowKey="id"
+          noun="volunteer"
+          filterFields={[
+            { key: "status", label: "Status" },
+            { key: "role", label: "Role" },
+          ]}
+        />
       </div>
     </div>
   );

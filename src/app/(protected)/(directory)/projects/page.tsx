@@ -27,7 +27,16 @@ export default async function ProjectsPage() {
         <Button>+ Add Project</Button>
       </PageHeader>
       <div className="flex min-h-0 flex-1 px-4 pb-4">
-        <DataTable columns={columns} data={projects} rowKey="id" />
+        <DataTable
+          columns={columns}
+          data={projects}
+          rowKey="id"
+          noun="project"
+          filterFields={[
+            { key: "status", label: "Status" },
+            { key: "type", label: "Type" },
+          ]}
+        />
       </div>
     </div>
   );

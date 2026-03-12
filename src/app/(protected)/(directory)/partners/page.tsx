@@ -21,7 +21,13 @@ export default async function PartnersPage() {
         <Button>+ Add Partner</Button>
       </PageHeader>
       <div className="flex min-h-0 flex-1 px-4 pb-4">
-        <DataTable columns={columns} data={partners} rowKey="id" />
+        <DataTable
+          columns={columns}
+          data={partners}
+          rowKey="id"
+          noun="partner"
+          filterFields={[{ key: "type", label: "Type" }]}
+        />
       </div>
     </div>
   );

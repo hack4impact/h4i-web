@@ -15,9 +15,17 @@ export function PartnersTable({ data, columns }: Props) {
   return (
     <DataTable
       data={data}
-      columns={columns}
+      columns={[
+        "Name",
+        "Status",
+        "Organization Type",
+        "Population",
+        "Contact Name",
+        "Email",
+      ]}
       rowKey="id"
       noun="partner"
+      defaultSort={{ key: "Name", dir: "asc" }}
       filterFields={[
         { key: "Status", label: "Status" },
         { key: "Organization Type", label: "Organization Type" },

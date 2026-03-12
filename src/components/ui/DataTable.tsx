@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useMemo, useRef, useEffect } from "react";
+import { useState, useMemo } from "react";
+import { Menu } from "@base-ui/react/menu";
 import { cn } from "@/lib/utils";
 
 export type FilterField = {
@@ -22,9 +23,9 @@ type DataTableProps = {
   noun?: string;
   filterFields?: FilterField[];
   columnConfig?: ColumnConfig[];
+  defaultSort?: SortState;
 };
 
-// Matches the secondary Button variant exactly
 const toolbarBtn = cn(
   "inline-flex h-8 cursor-pointer items-center gap-1.5 rounded-sm border",
   "border-border bg-card text-text-primary text-sm font-medium",
@@ -40,6 +41,20 @@ const toolbarBtnActive = cn(
   "focus-visible:outline-brand focus-visible:outline-2 focus-visible:outline-offset-2",
   "px-3"
 );
+
+const menuItemCls = cn(
+  "flex w-full items-center rounded px-2.5 py-1.5 text-left text-sm font-normal",
+  "text-text-secondary outline-none cursor-default select-none transition-colors",
+  "data-[highlighted]:bg-surface data-[highlighted]:text-text-primary"
+);
+
+const menuItemActiveCls = cn(menuItemCls, "bg-canvas text-text-primary");
+
+const menuPopupCls = cn(
+  "border-border bg-card w-52 rounded-md border shadow-sm outline-none"
+);
+
+const menuPositionerCls = "z-50";
 
 function SortIcon() {
   return (
@@ -77,6 +92,33 @@ function FilterIcon() {
   );
 }
 
+function CheckIcon() {
+  return (
+    <svg
+      width="11"
+      height="11"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <polyline points="20 6 9 17 4 12" />
+    </svg>
+  );
+}
+
+function MenuSectionLabel({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="border-divider border-b px-3 py-2">
+      <span className="text-text-meta text-xs tracking-[0.08em] uppercase">
+        {children}
+      </span>
+    </div>
+  );
+}
+
 export function DataTable({
   data,
   columns: columnsProp,
@@ -84,26 +126,11 @@ export function DataTable({
   noun = "row",
   filterFields,
   columnConfig,
+  defaultSort = null,
 }: DataTableProps) {
   const [search, setSearch] = useState("");
-  const [sort, setSort] = useState<SortState>(null);
+  const [sort, setSort] = useState<SortState>(defaultSort);
   const [filters, setFilters] = useState<Record<string, Set<string>>>({});
-  const [sortOpen, setSortOpen] = useState(false);
-  const [filterOpen, setFilterOpen] = useState(false);
-
-  const sortRef = useRef<HTMLDivElement>(null);
-  const filterRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    function onMouseDown(e: MouseEvent) {
-      if (sortRef.current && !sortRef.current.contains(e.target as Node))
-        setSortOpen(false);
-      if (filterRef.current && !filterRef.current.contains(e.target as Node))
-        setFilterOpen(false);
-    }
-    document.addEventListener("mousedown", onMouseDown);
-    return () => document.removeEventListener("mousedown", onMouseDown);
-  }, []);
 
   const columns = useMemo(() => {
     const keys = columnsProp?.length
@@ -183,13 +210,11 @@ export function DataTable({
 
   return (
     <div className="border-border bg-card flex flex-1 flex-col overflow-hidden rounded-md border">
-      {/* Toolbar */}
       <div className="border-divider flex shrink-0 items-center gap-2 border-b px-3 py-2">
         <span className="text-text-secondary text-sm whitespace-nowrap">
           {countLabel}
         </span>
 
-        {/* Search */}
         <div className="relative flex-1">
           <svg
             className="text-text-disabled pointer-events-none absolute top-1/2 left-2 -translate-y-1/2"
@@ -214,15 +239,8 @@ export function DataTable({
           />
         </div>
 
-        {/* Sort */}
-        <div className="relative" ref={sortRef}>
-          <button
-            onClick={() => {
-              setSortOpen((v) => !v);
-              setFilterOpen(false);
-            }}
-            className={sort ? toolbarBtnActive : toolbarBtn}
-          >
+        <Menu.Root modal={false}>
+          <Menu.Trigger className={sort ? toolbarBtnActive : toolbarBtn}>
             <SortIcon />
             Sort
             {sort && (
@@ -230,61 +248,60 @@ export function DataTable({
                 · {sort.key} {sort.dir === "asc" ? "↑" : "↓"}
               </span>
             )}
-          </button>
-
-          {sortOpen && (
-            <div className="border-border bg-card absolute top-full right-0 z-20 mt-1 w-52 rounded-md border shadow-sm">
-              <div className="border-divider border-b px-3 py-2">
-                <span className="text-text-meta text-xs tracking-[0.08em] uppercase">
-                  Sort by
-                </span>
-              </div>
-              <div className="flex flex-col gap-0.5 p-1.5">
-                {columns.map((col) => {
-                  const active = sort?.key === col.key;
-                  return (
-                    <button
-                      key={col.key}
-                      onClick={() => cycleSort(col.key)}
-                      className={cn(
-                        "flex items-center justify-between rounded px-2.5 py-1.5 text-left text-sm font-normal transition-colors",
-                        active
-                          ? "bg-canvas text-text-primary"
-                          : "text-text-secondary hover:bg-surface hover:text-text-primary"
-                      )}
-                    >
-                      {col.label}
-                      {active && (
-                        <span className="text-text-meta text-xs">
-                          {sort!.dir === "asc" ? "↑ A→Z" : "↓ Z→A"}
-                        </span>
-                      )}
-                    </button>
-                  );
-                })}
-              </div>
-              {sort && (
-                <div className="border-divider border-t p-1.5">
-                  <button
-                    onClick={() => setSort(null)}
-                    className="text-text-secondary hover:bg-surface hover:text-text-primary w-full rounded px-2.5 py-1.5 text-left text-sm font-normal transition-colors"
-                  >
-                    Clear sort
-                  </button>
+          </Menu.Trigger>
+          <Menu.Portal>
+            <Menu.Positioner
+              className={menuPositionerCls}
+              side="bottom"
+              align="end"
+              sideOffset={4}
+            >
+              <Menu.Popup className={menuPopupCls}>
+                <MenuSectionLabel>Sort by</MenuSectionLabel>
+                <div className="flex flex-col gap-0.5 p-1.5">
+                  <Menu.RadioGroup value={sort?.key ?? ""}>
+                    {columns.map((col) => {
+                      const active = sort?.key === col.key;
+                      return (
+                        <Menu.RadioItem
+                          key={col.key}
+                          value={col.key}
+                          closeOnClick={false}
+                          onClick={() => cycleSort(col.key)}
+                          className={active ? menuItemActiveCls : menuItemCls}
+                        >
+                          {col.label}
+                          {active && (
+                            <span className="text-text-meta ml-auto text-xs">
+                              {sort!.dir === "asc" ? "↑ A→Z" : "↓ Z→A"}
+                            </span>
+                          )}
+                        </Menu.RadioItem>
+                      );
+                    })}
+                  </Menu.RadioGroup>
                 </div>
-              )}
-            </div>
-          )}
-        </div>
+                {sort && (
+                  <>
+                    <Menu.Separator className="border-divider border-t" />
+                    <div className="p-1.5">
+                      <Menu.Item
+                        onClick={() => setSort(null)}
+                        className={menuItemCls}
+                      >
+                        Clear sort
+                      </Menu.Item>
+                    </div>
+                  </>
+                )}
+              </Menu.Popup>
+            </Menu.Positioner>
+          </Menu.Portal>
+        </Menu.Root>
 
-        {/* Filter */}
         {filterFields && filterFields.length > 0 && (
-          <div className="relative" ref={filterRef}>
-            <button
-              onClick={() => {
-                setFilterOpen((v) => !v);
-                setSortOpen(false);
-              }}
+          <Menu.Root modal={false}>
+            <Menu.Trigger
               className={activeFilterCount > 0 ? toolbarBtnActive : toolbarBtn}
             >
               <FilterIcon />
@@ -294,57 +311,66 @@ export function DataTable({
                   · {activeFilterCount}
                 </span>
               )}
-            </button>
-
-            {filterOpen && (
-              <div className="border-border bg-card absolute top-full right-0 z-20 mt-1 w-52 rounded-md border shadow-sm">
-                {filterFields.map((field, i) => (
-                  <div
-                    key={field.key}
-                    className={cn(i > 0 && "border-divider border-t")}
-                  >
-                    <div className="border-divider border-b px-3 py-2">
-                      <span className="text-text-meta text-xs tracking-[0.08em] uppercase">
-                        {field.label}
-                      </span>
-                    </div>
-                    <div className="flex flex-col gap-0.5 p-1.5">
-                      {(filterOptions[field.key] ?? []).map((opt) => (
-                        <label
-                          key={opt}
-                          className="hover:bg-surface flex cursor-pointer items-center gap-2 rounded px-2.5 py-1.5"
-                        >
-                          <input
-                            type="checkbox"
-                            checked={filters[field.key]?.has(opt) ?? false}
-                            onChange={() => toggleFilter(field.key, opt)}
-                            className="accent-brand"
-                          />
-                          <span className="text-text-primary text-sm font-normal">
-                            {opt}
-                          </span>
-                        </label>
-                      ))}
-                    </div>
-                  </div>
-                ))}
-                {activeFilterCount > 0 && (
-                  <div className="border-divider border-t p-1.5">
-                    <button
-                      onClick={() => setFilters({})}
-                      className="text-text-secondary hover:bg-surface hover:text-text-primary w-full rounded px-2.5 py-1.5 text-left text-sm font-normal transition-colors"
+            </Menu.Trigger>
+            <Menu.Portal>
+              <Menu.Positioner
+                className={menuPositionerCls}
+                side="bottom"
+                align="end"
+                sideOffset={4}
+              >
+                <Menu.Popup className={menuPopupCls}>
+                  {filterFields.map((field, i) => (
+                    <div
+                      key={field.key}
+                      className={cn(i > 0 && "border-divider border-t")}
                     >
-                      Clear filters
-                    </button>
-                  </div>
-                )}
-              </div>
-            )}
-          </div>
+                      <MenuSectionLabel>{field.label}</MenuSectionLabel>
+                      <div className="flex flex-col gap-0.5 p-1.5">
+                        {(filterOptions[field.key] ?? []).map((opt) => (
+                          <Menu.CheckboxItem
+                            key={opt}
+                            checked={filters[field.key]?.has(opt) ?? false}
+                            onCheckedChange={() => toggleFilter(field.key, opt)}
+                            closeOnClick={false}
+                            className={cn(menuItemCls, "gap-2")}
+                          >
+                            <Menu.CheckboxItemIndicator
+                              keepMounted
+                              className={cn(
+                                "flex h-3.5 w-3.5 shrink-0 items-center justify-center rounded-[3px] border transition-colors",
+                                "border-border text-transparent",
+                                "data-[checked]:bg-brand data-[checked]:border-brand data-[checked]:text-white"
+                              )}
+                            >
+                              <CheckIcon />
+                            </Menu.CheckboxItemIndicator>
+                            <span className="text-text-primary">{opt}</span>
+                          </Menu.CheckboxItem>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                  {activeFilterCount > 0 && (
+                    <>
+                      <Menu.Separator className="border-divider border-t" />
+                      <div className="p-1.5">
+                        <Menu.Item
+                          onClick={() => setFilters({})}
+                          className={menuItemCls}
+                        >
+                          Clear filters
+                        </Menu.Item>
+                      </div>
+                    </>
+                  )}
+                </Menu.Popup>
+              </Menu.Positioner>
+            </Menu.Portal>
+          </Menu.Root>
         )}
       </div>
 
-      {/* Table */}
       <div className="[&::-webkit-scrollbar-thumb]:bg-border flex-1 overflow-auto overscroll-none [scrollbar-color:var(--color-border)_transparent] [scrollbar-width:thin] [&::-webkit-scrollbar]:h-1.5 [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:rounded [&::-webkit-scrollbar-track]:bg-transparent">
         <table className="w-full min-w-max">
           <thead className="bg-surface sticky top-0 z-10">

@@ -17,9 +17,10 @@ export function ChaptersTable({ data, columns }: Props) {
   return (
     <DataTable
       data={data}
-      columns={columns}
+      columns={["Name", "Status", "Place", "Founded", "Email"]}
       rowKey="id"
       noun="chapter"
+      defaultSort={{ key: "Name", dir: "asc" }}
       filterFields={[{ key: "Status", label: "Status" }]}
       columnConfig={[
         {

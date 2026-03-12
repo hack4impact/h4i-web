@@ -15,9 +15,17 @@ export function VolunteersTable({ data, columns }: Props) {
   return (
     <DataTable
       data={data}
-      columns={columns}
+      columns={[
+        "Name",
+        "Status",
+        "Roles",
+        "Major",
+        "Graduation Year",
+        "School Email",
+      ]}
       rowKey="id"
       noun="volunteer"
+      defaultSort={{ key: "Name", dir: "asc" }}
       filterFields={[{ key: "Status", label: "Status" }]}
       columnConfig={[
         {

@@ -4,7 +4,7 @@ import { getChapters } from "@/actions/chapters";
 import { ChaptersTable } from "./ChaptersTable";
 
 export default async function ChaptersPage() {
-  const { rows, columns } = await getChapters();
+  const { rows } = await getChapters();
 
   return (
     <div className="flex h-full flex-col">
@@ -12,7 +12,7 @@ export default async function ChaptersPage() {
         <Button>+ Add Chapter</Button>
       </PageHeader>
       <div className="flex min-h-0 flex-1 px-4 pb-4">
-        <ChaptersTable data={rows} columns={columns} />
+        <ChaptersTable data={rows} />
       </div>
     </div>
   );

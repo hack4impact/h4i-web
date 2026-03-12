@@ -3,7 +3,7 @@
 import { DataTable } from "@/components/ui/DataTable";
 import { StatusBadge, BadgeColor } from "@/components/ui/StatusBadge";
 
-type Props = { data: Record<string, string>[]; columns: string[] };
+type Props = { data: Record<string, string>[] };
 
 const statusColors: Record<string, BadgeColor> = {
   Active: "green",
@@ -11,7 +11,7 @@ const statusColors: Record<string, BadgeColor> = {
   Prospect: "blue",
 };
 
-export function PartnersTable({ data, columns }: Props) {
+export function PartnersTable({ data }: Props) {
   return (
     <DataTable
       data={data}

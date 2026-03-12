@@ -30,7 +30,7 @@ export const NotionUtils = {
 
   getPhone: (prop: any) => prop?.phone_number || null,
 
-  getNumber: (prop: any) => prop?.number || null,
+  getNumber: (prop: any) => prop?.number ?? null,
 
   getRelation: (prop: any) => prop?.relation?.map((item: any) => item.id) || [],
 

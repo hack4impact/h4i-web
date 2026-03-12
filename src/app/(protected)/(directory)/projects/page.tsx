@@ -4,7 +4,7 @@ import { getProjects } from "@/actions/projects";
 import { ProjectsTable } from "./ProjectsTable";
 
 export default async function ProjectsPage() {
-  const { rows, columns } = await getProjects();
+  const { rows } = await getProjects();
 
   return (
     <div className="flex h-full flex-col">
@@ -12,7 +12,7 @@ export default async function ProjectsPage() {
         <Button>+ Add Project</Button>
       </PageHeader>
       <div className="flex min-h-0 flex-1 px-4 pb-4">
-        <ProjectsTable data={rows} columns={columns} />
+        <ProjectsTable data={rows} />
       </div>
     </div>
   );

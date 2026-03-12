@@ -4,7 +4,7 @@ import { getVolunteers } from "@/actions/volunteers";
 import { VolunteersTable } from "./VolunteersTable";
 
 export default async function VolunteersPage() {
-  const { rows, columns } = await getVolunteers();
+  const { rows } = await getVolunteers();
 
   return (
     <div className="flex h-full flex-col">
@@ -12,7 +12,7 @@ export default async function VolunteersPage() {
         <Button>+ Add Volunteer</Button>
       </PageHeader>
       <div className="flex min-h-0 flex-1 px-4 pb-4">
-        <VolunteersTable data={rows} columns={columns} />
+        <VolunteersTable data={rows} />
       </div>
     </div>
   );

@@ -34,9 +34,10 @@ function createGetter(name: string, sourceId: string, cacheKey: string) {
     async (): Promise<NotionData> => {
       try {
         const results = await fetchAllPages(sourceId);
+        const rows = results.map(flattenNotionPage);
         return {
-          rows: results.map(flattenNotionPage),
-          columns: Object.keys(results[0]?.properties ?? {}),
+          rows,
+          columns: Object.keys(rows[0] ?? {}),
         };
       } catch (error) {
         console.error(`Failed to fetch ${name} from Notion:`, error);

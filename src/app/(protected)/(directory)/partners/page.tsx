@@ -4,7 +4,7 @@ import { getPartners } from "@/actions/partners";
 import { PartnersTable } from "./PartnersTable";
 
 export default async function PartnersPage() {
-  const { rows, columns } = await getPartners();
+  const { rows } = await getPartners();
 
   return (
     <div className="flex h-full flex-col">
@@ -12,7 +12,7 @@ export default async function PartnersPage() {
         <Button>+ Add Partner</Button>
       </PageHeader>
       <div className="flex min-h-0 flex-1 px-4 pb-4">
-        <PartnersTable data={rows} columns={columns} />
+        <PartnersTable data={rows} />
       </div>
     </div>
   );

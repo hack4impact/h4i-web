@@ -2,11 +2,15 @@
 
 import { useState, useMemo, useRef, useEffect } from "react";
 import { cn } from "@/lib/utils";
-import { StatusBadge } from "@/components/ui/StatusBadge";
 
 export type FilterField = {
   key: string;
   label: string;
+};
+
+export type ColumnConfig = {
+  key: string;
+  render?: (value: string) => React.ReactNode;
 };
 
 type SortState = { key: string; dir: "asc" | "desc" } | null;
@@ -16,6 +20,7 @@ type DataTableProps = {
   rowKey?: string;
   noun?: string;
   filterFields?: FilterField[];
+  columnConfig?: ColumnConfig[];
 };
 
 // Matches the secondary Button variant exactly
@@ -76,6 +81,7 @@ export function DataTable({
   rowKey = "id",
   noun = "row",
   filterFields,
+  columnConfig,
 }: DataTableProps) {
   const [search, setSearch] = useState("");
   const [sort, setSort] = useState<SortState>(null);
@@ -361,11 +367,13 @@ export function DataTable({
                     key={col.key}
                     className="text-text-primary px-3 py-[7px] text-sm"
                   >
-                    {col.key === "Status" && row[col.key] ? (
-                      <StatusBadge status={row[col.key]} />
-                    ) : (
-                      (row[col.key] ?? "")
-                    )}
+                    {(() => {
+                      const val = row[col.key] ?? "";
+                      const config = columnConfig?.find(
+                        (c) => c.key === col.key
+                      );
+                      return config?.render ? config.render(val) : val;
+                    })()}
                   </td>
                 ))}
               </tr>

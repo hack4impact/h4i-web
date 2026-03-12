@@ -1,23 +1,37 @@
 import { cn } from "@/lib/utils";
 
-const styles: Record<string, string> = {
-  Active: "bg-green-50 text-green-500",
-  Forming: "bg-blue-50 text-blue-500",
-  Scoping: "bg-blue-50 text-blue-500",
-  Inactive: "bg-canvas text-text-secondary",
-  Complete: "bg-canvas text-text-secondary",
-  Hiatus: "bg-orange-50 text-orange-500",
+export type BadgeColor =
+  | "blue"
+  | "purple"
+  | "pink"
+  | "orange"
+  | "green"
+  | "grey";
+
+const colorStyles: Record<BadgeColor, string> = {
+  blue: "bg-blue-50 text-blue-600",
+  purple: "bg-purple-50 text-purple-600",
+  pink: "bg-pink-50 text-pink-600",
+  orange: "bg-orange-50 text-orange-600",
+  green: "bg-green-50 text-green-600",
+  grey: "bg-canvas text-text-secondary",
 };
 
-export function StatusBadge({ status }: { status: string }) {
+export function StatusBadge({
+  label,
+  color,
+}: {
+  label: string;
+  color: BadgeColor;
+}) {
   return (
     <span
       className={cn(
         "inline-flex items-center rounded px-[7px] py-[2px] text-sm font-medium",
-        styles[status] ?? "bg-canvas text-text-secondary"
+        colorStyles[color]
       )}
     >
-      {status}
+      {label}
     </span>
   );
 }

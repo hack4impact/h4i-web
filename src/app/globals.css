@@ -28,6 +28,7 @@
   --color-blue-700: #104581;
   --color-blue-800: #092749;
   --color-blue-900: #061a31;
+  --color-blue-950: #04101e;
 
   /* Green scale */
   --color-green-50: #e2fbdb;
@@ -40,6 +41,7 @@
   --color-green-700: #18500a;
   --color-green-800: #0d2d06;
   --color-green-900: #091e04;
+  --color-green-950: #061302;
 
   /* Orange scale */
   --color-orange-50: #fdf1eb;
@@ -52,6 +54,7 @@
   --color-orange-700: #73330e;
   --color-orange-800: #411d08;
   --color-orange-900: #2b1305;
+  --color-orange-950: #1b0c03;
 
   /* Purple scale */
   --color-purple-50: #f4f2fd;
@@ -64,6 +67,20 @@
   --color-purple-700: #321ad1;
   --color-purple-800: #1d0f7a;
   --color-purple-900: #140a53;
+  --color-purple-950: #0d0736;
+
+  /* Pink scale */
+  --color-pink-50: #fbf0fd;
+  --color-pink-100: #f8e0fb;
+  --color-pink-200: #f3cef9;
+  --color-pink-300: #efbaf6;
+  --color-pink-400: #df77ee;
+  --color-pink-500: #ce31e6;
+  --color-pink-600: #a417b9;
+  --color-pink-700: #771186;
+  --color-pink-800: #450a4d;
+  --color-pink-900: #2f0735;
+  --color-pink-950: #1f0423;
 
   /* Semantic aliases */
   --color-brand: var(--color-blue-500);

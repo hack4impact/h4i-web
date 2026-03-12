@@ -209,7 +209,7 @@ export function DataTable({
   }
 
   return (
-    <div className="border-border bg-card flex flex-1 flex-col overflow-hidden rounded-md border">
+    <div className="border-border bg-card flex max-h-full flex-1 flex-col self-start overflow-hidden rounded-md border">
       <div className="border-divider flex shrink-0 items-center gap-2 border-b px-3 py-2">
         <span className="text-text-secondary text-sm whitespace-nowrap">
           {countLabel}

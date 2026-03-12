@@ -1,3 +1,5 @@
 "use server";
 
-// TODO: implement project server actions
+import { getProjects } from "@/lib/notion/api";
+
+export { getProjects };

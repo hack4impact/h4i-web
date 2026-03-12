@@ -21,8 +21,7 @@ const variants: Record<Variant, string> = {
     "bg-card border border-border text-text-primary hover:bg-surface active:bg-canvas disabled:opacity-50 disabled:cursor-not-allowed",
   ghost:
     "text-brand hover:underline underline-offset-2 disabled:opacity-50 disabled:cursor-not-allowed",
-  dark:
-    "bg-text-primary text-white hover:opacity-90 active:opacity-80 disabled:opacity-50 disabled:cursor-not-allowed",
+  dark: "bg-text-primary text-white hover:opacity-90 active:opacity-80 disabled:opacity-50 disabled:cursor-not-allowed",
 };
 
 export function Button({

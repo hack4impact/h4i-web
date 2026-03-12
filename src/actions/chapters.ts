@@ -1,3 +1,5 @@
 "use server";
 
-// TODO: implement chapter server actions
+import { getChapters } from "@/lib/notion/api";
+
+export { getChapters };

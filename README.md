@@ -37,13 +37,13 @@ cp .env.local.example .env.local
 
 Fill in `.env.local`:
 
-| Variable | Description |
-|---|---|
-| `DATABASE_URL` | PostgreSQL connection string for the auth database |
-| `AUTH_SECRET` | Random secret — run `openssl rand -base64 32` |
-| `AUTH_URL` | App base URL (default: `http://localhost:3000`) |
-| `AUTH_GOOGLE_ID` | Google OAuth client ID |
-| `AUTH_GOOGLE_SECRET` | Google OAuth client secret |
+| Variable             | Description                                                       |
+| -------------------- | ----------------------------------------------------------------- |
+| `DATABASE_URL`       | PostgreSQL connection string for the auth database                |
+| `AUTH_SECRET`        | Random secret — run `openssl rand -base64 32`                     |
+| `AUTH_URL`           | App base URL (default: `http://localhost:3000`)                   |
+| `AUTH_GOOGLE_ID`     | Google OAuth client ID                                            |
+| `AUTH_GOOGLE_SECRET` | Google OAuth client secret                                        |
 | `OPERATIONS_API_URL` | Base URL of the operations-api (default: `http://localhost:3001`) |
 
 **3. Set up the auth database**

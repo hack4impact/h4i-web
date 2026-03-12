@@ -2,7 +2,8 @@ import { PageHeader } from "@/components/ui/PageHeader";
 import { Button } from "@/components/ui/Button";
 import { DataTable, type Column } from "@/components/ui/DataTable";
 import { StatusBadge } from "@/components/ui/StatusBadge";
-import { chapters, type Chapter } from "@/data/chapters";
+import { getChapters } from "@/actions/chapters";
+import type { Chapter } from "@/data/chapters";
 
 const columns: Column<Chapter>[] = [
   { key: "name", label: "Chapter" },
@@ -21,14 +22,16 @@ const columns: Column<Chapter>[] = [
   },
 ];
 
-export default function ChaptersPage() {
+export default async function ChaptersPage() {
+  const chapters = await getChapters();
+
   return (
-    <div>
+    <div className="flex h-full flex-col">
       <PageHeader title="Chapters Directory">
         <Button>+ Add Chapter</Button>
       </PageHeader>
-      <div className="px-4 pb-4">
-        <div className="border-border bg-card overflow-hidden rounded-md border">
+      <div className="flex min-h-0 flex-1 px-4 pb-4">
+        <div className="border-border bg-card [&::-webkit-scrollbar-thumb]:bg-border flex-1 overflow-auto overscroll-contain rounded-md border [scrollbar-color:var(--color-border)_transparent] [scrollbar-width:thin] [&::-webkit-scrollbar]:h-1.5 [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:rounded [&::-webkit-scrollbar-track]:bg-transparent">
           <DataTable columns={columns} data={chapters} rowKey="id" />
         </div>
       </div>

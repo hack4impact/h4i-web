@@ -1,3 +1,5 @@
 "use server";
 
-// TODO: implement partner server actions
+import { getPartners } from "@/lib/notion/api";
+
+export { getPartners };

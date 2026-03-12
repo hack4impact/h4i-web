@@ -5,7 +5,7 @@ export type Project = {
   type: string;
   volunteers: number;
   partner: string;
-  status: "Active" | "Scoping" | "Complete";
+  status: "Active" | "Scoping" | "Complete" | "Inactive";
 };
 
 export const projects: Project[] = [

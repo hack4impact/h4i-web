@@ -1,3 +1,5 @@
 "use server";
 
-// TODO: implement volunteer server actions
+import { getVolunteers } from "@/lib/notion/api";
+
+export { getVolunteers };

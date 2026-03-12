@@ -18,14 +18,14 @@ export function DataTable<T extends Record<string, unknown>>({
   rowKey,
 }: DataTableProps<T>) {
   return (
-    <div className="w-full overflow-x-auto">
-      <table className="w-full">
-        <thead>
+    <div className="w-full">
+      <table className="w-full min-w-max">
+        <thead className="bg-surface sticky top-0 z-10">
           <tr className="border-divider border-b">
             {columns.map((col) => (
               <th
                 key={col.key}
-                className="text-text-meta px-3 py-[7px] text-left text-xs font-normal tracking-[0.08em] uppercase"
+                className="text-text-meta px-3 py-[7px] text-left text-xs font-normal tracking-[0.08em] whitespace-nowrap uppercase"
               >
                 {col.label}
               </th>

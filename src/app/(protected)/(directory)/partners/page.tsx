@@ -1,24 +1,27 @@
 import { PageHeader } from "@/components/ui/PageHeader";
 import { Button } from "@/components/ui/Button";
 import { DataTable, type Column } from "@/components/ui/DataTable";
-import { partners, type Partner } from "@/data/partners";
+import { getPartners } from "@/actions/partners";
+import type { Partner } from "@/data/partners";
 
 const columns: Column<Partner>[] = [
   { key: "organization", label: "Organization" },
   { key: "type", label: "Type" },
   { key: "projects", label: "Projects", render: (row) => row.projects ?? "—" },
   { key: "chapter", label: "Chapter" },
-  { key: "since", label: "Since" },
+  { key: "since", label: "Since", render: (row) => row.since || "—" },
 ];
 
-export default function PartnersPage() {
+export default async function PartnersPage() {
+  const partners = await getPartners();
+
   return (
-    <div>
+    <div className="flex h-full flex-col">
       <PageHeader title="Partners Directory">
         <Button>+ Add Partner</Button>
       </PageHeader>
-      <div className="px-4 pb-4">
-        <div className="border-border bg-card overflow-hidden rounded-md border">
+      <div className="flex min-h-0 flex-1 px-4 pb-4">
+        <div className="border-border bg-card [&::-webkit-scrollbar-thumb]:bg-border flex-1 overflow-auto overscroll-contain rounded-md border [scrollbar-color:var(--color-border)_transparent] [scrollbar-width:thin] [&::-webkit-scrollbar]:h-1.5 [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:rounded [&::-webkit-scrollbar-track]:bg-transparent">
           <DataTable columns={columns} data={partners} rowKey="id" />
         </div>
       </div>

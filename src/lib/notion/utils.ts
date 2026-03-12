@@ -6,14 +6,6 @@ export function stripOrgPrefix(name: string): string {
     .replace(/^Hack\s*for\s*Impact\s*/i, "");
 }
 
-export function toSlug(name: string): string {
-  return stripOrgPrefix(name)
-    .trim()
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-|-$/g, "");
-}
-
 export const NotionUtils = {
   getText: (prop: any) =>
     prop?.title?.[0]?.plain_text || prop?.rich_text?.[0]?.plain_text || "",
@@ -53,7 +45,7 @@ export const NotionUtils = {
     const parts = address.split(",").map((s: string) => s.trim());
     for (let i = 1; i < parts.length - 1; i++) {
       const match = parts[i].match(/^([A-Z]{2})\b/);
-      if (match && i > 0) {
+      if (match) {
         return `${parts[i - 1]}, ${match[1]}`;
       }
     }

@@ -18,7 +18,7 @@ export function DataTable<T extends Record<string, unknown>>({
   rowKey,
 }: DataTableProps<T>) {
   return (
-    <div className="w-full">
+    <div className="border-border bg-card [&::-webkit-scrollbar-thumb]:bg-border flex-1 overflow-auto overscroll-none rounded-md border [scrollbar-color:var(--color-border)_transparent] [scrollbar-width:thin] [&::-webkit-scrollbar]:h-1.5 [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:rounded [&::-webkit-scrollbar-track]:bg-transparent">
       <table className="w-full min-w-max">
         <thead className="bg-surface sticky top-0 z-10">
           <tr className="border-divider border-b">

@@ -117,25 +117,36 @@ export async function getChapters(): Promise<Chapter[]> {
     getCachedVolunteers(),
   ]);
 
-  return programs.map((program: any) => {
-    const memberCount = volunteers.filter(
-      (v: any) => v.chapterId === program.id
-    ).length;
+  // Pre-build count maps to avoid O(n*m) filtering inside the loop
+  const volunteerCountByChapter = new Map<string, number>();
+  for (const v of volunteers) {
+    if (v.chapterId) {
+      volunteerCountByChapter.set(
+        v.chapterId,
+        (volunteerCountByChapter.get(v.chapterId) ?? 0) + 1
+      );
+    }
+  }
 
-    const projectCount = notionProjects.filter((p: any) =>
-      p.relatedIds.chapters.includes(program.id)
-    ).length;
+  const projectCountByChapter = new Map<string, number>();
+  for (const p of notionProjects) {
+    for (const chapterId of p.relatedIds.chapters) {
+      projectCountByChapter.set(
+        chapterId,
+        (projectCountByChapter.get(chapterId) ?? 0) + 1
+      );
+    }
+  }
 
-    return {
-      id: program.id,
-      name: stripOrgPrefix(program.name),
-      university: stripOrgPrefix(program.name),
-      volunteers: memberCount,
-      projects: projectCount || null,
-      coExecDirectors: null,
-      status: mapChapterStatus(program.status),
-    } satisfies Chapter;
-  });
+  return programs.map((program: any) => ({
+    id: program.id,
+    name: stripOrgPrefix(program.name),
+    university: stripOrgPrefix(program.name),
+    volunteers: volunteerCountByChapter.get(program.id) ?? 0,
+    projects: projectCountByChapter.get(program.id) ?? null,
+    coExecDirectors: null,
+    status: mapChapterStatus(program.status),
+  }));
 }
 
 export async function getPartners(): Promise<Partner[]> {
@@ -149,12 +160,21 @@ export async function getPartners(): Promise<Partner[]> {
     programs.map((p: any) => [p.id, stripOrgPrefix(p.name)])
   );
 
+  // Pre-build partner → project count for the fallback case
+  const projectCountByPartner = new Map<string, number>();
+  for (const p of notionProjects) {
+    for (const partnerId of p.relatedIds.partners) {
+      projectCountByPartner.set(
+        partnerId,
+        (projectCountByPartner.get(partnerId) ?? 0) + 1
+      );
+    }
+  }
+
   return notionPartners.map((partner: any) => {
     const projectCount =
       partner.relatedIds.projects.length ||
-      notionProjects.filter((p: any) =>
-        p.relatedIds.partners.includes(partner.id)
-      ).length;
+      (projectCountByPartner.get(partner.id) ?? 0);
 
     const chapterName =
       partner.relatedIds.chapters

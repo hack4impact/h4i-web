@@ -31,9 +31,7 @@ export default async function ChaptersPage() {
         <Button>+ Add Chapter</Button>
       </PageHeader>
       <div className="flex min-h-0 flex-1 px-4 pb-4">
-        <div className="border-border bg-card [&::-webkit-scrollbar-thumb]:bg-border flex-1 overflow-auto overscroll-contain rounded-md border [scrollbar-color:var(--color-border)_transparent] [scrollbar-width:thin] [&::-webkit-scrollbar]:h-1.5 [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:rounded [&::-webkit-scrollbar-track]:bg-transparent">
-          <DataTable columns={columns} data={chapters} rowKey="id" />
-        </div>
+        <DataTable columns={columns} data={chapters} rowKey="id" />
       </div>
     </div>
   );

@@ -1,22 +1,7 @@
 import { PageHeader } from "@/components/ui/PageHeader";
 import { Button } from "@/components/ui/Button";
-import { DataTable, type Column } from "@/components/ui/DataTable";
-import { StatusBadge } from "@/components/ui/StatusBadge";
 import { getProjects } from "@/actions/projects";
-import type { Project } from "@/data/projects";
-
-const columns: Column<Project>[] = [
-  { key: "name", label: "Project" },
-  { key: "chapter", label: "Chapter" },
-  { key: "type", label: "Project Type" },
-  { key: "volunteers", label: "Vol." },
-  { key: "partner", label: "Partner" },
-  {
-    key: "status",
-    label: "Status",
-    render: (row) => <StatusBadge status={row.status} />,
-  },
-];
+import { ProjectsTable } from "./ProjectsTable";
 
 export default async function ProjectsPage() {
   const projects = await getProjects();
@@ -27,16 +12,7 @@ export default async function ProjectsPage() {
         <Button>+ Add Project</Button>
       </PageHeader>
       <div className="flex min-h-0 flex-1 px-4 pb-4">
-        <DataTable
-          columns={columns}
-          data={projects}
-          rowKey="id"
-          noun="project"
-          filterFields={[
-            { key: "status", label: "Status" },
-            { key: "type", label: "Type" },
-          ]}
-        />
+        <ProjectsTable data={projects} />
       </div>
     </div>
   );

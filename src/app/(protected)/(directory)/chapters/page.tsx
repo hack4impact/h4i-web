@@ -1,26 +1,7 @@
 import { PageHeader } from "@/components/ui/PageHeader";
 import { Button } from "@/components/ui/Button";
-import { DataTable, type Column } from "@/components/ui/DataTable";
-import { StatusBadge } from "@/components/ui/StatusBadge";
 import { getChapters } from "@/actions/chapters";
-import type { Chapter } from "@/data/chapters";
-
-const columns: Column<Chapter>[] = [
-  { key: "name", label: "Chapter" },
-  { key: "university", label: "University" },
-  { key: "volunteers", label: "Volunteers" },
-  { key: "projects", label: "Projects", render: (row) => row.projects ?? "—" },
-  {
-    key: "coExecDirectors",
-    label: "Co-Exec Directors",
-    render: (row) => row.coExecDirectors ?? "—",
-  },
-  {
-    key: "status",
-    label: "Status",
-    render: (row) => <StatusBadge status={row.status} />,
-  },
-];
+import { ChaptersTable } from "./ChaptersTable";
 
 export default async function ChaptersPage() {
   const chapters = await getChapters();
@@ -31,13 +12,7 @@ export default async function ChaptersPage() {
         <Button>+ Add Chapter</Button>
       </PageHeader>
       <div className="flex min-h-0 flex-1 px-4 pb-4">
-        <DataTable
-          columns={columns}
-          data={chapters}
-          rowKey="id"
-          noun="chapter"
-          filterFields={[{ key: "status", label: "Status" }]}
-        />
+        <ChaptersTable data={chapters} />
       </div>
     </div>
   );

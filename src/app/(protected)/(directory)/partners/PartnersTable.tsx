@@ -1,24 +1,19 @@
 "use client";
 
-import { DataTable, type Column } from "@/components/ui/DataTable";
-import type { Partner } from "@/data/partners";
+import { DataTable } from "@/components/ui/DataTable";
 
-const columns: Column<Partner>[] = [
-  { key: "organization", label: "Organization" },
-  { key: "type", label: "Type" },
-  { key: "projects", label: "Projects", render: (row) => row.projects ?? "—" },
-  { key: "chapter", label: "Chapter" },
-  { key: "since", label: "Since", render: (row) => row.since || "—" },
-];
+type Row = Record<string, string>;
 
-export function PartnersTable({ data }: { data: Partner[] }) {
+export function PartnersTable({ data }: { data: Row[] }) {
   return (
     <DataTable
-      columns={columns}
       data={data}
       rowKey="id"
       noun="partner"
-      filterFields={[{ key: "type", label: "Type" }]}
+      filterFields={[
+        { key: "Status", label: "Status" },
+        { key: "Organization Type", label: "Organization Type" },
+      ]}
     />
   );
 }

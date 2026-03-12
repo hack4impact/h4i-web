@@ -4,7 +4,8 @@ export type Volunteer = {
   chapter: string;
   role: string;
   projects: number;
-  joined: string;
+  gradYear: number | null;
+  email: string | null;
   status: "Active" | "Hiatus" | "Inactive";
 };
 
@@ -15,7 +16,8 @@ export const volunteers: Volunteer[] = [
     chapter: "University of Pennsylvania",
     role: "Tech Lead",
     projects: 2,
-    joined: "Sep 2024",
+    gradYear: 2026,
+    email: "achen@seas.upenn.edu",
     status: "Active",
   },
   {
@@ -24,7 +26,8 @@ export const volunteers: Volunteer[] = [
     chapter: "California Polytechnic State, SLO",
     role: "Designer",
     projects: 3,
-    joined: "Jan 2025",
+    gradYear: 2025,
+    email: "mrivera@calpoly.edu",
     status: "Active",
   },
   {
@@ -33,7 +36,8 @@ export const volunteers: Volunteer[] = [
     chapter: "Georgia Institute of Technology",
     role: "Developer",
     projects: 1,
-    joined: "Sep 2023",
+    gradYear: 2026,
+    email: "rpatel@gatech.edu",
     status: "Active",
   },
   {
@@ -42,7 +46,8 @@ export const volunteers: Volunteer[] = [
     chapter: "Cornell University",
     role: "Project Manager",
     projects: 2,
-    joined: "Jan 2024",
+    gradYear: 2025,
+    email: "ytanaka@cornell.edu",
     status: "Active",
   },
   {
@@ -51,7 +56,8 @@ export const volunteers: Volunteer[] = [
     chapter: "Michigan State University",
     role: "Developer",
     projects: 1,
-    joined: "Jan 2025",
+    gradYear: 2027,
+    email: "ejohnson@umich.edu",
     status: "Active",
   },
   {
@@ -60,7 +66,8 @@ export const volunteers: Volunteer[] = [
     chapter: "New York University",
     role: "Tech Lead",
     projects: 1,
-    joined: "Sep 2024",
+    gradYear: 2026,
+    email: "smartinez@nyu.edu",
     status: "Active",
   },
   {
@@ -69,7 +76,8 @@ export const volunteers: Volunteer[] = [
     chapter: "California Polytechnic State, SLO",
     role: "Developer",
     projects: 2,
-    joined: "Jan 2024",
+    gradYear: 2025,
+    email: null,
     status: "Hiatus",
   },
   {
@@ -78,7 +86,8 @@ export const volunteers: Volunteer[] = [
     chapter: "University of Pennsylvania",
     role: "Design Lead",
     projects: 2,
-    joined: "Sep 2024",
+    gradYear: null,
+    email: null,
     status: "Inactive",
   },
 ];

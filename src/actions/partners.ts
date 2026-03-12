@@ -1,5 +1,7 @@
 "use server";
 
-import { getPartners } from "@/lib/notion/api";
+import { getPartners as _getPartners } from "@/lib/notion/api";
 
-export { getPartners };
+export async function getPartners() {
+  return _getPartners();
+}

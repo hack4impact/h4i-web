@@ -1,5 +1,7 @@
 "use server";
 
-import { getChapters } from "@/lib/notion/api";
+import { getChapters as _getChapters } from "@/lib/notion/api";
 
-export { getChapters };
+export async function getChapters() {
+  return _getChapters();
+}

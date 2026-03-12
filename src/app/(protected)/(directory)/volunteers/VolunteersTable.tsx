@@ -1,33 +1,16 @@
 "use client";
 
-import { DataTable, type Column } from "@/components/ui/DataTable";
-import { StatusBadge } from "@/components/ui/StatusBadge";
-import type { Volunteer } from "@/data/volunteers";
+import { DataTable } from "@/components/ui/DataTable";
 
-const columns: Column<Volunteer>[] = [
-  { key: "name", label: "Name" },
-  { key: "chapter", label: "Chapter" },
-  { key: "role", label: "Current Role" },
-  { key: "projects", label: "Projects" },
-  { key: "joined", label: "Joined", render: (row) => row.joined || "—" },
-  {
-    key: "status",
-    label: "Status",
-    render: (row) => <StatusBadge status={row.status} />,
-  },
-];
+type Row = Record<string, string>;
 
-export function VolunteersTable({ data }: { data: Volunteer[] }) {
+export function VolunteersTable({ data }: { data: Row[] }) {
   return (
     <DataTable
-      columns={columns}
       data={data}
       rowKey="id"
       noun="volunteer"
-      filterFields={[
-        { key: "status", label: "Status" },
-        { key: "role", label: "Role" },
-      ]}
+      filterFields={[{ key: "Status", label: "Status" }]}
     />
   );
 }

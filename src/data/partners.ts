@@ -1,75 +1,84 @@
 export type Partner = {
   id: string;
-  organization: string;
+  name: string;
   type: string;
+  status: string | null;
+  contactName: string | null;
   projects: number | null;
   chapter: string;
-  since: string;
 };
 
 export const partners: Partner[] = [
   {
     id: "1",
-    organization: "Philabundance",
+    name: "Philabundance",
     type: "Nonprofit",
+    status: "Active",
+    contactName: "Maria Gonzalez",
     projects: 3,
     chapter: "UPenn",
-    since: "2022",
   },
   {
     id: "2",
-    organization: "Pittsburgh Housing Auth.",
+    name: "Pittsburgh Housing Auth.",
     type: "Housing",
+    status: "Active",
+    contactName: "Tom Bradley",
     projects: 2,
     chapter: "CMU",
-    since: "2023",
   },
   {
     id: "3",
-    organization: "SLO Food Bank",
+    name: "SLO Food Bank",
     type: "Nonprofit",
+    status: "Active",
+    contactName: "Sarah Kim",
     projects: 1,
     chapter: "Cal Poly",
-    since: "2024",
   },
   {
     id: "4",
-    organization: "Local Habitat",
+    name: "Local Habitat",
     type: "Housing",
+    status: "Active",
+    contactName: null,
     projects: 2,
     chapter: "Cornell",
-    since: "2022",
   },
   {
     id: "5",
-    organization: "Teach for America",
+    name: "Teach for America",
     type: "Education",
+    status: "Active",
+    contactName: "James Park",
     projects: 1,
     chapter: "Michigan",
-    since: "2023",
   },
   {
     id: "6",
-    organization: "Community Foundation GT",
+    name: "Community Foundation GT",
     type: "Nonprofit",
+    status: "Active",
+    contactName: "Priya Nair",
     projects: 1,
     chapter: "Georgia Tech",
-    since: "2024",
   },
   {
     id: "7",
-    organization: "NYC Coalition for Change",
+    name: "NYC Coalition for Change",
     type: "Advocacy",
+    status: "Prospect",
+    contactName: null,
     projects: 1,
     chapter: "NYU",
-    since: "2025",
   },
   {
     id: "8",
-    organization: "Austin Relief Network",
+    name: "Austin Relief Network",
     type: "Nonprofit",
+    status: "Prospect",
+    contactName: "Luis Flores",
     projects: null,
     chapter: "UT Austin",
-    since: "2025",
   },
 ];

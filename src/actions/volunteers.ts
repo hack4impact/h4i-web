@@ -1,5 +1,7 @@
 "use server";
 
-import { getVolunteers } from "@/lib/notion/api";
+import { getVolunteers as _getVolunteers } from "@/lib/notion/api";
 
-export { getVolunteers };
+export async function getVolunteers() {
+  return _getVolunteers();
+}

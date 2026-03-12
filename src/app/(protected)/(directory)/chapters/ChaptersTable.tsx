@@ -1,34 +1,16 @@
 "use client";
 
-import { DataTable, type Column } from "@/components/ui/DataTable";
-import { StatusBadge } from "@/components/ui/StatusBadge";
-import type { Chapter } from "@/data/chapters";
+import { DataTable } from "@/components/ui/DataTable";
 
-const columns: Column<Chapter>[] = [
-  { key: "name", label: "Chapter" },
-  { key: "university", label: "University" },
-  { key: "volunteers", label: "Volunteers" },
-  { key: "projects", label: "Projects", render: (row) => row.projects ?? "—" },
-  {
-    key: "coExecDirectors",
-    label: "Co-Exec Directors",
-    render: (row) => row.coExecDirectors ?? "—",
-  },
-  {
-    key: "status",
-    label: "Status",
-    render: (row) => <StatusBadge status={row.status} />,
-  },
-];
+type Row = Record<string, string>;
 
-export function ChaptersTable({ data }: { data: Chapter[] }) {
+export function ChaptersTable({ data }: { data: Row[] }) {
   return (
     <DataTable
-      columns={columns}
       data={data}
       rowKey="id"
       noun="chapter"
-      filterFields={[{ key: "status", label: "Status" }]}
+      filterFields={[{ key: "Status", label: "Status" }]}
     />
   );
 }

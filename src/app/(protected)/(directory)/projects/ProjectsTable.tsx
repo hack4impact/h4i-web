@@ -1,7 +1,7 @@
 "use client";
 
 import { DataTable } from "@/components/ui/DataTable";
-import { StatusBadge, BadgeColor } from "@/components/ui/StatusBadge";
+import { Badge, BadgeColor } from "@/components/ui/Badge";
 
 type Props = { data: Record<string, string>[] };
 
@@ -18,7 +18,7 @@ export function ProjectsTable({ data }: Props) {
   return (
     <DataTable
       data={data}
-      columns={["Name", "Status", "Type", "Description"]}
+      columns={["Name", "Status", "Type"]}
       rowKey="id"
       noun="project"
       defaultSort={{ key: "Name", dir: "asc" }}
@@ -30,7 +30,7 @@ export function ProjectsTable({ data }: Props) {
         {
           key: "Status",
           render: (val) => (
-            <StatusBadge label={val} color={statusColors[val] ?? "grey"} />
+            <Badge label={val} color={statusColors[val] ?? "grey"} />
           ),
         },
       ]}

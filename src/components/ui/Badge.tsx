@@ -17,13 +17,7 @@ const colorStyles: Record<BadgeColor, string> = {
   grey: "bg-canvas text-text-secondary",
 };
 
-export function StatusBadge({
-  label,
-  color,
-}: {
-  label: string;
-  color: BadgeColor;
-}) {
+export function Badge({ label, color }: { label: string; color: BadgeColor }) {
   return (
     <span
       className={cn(

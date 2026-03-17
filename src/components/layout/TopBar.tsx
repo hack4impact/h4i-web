@@ -140,7 +140,7 @@ function UserMenu() {
 
 export function TopBar() {
   return (
-    <header className="border-border bg-topbar flex h-12 shrink-0 items-center justify-between border-b px-4">
+    <header className="border-border bg-frame flex h-12 shrink-0 items-center justify-between border-b px-4">
       <div className="flex items-center gap-2.5">
         <span className="text-text-primary">
           <LogoIcon />

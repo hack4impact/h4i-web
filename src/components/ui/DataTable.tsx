@@ -340,7 +340,7 @@ export function DataTable({
                               className={cn(
                                 "flex h-3.5 w-3.5 shrink-0 items-center justify-center rounded-[3px] border transition-colors",
                                 "border-border text-transparent",
-                                "data-[checked]:bg-brand data-[checked]:border-brand data-[checked]:text-white"
+                                "data-checked:bg-brand data-checked:border-brand data-checked:text-white"
                               )}
                             >
                               <CheckIcon />
@@ -373,7 +373,7 @@ export function DataTable({
 
       <div className="[&::-webkit-scrollbar-thumb]:bg-border flex-1 overflow-auto overscroll-none [scrollbar-color:var(--color-border)_transparent] [scrollbar-width:thin] [&::-webkit-scrollbar]:h-1.5 [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:rounded [&::-webkit-scrollbar-track]:bg-transparent">
         <table className="w-full min-w-max">
-          <thead className="bg-surface sticky top-0 z-10">
+          <thead className="bg-frame sticky top-0 z-10">
             <tr className="border-divider border-b">
               {columns.map((col) => (
                 <th

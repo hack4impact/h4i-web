@@ -189,7 +189,7 @@ export function Sidebar() {
   return (
     <nav
       aria-label="Main"
-      className="border-border bg-surface flex h-full w-[200px] shrink-0 flex-col border-r"
+      className="border-border bg-surface flex h-full w-50 shrink-0 flex-col border-r"
     >
       <div className="flex flex-1 flex-col gap-5 overflow-y-auto px-2 py-4">
         <NavSection label="Overview">

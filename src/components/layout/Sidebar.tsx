@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { cn } from "@/lib/utils";
 
 // Icons
 
@@ -132,24 +131,13 @@ function NavItem({ href, label, icon: Icon, count }: NavItemProps) {
 
   return (
     <li>
-      <Link
-        href={href}
-        className={cn(
-          "flex h-8 items-center gap-2.5 rounded-sm px-3 text-sm transition-colors",
-          "focus-visible:outline-brand focus-visible:outline-2 focus-visible:outline-offset-2",
-          isActive
-            ? "bg-canvas text-text-primary font-medium"
-            : "text-text-secondary hover:bg-canvas/60"
-        )}
-      >
+      <Link href={href} className="flex h-7 items-center gap-1.5 px-2">
         <span className="shrink-0">
           <Icon />
         </span>
         <span className="flex-1">{label}</span>
         {count !== undefined && (
-          <span className="text-text-meta text-xs tabular-nums">
-            {count.toLocaleString()}
-          </span>
+          <span className="tabular-nums">{count.toLocaleString()}</span>
         )}
       </Link>
     </li>
@@ -159,11 +147,7 @@ function NavItem({ href, label, icon: Icon, count }: NavItemProps) {
 // Section label
 
 function SectionLabel({ children }: { children: React.ReactNode }) {
-  return (
-    <p className="text-text-meta mb-1 px-3 text-xs tracking-[0.08em] uppercase">
-      {children}
-    </p>
-  );
+  return <p className="mb-1 px-2">{children}</p>;
 }
 
 // Nav section
@@ -187,10 +171,7 @@ function NavSection({
 
 export function Sidebar() {
   return (
-    <nav
-      aria-label="Main"
-      className="border-border bg-surface flex h-full w-50 shrink-0 flex-col border-r"
-    >
+    <nav aria-label="Main" className="flex h-full w-50 shrink-0 flex-col">
       <div className="flex flex-1 flex-col gap-5 overflow-y-auto px-2 py-4">
         <NavSection label="Overview">
           <NavItem href="/dashboard" label="Dashboard" icon={DashboardIcon} />
@@ -208,7 +189,7 @@ export function Sidebar() {
         </NavSection>
       </div>
 
-      <div className="border-border border-t px-2 py-4">
+      <div className="px-2 py-4">
         <NavSection label="Settings">
           <NavItem href="/settings" label="Settings" icon={SettingsIcon} />
         </NavSection>

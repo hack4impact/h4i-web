@@ -93,18 +93,14 @@ export default function SignInForm() {
   return (
     <Card className="w-100">
       <div className="mb-5">
-        <p className="text-text-primary mb-1 text-sm font-semibold tracking-tight">
-          Hack for Impact
-        </p>
-        <p className="text-text-meta text-xs">Volunteer Platform</p>
+        <p className="mb-1">Hack for Impact</p>
+        <p>Volunteer Platform</p>
       </div>
 
       <CardDivider className="mb-5" />
 
-      <h1 className="text-text-primary mb-1 text-lg font-semibold">
-        Sign in to your account
-      </h1>
-      <p className="text-text-secondary mb-5 text-xs leading-relaxed">
+      <h1 className="mb-1">Sign in to your account</h1>
+      <p className="mb-5">
         Admin access only. Contact your administrator if you need help.
       </p>
 
@@ -135,11 +131,7 @@ export default function SignInForm() {
         >
           <div className="flex items-center justify-between">
             <FormLabel>Password</FormLabel>
-            <a
-              href="#"
-              className="text-brand text-xs hover:underline"
-              tabIndex={-1}
-            >
+            <a href="#" tabIndex={-1}>
               Forgot password?
             </a>
           </div>
@@ -154,7 +146,7 @@ export default function SignInForm() {
             <button
               type="button"
               onClick={() => setShowPassword((v) => !v)}
-              className="text-text-meta hover:text-text-secondary absolute top-1/2 right-3 -translate-y-1/2 focus-visible:outline-none"
+              className="absolute top-1/2 right-3 -translate-y-1/2"
               tabIndex={-1}
               aria-label={showPassword ? "Hide password" : "Show password"}
             >
@@ -164,7 +156,7 @@ export default function SignInForm() {
           <FormError />
         </FormField>
 
-        {error && <p className="text-xs text-red-500">{error}</p>}
+        {error && <p>{error}</p>}
 
         <Button type="submit" className="mt-1 w-full" disabled={isPending}>
           {isPending ? "Signing in…" : "Sign In"}
@@ -172,9 +164,9 @@ export default function SignInForm() {
       </Form>
 
       <div className="my-4 flex items-center gap-3">
-        <hr className="border-divider flex-1 border-t" />
-        <span className="text-text-disabled text-xs">or</span>
-        <hr className="border-divider flex-1 border-t" />
+        <hr className="flex-1" />
+        <span>or</span>
+        <hr className="flex-1" />
       </div>
 
       <Button variant="secondary" className="w-full gap-2" type="button">

@@ -4,7 +4,6 @@ import { usePathname } from "next/navigation";
 import { Popover } from "@base-ui/react/popover";
 import { Avatar } from "@base-ui/react/avatar";
 import { credentialsSignOut } from "@/actions/auth";
-import { cn } from "@/lib/utils";
 
 // Icons
 
@@ -78,12 +77,12 @@ function Breadcrumb() {
   const pageLabel = pageLabels[segment] ?? "Dashboard";
 
   return (
-    <div className="flex items-center gap-2 text-sm">
-      <span className="text-text-primary font-semibold">Hack for Impact</span>
-      <span className="text-text-meta">/</span>
-      <span className="text-text-secondary">Admin</span>
-      <span className="text-text-meta">/</span>
-      <span className="text-text-secondary">{pageLabel}</span>
+    <div className="flex items-center gap-2">
+      <span>Hack for Impact</span>
+      <span>/</span>
+      <span>Admin</span>
+      <span>/</span>
+      <span>{pageLabel}</span>
     </div>
   );
 }
@@ -96,19 +95,11 @@ function UserMenu() {
 
   return (
     <Popover.Root>
-      <Popover.Trigger
-        className={cn(
-          "flex h-8 cursor-pointer items-center gap-1.5 rounded-sm px-2",
-          "bg-canvas transition-opacity hover:opacity-80",
-          "focus-visible:outline-brand focus-visible:outline-2 focus-visible:outline-offset-2"
-        )}
-      >
-        <Avatar.Root className="flex h-4.5 w-4.5 shrink-0 items-center justify-center rounded-full bg-[#DBEAFE]">
-          <Avatar.Fallback className="text-[9px] leading-none text-[#1E40AF]">
-            {initials}
-          </Avatar.Fallback>
+      <Popover.Trigger className="flex h-8 cursor-pointer items-center gap-1.5 px-2">
+        <Avatar.Root className="flex h-4.5 w-4.5 shrink-0 items-center justify-center">
+          <Avatar.Fallback className="leading-none">{initials}</Avatar.Fallback>
         </Avatar.Root>
-        <span className="text-text-primary text-sm">{name}</span>
+        <span>{name}</span>
         <span>
           <ChevronDownIcon />
         </span>
@@ -116,15 +107,9 @@ function UserMenu() {
 
       <Popover.Portal>
         <Popover.Positioner align="end" sideOffset={4}>
-          <Popover.Popup
-            className={cn(
-              "border-border bg-card min-w-35 rounded-md border p-1 shadow-md",
-              "origin-top-right data-starting-scale:scale-95 data-starting-style:opacity-0",
-              "transition-[transform,opacity] duration-100"
-            )}
-          >
+          <Popover.Popup className="min-w-35 p-1">
             <Popover.Close
-              className="text-text-secondary hover:bg-surface hover:text-text-primary focus-visible:outline-brand flex w-full cursor-pointer items-center rounded-sm px-3 py-1.5 text-sm focus-visible:outline-2 focus-visible:outline-offset-2"
+              className="flex w-full cursor-pointer items-center px-3 py-1.5"
               onClick={() => credentialsSignOut()}
             >
               Sign out
@@ -140,9 +125,9 @@ function UserMenu() {
 
 export function TopBar() {
   return (
-    <header className="border-border bg-frame flex h-12 shrink-0 items-center justify-between border-b px-4">
+    <header className="flex h-12 shrink-0 items-center justify-between px-4">
       <div className="flex items-center gap-2.5">
-        <span className="text-text-primary">
+        <span>
           <LogoIcon />
         </span>
         <Breadcrumb />
@@ -150,7 +135,7 @@ export function TopBar() {
 
       <div className="flex items-center gap-3">
         <button
-          className="text-text-meta hover:bg-surface hover:text-text-secondary focus-visible:outline-brand flex h-8 w-8 items-center justify-center rounded-sm transition-colors focus-visible:outline-2"
+          className="flex h-8 w-8 items-center justify-center"
           aria-label="Notifications"
         >
           <BellIcon />

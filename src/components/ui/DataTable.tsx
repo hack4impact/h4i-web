@@ -26,33 +26,12 @@ type DataTableProps = {
   defaultSort?: SortState;
 };
 
-const toolbarBtn = cn(
-  "inline-flex h-8 cursor-pointer items-center gap-1.5 rounded-sm border",
-  "border-border bg-card text-text-primary text-sm font-medium",
-  "hover:bg-surface active:bg-canvas transition-colors",
-  "focus-visible:outline-brand focus-visible:outline-2 focus-visible:outline-offset-2",
-  "px-3"
-);
+const toolbarBtn = "inline-flex h-8 cursor-pointer items-center gap-1.5 px-3";
 
-const toolbarBtnActive = cn(
-  "inline-flex h-8 cursor-pointer items-center gap-1.5 rounded-sm border",
-  "border-border bg-canvas text-text-primary text-sm font-medium",
-  "hover:bg-canvas active:bg-canvas transition-colors",
-  "focus-visible:outline-brand focus-visible:outline-2 focus-visible:outline-offset-2",
-  "px-3"
-);
+const menuItemCls =
+  "flex w-full items-center px-2.5 py-1.5 text-left cursor-default select-none";
 
-const menuItemCls = cn(
-  "flex w-full items-center rounded px-2.5 py-1.5 text-left text-sm font-normal",
-  "text-text-secondary outline-none cursor-default select-none transition-colors",
-  "data-[highlighted]:bg-surface data-[highlighted]:text-text-primary"
-);
-
-const menuItemActiveCls = cn(menuItemCls, "bg-canvas text-text-primary");
-
-const menuPopupCls = cn(
-  "border-border bg-card w-52 rounded-md border shadow-sm outline-none"
-);
+const menuPopupCls = "w-52";
 
 const menuPositionerCls = "z-50";
 
@@ -111,10 +90,8 @@ function CheckIcon() {
 
 function MenuSectionLabel({ children }: { children: React.ReactNode }) {
   return (
-    <div className="border-divider border-b px-3 py-2">
-      <span className="text-text-meta text-xs tracking-[0.08em] uppercase">
-        {children}
-      </span>
+    <div className="px-3 py-2">
+      <span>{children}</span>
     </div>
   );
 }
@@ -209,15 +186,13 @@ export function DataTable({
   }
 
   return (
-    <div className="border-border bg-card flex max-h-full flex-1 flex-col self-start overflow-hidden rounded-md border">
-      <div className="border-divider flex shrink-0 items-center gap-2 border-b px-3 py-2">
-        <span className="text-text-secondary text-sm whitespace-nowrap">
-          {countLabel}
-        </span>
+    <div className="flex max-h-full flex-1 flex-col self-start overflow-hidden">
+      <div className="flex shrink-0 items-center gap-2 px-3 py-2">
+        <span className="whitespace-nowrap">{countLabel}</span>
 
         <div className="relative flex-1">
           <svg
-            className="text-text-disabled pointer-events-none absolute top-1/2 left-2 -translate-y-1/2"
+            className="pointer-events-none absolute top-1/2 left-2 -translate-y-1/2"
             width="14"
             height="14"
             viewBox="0 0 24 24"
@@ -235,16 +210,16 @@ export function DataTable({
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder={`Search ${noun}s...`}
-            className="border-border bg-surface placeholder:text-text-disabled text-text-primary focus:border-brand h-8 w-full rounded-sm border py-1 pr-3 pl-7 text-sm font-normal focus:outline-none"
+            className="h-8 w-full py-1 pr-3 pl-7"
           />
         </div>
 
         <Menu.Root modal={false}>
-          <Menu.Trigger className={sort ? toolbarBtnActive : toolbarBtn}>
+          <Menu.Trigger className={toolbarBtn}>
             <SortIcon />
             Sort
             {sort && (
-              <span className="text-text-meta font-normal">
+              <span>
                 · {sort.key} {sort.dir === "asc" ? "↑" : "↓"}
               </span>
             )}
@@ -268,11 +243,11 @@ export function DataTable({
                           value={col.key}
                           closeOnClick={false}
                           onClick={() => cycleSort(col.key)}
-                          className={active ? menuItemActiveCls : menuItemCls}
+                          className={menuItemCls}
                         >
                           {col.label}
                           {active && (
-                            <span className="text-text-meta ml-auto text-xs">
+                            <span className="ml-auto">
                               {sort!.dir === "asc" ? "↑ A→Z" : "↓ Z→A"}
                             </span>
                           )}
@@ -283,7 +258,7 @@ export function DataTable({
                 </div>
                 {sort && (
                   <>
-                    <Menu.Separator className="border-divider border-t" />
+                    <Menu.Separator />
                     <div className="p-1.5">
                       <Menu.Item
                         onClick={() => setSort(null)}
@@ -301,16 +276,10 @@ export function DataTable({
 
         {filterFields && filterFields.length > 0 && (
           <Menu.Root modal={false}>
-            <Menu.Trigger
-              className={activeFilterCount > 0 ? toolbarBtnActive : toolbarBtn}
-            >
+            <Menu.Trigger className={toolbarBtn}>
               <FilterIcon />
               Filter
-              {activeFilterCount > 0 && (
-                <span className="text-text-meta font-normal">
-                  · {activeFilterCount}
-                </span>
-              )}
+              {activeFilterCount > 0 && <span>· {activeFilterCount}</span>}
             </Menu.Trigger>
             <Menu.Portal>
               <Menu.Positioner
@@ -321,10 +290,7 @@ export function DataTable({
               >
                 <Menu.Popup className={menuPopupCls}>
                   {filterFields.map((field, i) => (
-                    <div
-                      key={field.key}
-                      className={cn(i > 0 && "border-divider border-t")}
-                    >
+                    <div key={field.key} className={cn(i > 0 && "border-t")}>
                       <MenuSectionLabel>{field.label}</MenuSectionLabel>
                       <div className="flex flex-col gap-0.5 p-1.5">
                         {(filterOptions[field.key] ?? []).map((opt) => (
@@ -337,15 +303,11 @@ export function DataTable({
                           >
                             <Menu.CheckboxItemIndicator
                               keepMounted
-                              className={cn(
-                                "flex h-3.5 w-3.5 shrink-0 items-center justify-center rounded-[3px] border transition-colors",
-                                "border-border text-transparent",
-                                "data-checked:bg-brand data-checked:border-brand data-checked:text-white"
-                              )}
+                              className="flex h-3.5 w-3.5 shrink-0 items-center justify-center"
                             >
                               <CheckIcon />
                             </Menu.CheckboxItemIndicator>
-                            <span className="text-text-primary">{opt}</span>
+                            <span>{opt}</span>
                           </Menu.CheckboxItem>
                         ))}
                       </div>
@@ -353,7 +315,7 @@ export function DataTable({
                   ))}
                   {activeFilterCount > 0 && (
                     <>
-                      <Menu.Separator className="border-divider border-t" />
+                      <Menu.Separator />
                       <div className="p-1.5">
                         <Menu.Item
                           onClick={() => setFilters({})}
@@ -371,14 +333,14 @@ export function DataTable({
         )}
       </div>
 
-      <div className="[&::-webkit-scrollbar-thumb]:bg-border flex-1 overflow-auto overscroll-none [scrollbar-color:var(--color-border)_transparent] [scrollbar-width:thin] [&::-webkit-scrollbar]:h-1.5 [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:rounded [&::-webkit-scrollbar-track]:bg-transparent">
+      <div className="flex-1 overflow-auto overscroll-none">
         <table className="w-full min-w-max">
-          <thead className="bg-frame sticky top-0 z-10">
-            <tr className="border-divider border-b">
+          <thead className="sticky top-0 z-10">
+            <tr>
               {columns.map((col) => (
                 <th
                   key={col.key}
-                  className="text-text-meta px-3 py-[7px] text-left text-xs font-normal tracking-[0.08em] whitespace-nowrap uppercase"
+                  className="px-3 py-[7px] text-left whitespace-nowrap"
                 >
                   {col.label}
                 </th>
@@ -387,15 +349,9 @@ export function DataTable({
           </thead>
           <tbody>
             {processed.map((row, i) => (
-              <tr
-                key={row[rowKey] ?? i}
-                className="border-divider border-b last:border-0"
-              >
+              <tr key={row[rowKey] ?? i}>
                 {columns.map((col) => (
-                  <td
-                    key={col.key}
-                    className="text-text-primary px-3 py-[7px] text-sm"
-                  >
+                  <td key={col.key} className="px-3 py-[7px]">
                     {(() => {
                       const val = row[col.key] ?? "";
                       const config = columnConfig?.find(

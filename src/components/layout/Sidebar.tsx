@@ -2,6 +2,9 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { Popover } from "@base-ui/react/popover";
+import { Avatar } from "@base-ui/react/avatar";
+import { credentialsSignOut } from "@/actions/auth";
 
 // Icons
 
@@ -111,8 +114,59 @@ function SettingsIcon() {
       strokeLinejoin="round"
     >
       <circle cx="12" cy="12" r="3" />
-      <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
+      <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
     </svg>
+  );
+}
+
+function ChevronDownIcon() {
+  return (
+    <svg
+      width="12"
+      height="12"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <polyline points="6 9 12 15 18 9" />
+    </svg>
+  );
+}
+
+// User menu
+
+function UserMenu() {
+  const initials = "AK";
+  const name = "Admin Khoa";
+
+  return (
+    <Popover.Root>
+      <Popover.Trigger className="flex h-8 w-full cursor-pointer items-center gap-1.5 px-2">
+        <Avatar.Root className="flex h-4.5 w-4.5 shrink-0 items-center justify-center">
+          <Avatar.Fallback className="leading-none">{initials}</Avatar.Fallback>
+        </Avatar.Root>
+        <span className="flex-1 text-left">{name}</span>
+        <span>
+          <ChevronDownIcon />
+        </span>
+      </Popover.Trigger>
+
+      <Popover.Portal>
+        <Popover.Positioner align="start" sideOffset={4}>
+          <Popover.Popup className="min-w-35 p-1">
+            <Popover.Close
+              className="flex w-full cursor-pointer items-center px-3 py-1.5"
+              onClick={() => credentialsSignOut()}
+            >
+              Sign out
+            </Popover.Close>
+          </Popover.Popup>
+        </Popover.Positioner>
+      </Popover.Portal>
+    </Popover.Root>
   );
 }
 
@@ -172,7 +226,11 @@ function NavSection({
 export function Sidebar() {
   return (
     <nav aria-label="Main" className="flex h-full w-50 shrink-0 flex-col">
-      <div className="flex flex-1 flex-col gap-5 overflow-y-auto px-2 py-4">
+      <div className="shrink-0 px-2 py-4">
+        <UserMenu />
+      </div>
+
+      <div className="flex flex-1 flex-col gap-5 overflow-y-auto px-2 pb-4">
         <NavSection label="Overview">
           <NavItem href="/dashboard" label="Dashboard" icon={DashboardIcon} />
         </NavSection>
@@ -189,7 +247,7 @@ export function Sidebar() {
         </NavSection>
       </div>
 
-      <div className="px-2 py-4">
+      <div className="shrink-0 px-2 py-4">
         <NavSection label="Settings">
           <NavItem href="/settings" label="Settings" icon={SettingsIcon} />
         </NavSection>

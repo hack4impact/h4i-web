@@ -143,7 +143,8 @@ export default function SignInForm() {
               autoComplete="current-password"
               disabled={isPending}
             />
-            <button
+            <Button
+              variant="ghost"
               type="button"
               onClick={() => setShowPassword((v) => !v)}
               className="absolute top-1/2 right-3 -translate-y-1/2"
@@ -151,7 +152,7 @@ export default function SignInForm() {
               aria-label={showPassword ? "Hide password" : "Show password"}
             >
               {showPassword ? <EyeOffIcon /> : <EyeIcon />}
-            </button>
+            </Button>
           </div>
           <FormError />
         </FormField>
@@ -164,9 +165,9 @@ export default function SignInForm() {
       </Form>
 
       <div className="my-4 flex items-center gap-3">
-        <hr className="flex-1" />
+        <CardDivider className="flex-1" />
         <span>or</span>
-        <hr className="flex-1" />
+        <CardDivider className="flex-1" />
       </div>
 
       <Button variant="secondary" className="w-full gap-2" type="button">

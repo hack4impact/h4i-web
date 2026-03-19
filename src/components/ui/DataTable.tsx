@@ -2,6 +2,7 @@
 
 import { useState, useMemo } from "react";
 import { Menu } from "@base-ui/react/menu";
+import { Input } from "@base-ui/react/input";
 import { cn } from "@/lib/utils";
 
 export type FilterField = {
@@ -205,8 +206,7 @@ export function DataTable({
             <circle cx="11" cy="11" r="8" />
             <path d="M21 21l-4.35-4.35" />
           </svg>
-          <input
-            type="text"
+          <Input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder={`Search ${noun}s...`}

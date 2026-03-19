@@ -1,5 +1,6 @@
+import { Separator } from "@base-ui/react/separator";
 import { cn } from "@/lib/utils";
-import type { HTMLAttributes } from "react";
+import type { HTMLAttributes, ComponentPropsWithoutRef } from "react";
 
 export function Card({ className, ...props }: HTMLAttributes<HTMLDivElement>) {
   return <div className={cn("p-6", className)} {...props} />;
@@ -8,6 +9,6 @@ export function Card({ className, ...props }: HTMLAttributes<HTMLDivElement>) {
 export function CardDivider({
   className,
   ...props
-}: HTMLAttributes<HTMLHRElement>) {
-  return <hr className={className} {...props} />;
+}: ComponentPropsWithoutRef<typeof Separator>) {
+  return <Separator className={className} {...props} />;
 }

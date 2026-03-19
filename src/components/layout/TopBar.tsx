@@ -3,6 +3,7 @@
 import { usePathname } from "next/navigation";
 import { Popover } from "@base-ui/react/popover";
 import { Avatar } from "@base-ui/react/avatar";
+import { Button } from "@/components/ui/Button";
 import { credentialsSignOut } from "@/actions/auth";
 
 // Icons
@@ -134,12 +135,13 @@ export function TopBar() {
       </div>
 
       <div className="flex items-center gap-3">
-        <button
+        <Button
+          variant="ghost"
           className="flex h-8 w-8 items-center justify-center"
           aria-label="Notifications"
         >
           <BellIcon />
-        </button>
+        </Button>
         <UserMenu />
       </div>
     </header>

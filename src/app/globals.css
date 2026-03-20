@@ -27,8 +27,19 @@
   --text-5: light-dark(oklab(0% none none / 0.1), oklab(100% 0 0 / 0.1));
   --color-inverse: light-dark(black, white);
 
+  --text-sm: 10px;
+  --text-base: 12px;
+  --text-lg: 13px;
+  --text-xl: 18px;
+  --text-2xl: 24px;
+  --text-3xl: 30px;
+
+  --lh-xl: 28px;
+  --lh-2xl: 32px;
+  --lh-3xl: 38px;
+
   /* Borders */
-  --border: light-dark(rgb(0 0 0 / 0.1), rgb(255 255 255 / 0.1));
+  --border: light-dark(#e2e2e2, #373737);
 
   /* Interactive */
   ---color-focus: light-dark(oklch(74% 0.12 258/0.95), oklch(60% 0.15 258/0.95))
@@ -93,7 +104,7 @@
     background-color: var(--color-root);
     color: var(--text-primary);
     font-family: var(--font-sans);
-    font-size: 13px;
+    font-size: var(--text-base);
     line-height: var(--lh);
     -webkit-font-smoothing: antialiased;
   }

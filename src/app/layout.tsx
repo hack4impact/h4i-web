@@ -1,10 +1,14 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
-import { Inter } from "next/font/google";
-import { cn } from "@/lib/utils";
 
-const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
+const inclusiveSans = localFont({
+  src: [
+    { path: "./fonts/inclusive-sans-regular.woff2", style: "normal" },
+    { path: "./fonts/inclusive-sans-italic.woff2", style: "italic" },
+  ],
+  variable: "--font-sans",
+});
 
 export const metadata: Metadata = {
   title: "Hack for Impact",
@@ -17,7 +21,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={cn("font-sans", inter.variable)}>
+    <html lang="en" className={inclusiveSans.variable}>
       <body>{children}</body>
     </html>
   );

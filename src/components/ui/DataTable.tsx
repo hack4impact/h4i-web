@@ -1,8 +1,19 @@
 "use client";
 
 import { useState, useMemo } from "react";
+import {
+  useReactTable,
+  getCoreRowModel,
+  getSortedRowModel,
+  getFilteredRowModel,
+  flexRender,
+  type ColumnDef,
+  type SortingState,
+  type ColumnFiltersState,
+} from "@tanstack/react-table";
 import { Menu } from "@base-ui/react/menu";
 import { Input } from "@base-ui/react/input";
+import { Search, ArrowUpDown, ListFilter } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export type FilterField = {
@@ -55,16 +66,31 @@ export function DataTable({
   columnConfig,
   defaultSort = null,
 }: DataTableProps) {
-  const [search, setSearch] = useState("");
-  const [sort, setSort] = useState<SortState>(defaultSort);
-  const [filters, setFilters] = useState<Record<string, Set<string>>>({});
+  const [globalFilter, setGlobalFilter] = useState("");
+  const [sorting, setSorting] = useState<SortingState>(
+    defaultSort
+      ? [{ id: defaultSort.key, desc: defaultSort.dir === "desc" }]
+      : []
+  );
+  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
 
-  const columns = useMemo(() => {
+  const columnDefs = useMemo((): ColumnDef<Record<string, string>>[] => {
     const keys = columnsProp?.length
       ? columnsProp.filter((k) => k !== rowKey)
       : Object.keys(data[0] ?? {}).filter((k) => k !== rowKey);
-    return keys.map((key) => ({ key, label: key }));
-  }, [columnsProp, data, rowKey]);
+
+    return keys.map((key) => ({
+      accessorKey: key,
+      header: key,
+      cell: ({ getValue }) => {
+        const val = getValue<string>() ?? "";
+        const config = columnConfig?.find((c) => c.key === key);
+        return config?.render ? config.render(val) : val;
+      },
+      filterFn: (row, columnId, filterValue: Set<string>) =>
+        !filterValue?.size || filterValue.has(row.getValue(columnId) ?? ""),
+    }));
+  }, [columnsProp, data, rowKey, columnConfig]);
 
   const filterOptions = useMemo(() => {
     if (!filterFields?.length) return {} as Record<string, string[]>;
@@ -80,60 +106,58 @@ export function DataTable({
     return opts;
   }, [data, filterFields]);
 
-  const afterSearch = useMemo(() => {
-    const q = search.trim().toLowerCase();
-    if (!q) return data;
-    return data.filter((row) =>
-      columns.some((col) => (row[col.key] ?? "").toLowerCase().includes(q))
-    );
-  }, [data, search, columns]);
+  const table = useReactTable({
+    data,
+    columns: columnDefs,
+    state: { sorting, columnFilters, globalFilter },
+    onSortingChange: setSorting,
+    onColumnFiltersChange: setColumnFilters,
+    onGlobalFilterChange: setGlobalFilter,
+    getCoreRowModel: getCoreRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
+    globalFilterFn: "includesString",
+  });
 
-  const afterFilter = useMemo(() => {
-    const active = Object.entries(filters).filter(([, s]) => s.size > 0);
-    if (!active.length) return afterSearch;
-    return afterSearch.filter((row) =>
-      active.every(([key, set]) => set.has(row[key] ?? ""))
-    );
-  }, [afterSearch, filters]);
+  const activeSortCol = sorting[0]?.id ?? null;
+  const activeSortDir = sorting[0]?.desc ? "desc" : "asc";
 
-  const processed = useMemo(() => {
-    if (!sort) return afterFilter;
-    return [...afterFilter].sort((a, b) => {
-      const cmp = (a[sort.key] ?? "").localeCompare(
-        b[sort.key] ?? "",
-        undefined,
-        { numeric: true }
-      );
-      return sort.dir === "asc" ? cmp : -cmp;
-    });
-  }, [afterFilter, sort]);
-
-  const activeFilterCount = Object.values(filters).filter(
-    (s) => s.size > 0
-  ).length;
-  const isFiltered = !!search.trim() || activeFilterCount > 0;
+  const activeFilterCount = columnFilters.length;
+  const isFiltered = !!globalFilter.trim() || activeFilterCount > 0;
   const total = data.length;
-  const shown = processed.length;
+  const shown = table.getFilteredRowModel().rows.length;
   const noun_plural = (n: number) => `${n} ${n === 1 ? noun : `${noun}s`}`;
   const countLabel = isFiltered
     ? `${shown} of ${noun_plural(total)}`
     : noun_plural(total);
 
-  function toggleFilter(key: string, value: string) {
-    setFilters((prev) => {
-      const set = new Set(prev[key] ?? []);
-      set.has(value) ? set.delete(value) : set.add(value);
-      return { ...prev, [key]: set };
+  function cycleSort(key: string) {
+    setSorting((prev) => {
+      const current = prev[0];
+      if (!current || current.id !== key) return [{ id: key, desc: false }];
+      if (!current.desc) return [{ id: key, desc: true }];
+      return [];
     });
   }
 
-  function cycleSort(key: string) {
-    setSort((prev) => {
-      if (!prev || prev.key !== key) return { key, dir: "asc" };
-      if (prev.dir === "asc") return { key, dir: "desc" };
-      return null;
+  function toggleFilter(key: string, value: string) {
+    setColumnFilters((prev) => {
+      const existing = prev.find((f) => f.id === key);
+      const set = new Set<string>(
+        existing ? (existing.value as Set<string>) : []
+      );
+      set.has(value) ? set.delete(value) : set.add(value);
+      if (!set.size) return prev.filter((f) => f.id !== key);
+      return [...prev.filter((f) => f.id !== key), { id: key, value: set }];
     });
   }
+
+  function getFilterSet(key: string): Set<string> {
+    const entry = columnFilters.find((f) => f.id === key);
+    return entry ? (entry.value as Set<string>) : new Set();
+  }
+
+  const visibleColumns = table.getAllColumns();
 
   return (
     <div className="flex max-h-full flex-1 flex-col self-start overflow-hidden border border-(--border) bg-(--surface-panel)">
@@ -142,19 +166,27 @@ export function DataTable({
           {countLabel}
         </span>
 
-        <Input
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          placeholder={`Search ${noun}s...`}
-          className="h-8 flex-1 border border-(--border) bg-(--surface-panel) px-3 py-1 placeholder:text-(--text-secondary) focus:border-(--accent) focus:outline-none"
-        />
+        <div className="relative flex-1">
+          <Search
+            size={13}
+            strokeWidth={1}
+            className="pointer-events-none absolute top-1/2 left-2 -translate-y-1/2"
+          />
+          <Input
+            value={globalFilter}
+            onChange={(e) => setGlobalFilter(e.target.value)}
+            placeholder={`Search ${noun}s...`}
+            className="h-8 w-full border border-(--border) bg-(--surface-panel) py-1 pr-3 pl-7 placeholder:text-(--text-secondary) focus:border-(--accent) focus:outline-none"
+          />
+        </div>
 
         <Menu.Root modal={false}>
           <Menu.Trigger className={toolbarBtn}>
+            <ArrowUpDown size={13} strokeWidth={1} />
             Sort
-            {sort && (
+            {activeSortCol && (
               <span className="text-(--text-secondary)">
-                · {sort.key} {sort.dir === "asc" ? "↑" : "↓"}
+                · {activeSortCol} {activeSortDir === "asc" ? "↑" : "↓"}
               </span>
             )}
           </Menu.Trigger>
@@ -168,21 +200,21 @@ export function DataTable({
               <Menu.Popup className={menuPopupCls}>
                 <MenuSectionLabel>Sort by</MenuSectionLabel>
                 <div className="flex flex-col gap-0.5 p-1.5">
-                  <Menu.RadioGroup value={sort?.key ?? ""}>
-                    {columns.map((col) => {
-                      const active = sort?.key === col.key;
+                  <Menu.RadioGroup value={activeSortCol ?? ""}>
+                    {visibleColumns.map((col) => {
+                      const active = activeSortCol === col.id;
                       return (
                         <Menu.RadioItem
-                          key={col.key}
-                          value={col.key}
+                          key={col.id}
+                          value={col.id}
                           closeOnClick={false}
-                          onClick={() => cycleSort(col.key)}
+                          onClick={() => cycleSort(col.id)}
                           className={menuItemCls}
                         >
-                          {col.label}
+                          {col.id}
                           {active && (
                             <span className="ml-auto text-(--text-secondary)">
-                              {sort!.dir === "asc" ? "↑ A→Z" : "↓ Z→A"}
+                              {activeSortDir === "asc" ? "↑ A→Z" : "↓ Z→A"}
                             </span>
                           )}
                         </Menu.RadioItem>
@@ -190,12 +222,12 @@ export function DataTable({
                     })}
                   </Menu.RadioGroup>
                 </div>
-                {sort && (
+                {activeSortCol && (
                   <>
                     <Menu.Separator className="my-1" />
                     <div className="p-1.5">
                       <Menu.Item
-                        onClick={() => setSort(null)}
+                        onClick={() => setSorting([])}
                         className={menuItemCls}
                       >
                         Clear sort
@@ -211,6 +243,7 @@ export function DataTable({
         {filterFields && filterFields.length > 0 && (
           <Menu.Root modal={false}>
             <Menu.Trigger className={toolbarBtn}>
+              <ListFilter size={13} strokeWidth={1} />
               Filter
               {activeFilterCount > 0 && (
                 <span className="text-(--text-secondary)">
@@ -236,7 +269,7 @@ export function DataTable({
                         {(filterOptions[field.key] ?? []).map((opt) => (
                           <Menu.CheckboxItem
                             key={opt}
-                            checked={filters[field.key]?.has(opt) ?? false}
+                            checked={getFilterSet(field.key).has(opt)}
                             onCheckedChange={() => toggleFilter(field.key, opt)}
                             closeOnClick={false}
                             className={cn(menuItemCls, "gap-2")}
@@ -257,7 +290,7 @@ export function DataTable({
                       <Menu.Separator className="my-1" />
                       <div className="p-1.5">
                         <Menu.Item
-                          onClick={() => setFilters({})}
+                          onClick={() => setColumnFilters([])}
                           className={menuItemCls}
                         >
                           Clear filters
@@ -275,32 +308,31 @@ export function DataTable({
       <div className="flex-1 overflow-auto overscroll-none">
         <table className="w-full min-w-max">
           <thead className="sticky top-0 z-10 border-b border-(--border) bg-(--surface-panel)">
-            <tr>
-              {columns.map((col) => (
-                <th
-                  key={col.key}
-                  className="section-label px-3 py-[7px] text-left whitespace-nowrap"
-                >
-                  {col.label}
-                </th>
-              ))}
-            </tr>
+            {table.getHeaderGroups().map((hg) => (
+              <tr key={hg.id}>
+                {hg.headers.map((header) => (
+                  <th
+                    key={header.id}
+                    className="section-label px-3 py-[7px] text-left whitespace-nowrap"
+                  >
+                    {flexRender(
+                      header.column.columnDef.header,
+                      header.getContext()
+                    )}
+                  </th>
+                ))}
+              </tr>
+            ))}
           </thead>
           <tbody>
-            {processed.map((row, i) => (
+            {table.getRowModel().rows.map((row) => (
               <tr
-                key={row[rowKey] ?? i}
+                key={row.id}
                 className="border-b border-(--border) hover:bg-(--hover-bg)"
               >
-                {columns.map((col) => (
-                  <td key={col.key} className="px-3 py-[7px]">
-                    {(() => {
-                      const val = row[col.key] ?? "";
-                      const config = columnConfig?.find(
-                        (c) => c.key === col.key
-                      );
-                      return config?.render ? config.render(val) : val;
-                    })()}
+                {row.getVisibleCells().map((cell) => (
+                  <td key={cell.id} className="px-3 py-[7px]">
+                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
                   </td>
                 ))}
               </tr>

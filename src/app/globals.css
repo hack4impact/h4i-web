@@ -4,6 +4,14 @@
   color-scheme: light dark;
 
   /* Surfaces */
+  --color--root: light-dark(#fff, #222);
+  --color-panel: light-dark(#f2f2f2, #2a2a2a);
+  --color-panel-highlight-1: light-dark(#e8e8e8, #333);
+  --color-panel-highlight-2: light-dark(#ddd, #3c3c3c);
+  --color-panel-header: light-dark(#eee, #272727);
+  --color-canvas-light: #eee;
+  --color-canvas-dark: #282828;
+
   --surface-canvas: light-dark(#eeeeee, #282828);
   --surface-panel: light-dark(#ffffff, #333333);
   --surface-raised: light-dark(#ffffff, #3c3c3c);
@@ -50,7 +58,7 @@
 }
 
 @theme {
-  --font-sans: system-ui, sans-serif;
+  --font-sans: "Inclusive Sans", system-ui, sans-serif;
 }
 
 @layer base {
@@ -61,7 +69,7 @@
   }
 
   body {
-    background-color: var(--surface-canvas);
+    background-color: var(--color-root);
     color: var(--text-primary);
     font-family: var(--font-sans);
     font-size: 13px;

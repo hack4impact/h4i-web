@@ -124,7 +124,7 @@ export function Sidebar() {
   return (
     <nav
       aria-label="Main"
-      className="flex h-full w-50 shrink-0 flex-col border-r border-(--border) bg-(--surface-panel)"
+      className="flex h-full w-60 shrink-0 flex-col border-r border-(--border) bg-(--color-panel)"
     >
       <div className="shrink-0 px-2 py-4">
         <UserMenu />

@@ -18,7 +18,6 @@
     "@notionhq/client": "^5.13.0",
     "@prisma/adapter-pg": "^7.5.0",
     "@prisma/client": "^7.5.0",
-    "@tanstack/react-table": "^8.21.3",
     "bcryptjs": "^3.0.3",
     "lucide-react": "^0.577.0",
     "next": "16.1.6",

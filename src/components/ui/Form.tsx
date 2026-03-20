@@ -34,7 +34,12 @@ export function FormLabel({
   className,
   ...props
 }: WithStringClassName<ComponentPropsWithoutRef<typeof Field.Label>>) {
-  return <Field.Label className={className} {...props} />;
+  return (
+    <Field.Label
+      className={cn("font-medium text-(--text-primary)", className)}
+      {...props}
+    />
+  );
 }
 
 export function FormInput({
@@ -44,8 +49,10 @@ export function FormInput({
   return (
     <BaseInput
       className={cn(
-        "h-8 w-full px-3",
-        "disabled:cursor-not-allowed",
+        "h-8 w-full border border-(--border) bg-(--surface-panel) px-3",
+        "placeholder:text-(--text-secondary)",
+        "focus:border-(--accent) focus:outline-none",
+        "disabled:cursor-not-allowed disabled:opacity-50",
         className
       )}
       {...props}
@@ -57,5 +64,10 @@ export function FormError({
   className,
   ...props
 }: WithStringClassName<ComponentPropsWithoutRef<typeof Field.Error>>) {
-  return <Field.Error className={className} {...props} />;
+  return (
+    <Field.Error
+      className={cn("text-[11px] text-red-600 dark:text-red-400", className)}
+      {...props}
+    />
+  );
 }

@@ -3,7 +3,15 @@ import { cn } from "@/lib/utils";
 import type { HTMLAttributes, ComponentPropsWithoutRef } from "react";
 
 export function Card({ className, ...props }: HTMLAttributes<HTMLDivElement>) {
-  return <div className={cn("p-6", className)} {...props} />;
+  return (
+    <div
+      className={cn(
+        "border border-(--border) bg-(--surface-panel) p-6",
+        className
+      )}
+      {...props}
+    />
+  );
 }
 
 export function CardDivider({

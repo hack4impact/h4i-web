@@ -27,72 +27,21 @@ type DataTableProps = {
   defaultSort?: SortState;
 };
 
-const toolbarBtn = "inline-flex h-8 cursor-pointer items-center gap-1.5 px-3";
+const toolbarBtn =
+  "inline-flex h-8 cursor-pointer items-center gap-1.5 px-3 hover:bg-(--hover-bg)";
 
 const menuItemCls =
-  "flex w-full items-center px-2.5 py-1.5 text-left cursor-default select-none";
+  "flex w-full items-center px-2.5 py-1.5 text-left cursor-default select-none data-[highlighted]:bg-(--hover-bg)";
 
-const menuPopupCls = "w-52";
+const menuPopupCls =
+  "w-52 border border-(--border) bg-(--surface-raised) p-1 shadow-sm";
 
 const menuPositionerCls = "z-50";
-
-function SortIcon() {
-  return (
-    <svg
-      width="14"
-      height="14"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.5"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      className="shrink-0"
-    >
-      <path d="M3 6h18M6 12h12M10 18h4" />
-    </svg>
-  );
-}
-
-function FilterIcon() {
-  return (
-    <svg
-      width="14"
-      height="14"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.5"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      className="shrink-0"
-    >
-      <path d="M22 3H2l8 9.46V19l4 2V12.46L22 3z" />
-    </svg>
-  );
-}
-
-function CheckIcon() {
-  return (
-    <svg
-      width="11"
-      height="11"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2.5"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <polyline points="20 6 9 17 4 12" />
-    </svg>
-  );
-}
 
 function MenuSectionLabel({ children }: { children: React.ReactNode }) {
   return (
     <div className="px-3 py-2">
-      <span>{children}</span>
+      <span className="section-label">{children}</span>
     </div>
   );
 }
@@ -187,39 +136,24 @@ export function DataTable({
   }
 
   return (
-    <div className="flex max-h-full flex-1 flex-col self-start overflow-hidden">
-      <div className="flex shrink-0 items-center gap-2 px-3 py-2">
-        <span className="whitespace-nowrap">{countLabel}</span>
+    <div className="flex max-h-full flex-1 flex-col self-start overflow-hidden border border-(--border) bg-(--surface-panel)">
+      <div className="flex shrink-0 items-center gap-2 border-b border-(--border) px-3 py-2">
+        <span className="whitespace-nowrap text-(--text-secondary)">
+          {countLabel}
+        </span>
 
-        <div className="relative flex-1">
-          <svg
-            className="pointer-events-none absolute top-1/2 left-2 -translate-y-1/2"
-            width="14"
-            height="14"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="1.5"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <circle cx="11" cy="11" r="8" />
-            <path d="M21 21l-4.35-4.35" />
-          </svg>
-          <Input
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder={`Search ${noun}s...`}
-            className="h-8 w-full py-1 pr-3 pl-7"
-          />
-        </div>
+        <Input
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          placeholder={`Search ${noun}s...`}
+          className="h-8 flex-1 border border-(--border) bg-(--surface-panel) px-3 py-1 placeholder:text-(--text-secondary) focus:border-(--accent) focus:outline-none"
+        />
 
         <Menu.Root modal={false}>
           <Menu.Trigger className={toolbarBtn}>
-            <SortIcon />
             Sort
             {sort && (
-              <span>
+              <span className="text-(--text-secondary)">
                 · {sort.key} {sort.dir === "asc" ? "↑" : "↓"}
               </span>
             )}
@@ -247,7 +181,7 @@ export function DataTable({
                         >
                           {col.label}
                           {active && (
-                            <span className="ml-auto">
+                            <span className="ml-auto text-(--text-secondary)">
                               {sort!.dir === "asc" ? "↑ A→Z" : "↓ Z→A"}
                             </span>
                           )}
@@ -258,7 +192,7 @@ export function DataTable({
                 </div>
                 {sort && (
                   <>
-                    <Menu.Separator />
+                    <Menu.Separator className="my-1" />
                     <div className="p-1.5">
                       <Menu.Item
                         onClick={() => setSort(null)}
@@ -277,9 +211,12 @@ export function DataTable({
         {filterFields && filterFields.length > 0 && (
           <Menu.Root modal={false}>
             <Menu.Trigger className={toolbarBtn}>
-              <FilterIcon />
               Filter
-              {activeFilterCount > 0 && <span>· {activeFilterCount}</span>}
+              {activeFilterCount > 0 && (
+                <span className="text-(--text-secondary)">
+                  · {activeFilterCount}
+                </span>
+              )}
             </Menu.Trigger>
             <Menu.Portal>
               <Menu.Positioner
@@ -290,7 +227,10 @@ export function DataTable({
               >
                 <Menu.Popup className={menuPopupCls}>
                   {filterFields.map((field, i) => (
-                    <div key={field.key} className={cn(i > 0 && "border-t")}>
+                    <div
+                      key={field.key}
+                      className={cn(i > 0 && "border-t border-(--border)")}
+                    >
                       <MenuSectionLabel>{field.label}</MenuSectionLabel>
                       <div className="flex flex-col gap-0.5 p-1.5">
                         {(filterOptions[field.key] ?? []).map((opt) => (
@@ -301,11 +241,8 @@ export function DataTable({
                             closeOnClick={false}
                             className={cn(menuItemCls, "gap-2")}
                           >
-                            <Menu.CheckboxItemIndicator
-                              keepMounted
-                              className="flex h-3.5 w-3.5 shrink-0 items-center justify-center"
-                            >
-                              <CheckIcon />
+                            <Menu.CheckboxItemIndicator className="flex h-3.5 w-3.5 shrink-0 items-center justify-center border border-(--border)">
+                              ✓
                             </Menu.CheckboxItemIndicator>
                             <span>{opt}</span>
                           </Menu.CheckboxItem>
@@ -315,7 +252,7 @@ export function DataTable({
                   ))}
                   {activeFilterCount > 0 && (
                     <>
-                      <Menu.Separator />
+                      <Menu.Separator className="my-1" />
                       <div className="p-1.5">
                         <Menu.Item
                           onClick={() => setFilters({})}
@@ -335,12 +272,12 @@ export function DataTable({
 
       <div className="flex-1 overflow-auto overscroll-none">
         <table className="w-full min-w-max">
-          <thead className="sticky top-0 z-10">
+          <thead className="sticky top-0 z-10 border-b border-(--border) bg-(--surface-panel)">
             <tr>
               {columns.map((col) => (
                 <th
                   key={col.key}
-                  className="px-3 py-[7px] text-left whitespace-nowrap"
+                  className="section-label px-3 py-[7px] text-left whitespace-nowrap"
                 >
                   {col.label}
                 </th>
@@ -349,7 +286,10 @@ export function DataTable({
           </thead>
           <tbody>
             {processed.map((row, i) => (
-              <tr key={row[rowKey] ?? i}>
+              <tr
+                key={row[rowKey] ?? i}
+                className="border-b border-(--border) hover:bg-(--hover-bg)"
+              >
                 {columns.map((col) => (
                   <td key={col.key} className="px-3 py-[7px]">
                     {(() => {

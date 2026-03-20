@@ -124,43 +124,39 @@ export function Sidebar() {
   return (
     <nav
       aria-label="Main"
-      className="flex h-full w-60 shrink-0 flex-col border-r border-(--border) bg-(--color-panel)"
+      className="flex h-full w-60 shrink-0 flex-col border-r border-(--border) bg-(--surface-panel)"
     >
       <div className="shrink-0 px-2 py-4">
         <UserMenu />
       </div>
 
-      <div className="flex flex-1 flex-col gap-5 overflow-y-auto px-2 pb-4">
-        <NavSection label="Overview">
-          <NavItem
-            href="/dashboard"
-            label="Dashboard"
-            icon={<LayoutDashboard size={14} strokeWidth={1} />}
-          />
-        </NavSection>
+      <div className="flex flex-1 flex-col gap-1 overflow-y-auto px-2 pb-4">
+        <NavItem
+          href="/dashboard"
+          label="Dashboard"
+          icon={<LayoutDashboard size={15} strokeWidth={1.5} />}
+        />
 
-        <NavSection label="Directories">
-          <NavItem
-            href="/chapters"
-            label="Chapters"
-            icon={<Building2 size={14} strokeWidth={1} />}
-          />
-          <NavItem
-            href="/partners"
-            label="Partners"
-            icon={<Handshake size={14} strokeWidth={1} />}
-          />
-          <NavItem
-            href="/projects"
-            label="Projects"
-            icon={<FolderOpen size={14} strokeWidth={1} />}
-          />
-          <NavItem
-            href="/volunteers"
-            label="Volunteers"
-            icon={<Users size={14} strokeWidth={1} />}
-          />
-        </NavSection>
+        <NavItem
+          href="/chapters"
+          label="Chapters"
+          icon={<Building2 size={15} strokeWidth={1.5} />}
+        />
+        <NavItem
+          href="/partners"
+          label="Partners"
+          icon={<Handshake size={15} strokeWidth={1.5} />}
+        />
+        <NavItem
+          href="/projects"
+          label="Projects"
+          icon={<FolderOpen size={15} strokeWidth={1.5} />}
+        />
+        <NavItem
+          href="/volunteers"
+          label="Volunteers"
+          icon={<Users size={15} strokeWidth={1.5} />}
+        />
       </div>
     </nav>
   );

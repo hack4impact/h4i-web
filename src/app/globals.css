@@ -17,18 +17,39 @@
   --surface-raised: light-dark(#ffffff, #3c3c3c);
 
   /* Text */
-  --text-primary: light-dark(oklch(0% none none / 0.8), oklch(100% 0 0 / 0.9));
+  --text-primary: light-dark(oklab(0% none none / 0.8), oklab(100% 0 0 / 0.9));
   --text-secondary: light-dark(
-    oklch(0% none none / 0.45),
-    oklch(100% 0 0 / 0.45)
+    oklab(0% none none / 0.6),
+    oklab(100% 0 0 / 0.65)
   );
+  --text-3: light-dark(oklab(0% none none / 0.5), oklab(100% 0 0 / 0.575));
+  --text-4: light-dark(oklab(0% none none / 0.4), oklab(100% 0 0 / 0.5));
+  --text-5: light-dark(oklab(0% none none / 0.1), oklab(100% 0 0 / 0.1));
+  --color-inverse: light-dark(black, white);
 
   /* Borders */
   --border: light-dark(rgb(0 0 0 / 0.1), rgb(255 255 255 / 0.1));
 
   /* Interactive */
+  ---color-focus: light-dark(oklch(74% 0.12 258/0.95), oklch(60% 0.15 258/0.95))
+    --color-selection: light-dark(
+      oklch(78% 0.12 258/0.5),
+      oklch(74% 0.3 258/0.3)
+    )
+    --color-ghost-hover: light-dark(
+      oklab(0% none none/.06),
+      oklab(100%.../0.06)
+    );
+  --color-ghost-pressed: light-dark(
+    oklab(0% none none/.085),
+    oklab(100%.../0.085)
+  );
+
   --hover-bg: light-dark(rgb(0 0 0 / 0.05), rgb(255 255 255 / 0.05));
   --active-bg: light-dark(rgb(0 0 0 / 0.08), rgb(255 255 255 / 0.08));
+
+  /* Controls */
+  --color-control: light-dark(#f9f9f9, #373737);
 
   /* Brand */
   --accent: oklch(55% 0.2 258);

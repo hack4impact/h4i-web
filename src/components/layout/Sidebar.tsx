@@ -130,7 +130,7 @@ export function Sidebar() {
         <UserMenu />
       </div>
 
-      <div className="flex flex-1 flex-col gap-1 overflow-y-auto px-2 pb-4">
+      <ul className="flex flex-1 flex-col gap-1 overflow-y-auto px-2 pb-4">
         <NavItem
           href="/dashboard"
           label="Dashboard"
@@ -157,7 +157,7 @@ export function Sidebar() {
           label="Volunteers"
           icon={<Users size={15} strokeWidth={1.5} />}
         />
-      </div>
+      </ul>
     </nav>
   );
 }

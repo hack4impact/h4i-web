@@ -29,12 +29,12 @@ type DataTableProps = {
 };
 
 const toolbarBtn =
-  "inline-flex h-8 cursor-pointer items-center gap-1.5 px-3 hover:bg-(--hover-bg)";
+  "inline-flex h-32 cursor-pointer items-center gap-6 px-12 hover:bg-(--hover-bg)";
 
 const menuItemCls =
-  "flex w-full items-center px-2.5 py-1.5 text-left cursor-default select-none data-[highlighted]:bg-(--hover-bg)";
+  "flex w-full items-center px-10 py-6 text-left cursor-default select-none data-[highlighted]:bg-(--hover-bg)";
 
-const menuPopupCls = "w-52 border border-separator bg-popup p-1 shadow-sm";
+const menuPopupCls = "w-208 border border-separator bg-popup p-4 shadow-sm";
 
 const menuPositionerCls = "z-50";
 
@@ -137,7 +137,7 @@ export function DataTable({
 
   return (
     <div className="border-separator bg-panel flex max-h-full flex-1 flex-col self-start overflow-hidden border">
-      <div className="border-separator flex shrink-0 items-center gap-2 border-b px-3 py-2">
+      <div className="border-separator flex shrink-0 items-center gap-8 border-b px-12 py-8">
         <span className="whitespace-nowrap text-(--text-secondary)">
           {countLabel}
         </span>
@@ -146,13 +146,13 @@ export function DataTable({
           <Search
             size={13}
             strokeWidth={1}
-            className="pointer-events-none absolute top-1/2 left-2 -translate-y-1/2"
+            className="pointer-events-none absolute top-1/2 left-8 -translate-y-1/2"
           />
           <Input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder={`Search ${noun}s...`}
-            className="border-separator bg-panel h-8 w-full border py-1 pr-3 pl-7 placeholder:text-(--text-secondary) focus:border-(--accent) focus:outline-none"
+            className="border-separator bg-panel h-32 w-full border py-4 pr-12 pl-28 placeholder:text-(--text-secondary) focus:border-(--accent) focus:outline-none"
           />
         </div>
 
@@ -175,7 +175,7 @@ export function DataTable({
             >
               <Menu.Popup className={menuPopupCls}>
                 <MenuSectionLabel>Sort by</MenuSectionLabel>
-                <div className="flex flex-col gap-0.5 p-1.5">
+                <div className="flex flex-col gap-2 p-6">
                   <Menu.RadioGroup value={sort?.key ?? ""}>
                     {columns.map((col) => {
                       const active = sort?.key === col.key;
@@ -200,8 +200,8 @@ export function DataTable({
                 </div>
                 {sort && (
                   <>
-                    <Menu.Separator className="my-1" />
-                    <div className="p-1.5">
+                    <Menu.Separator className="my-4" />
+                    <div className="p-6">
                       <Menu.Item
                         onClick={() => setSort(null)}
                         className={menuItemCls}
@@ -238,10 +238,10 @@ export function DataTable({
                   {filterFields.map((field, i) => (
                     <div
                       key={field.key}
-                      className={cn(i > 0 && "border-t border-(--border)")}
+                      className={cn(i > 0 && "border-separator border-t")}
                     >
                       <MenuSectionLabel>{field.label}</MenuSectionLabel>
-                      <div className="flex flex-col gap-0.5 p-1.5">
+                      <div className="flex flex-col gap-2 p-6">
                         {(filterOptions[field.key] ?? []).map((opt) => (
                           <Menu.CheckboxItem
                             key={opt}
@@ -250,7 +250,7 @@ export function DataTable({
                             closeOnClick={false}
                             className={cn(menuItemCls, "gap-2")}
                           >
-                            <span className="flex h-3.5 w-3.5 shrink-0 items-center justify-center border border-(--border)">
+                            <span className="border-separator flex h-14 w-14 shrink-0 items-center justify-center border">
                               <Menu.CheckboxItemIndicator>
                                 ✓
                               </Menu.CheckboxItemIndicator>
@@ -263,8 +263,8 @@ export function DataTable({
                   ))}
                   {activeFilterCount > 0 && (
                     <>
-                      <Menu.Separator className="my-1" />
-                      <div className="p-1.5">
+                      <Menu.Separator className="my-4" />
+                      <div className="p-6">
                         <Menu.Item
                           onClick={() => setFilters({})}
                           className={menuItemCls}
@@ -288,7 +288,7 @@ export function DataTable({
               {columns.map((col) => (
                 <th
                   key={col.key}
-                  className="section-label px-3 py-[7px] text-left whitespace-nowrap"
+                  className="section-label px-12 py-7 text-left whitespace-nowrap"
                 >
                   {col.label}
                 </th>
@@ -302,7 +302,7 @@ export function DataTable({
                 className="border-separator border-b hover:bg-(--hover-bg)"
               >
                 {columns.map((col) => (
-                  <td key={col.key} className="px-3 py-[7px]">
+                  <td key={col.key} className="px-12 py-7">
                     {(() => {
                       const val = row[col.key] ?? "";
                       const config = columnConfig?.find(

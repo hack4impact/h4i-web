@@ -118,8 +118,11 @@
   );
 
   /* Popups / Overlays */
-  --color-popup: --color-panel;
-  --color-popup-header: light-dark(--color-panel-highlight-2, --color-root);
+  --color-popup: var(--color-panel);
+  --color-popup-header: light-dark(
+    var(--color-panel-highlight-2),
+    var(--color-root)
+  );
   --color-popup-outline: light-dark(#0000001a, #444);
   --color-tooltip-border: light-dark(none, #555);
   --color-menu: color-mix(
@@ -127,7 +130,10 @@
     light-dark(#f2f2f2, #2a2a2a) 92%,
     transparent
   );
-  --color-menu-highlight: light-dark(--color-panel-highlight, --color-root);
+  --color-menu-highlight: light-dark(
+    var(--color-panel-highlight),
+    var(--color-root)
+  );
   --color-toast: color-mix(
     in oklab,
     light-dark(#f2f2f2, #2a2a2a) 92%,

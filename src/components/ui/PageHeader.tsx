@@ -9,12 +9,12 @@ type PageHeaderProps = {
 
 export function PageHeader({ title, subtitle, children }: PageHeaderProps) {
   return (
-    <div className="flex items-center justify-between px-8 pt-8">
+    <div className="flex items-center justify-between px-32 pt-32">
       <div>
         <h1>{title}</h1>
-        {subtitle && <p className="mt-0.5">{subtitle}</p>}
+        {subtitle && <p className="mt-2">{subtitle}</p>}
       </div>
-      {children && <div className="flex items-center gap-2">{children}</div>}
+      {children && <div className="flex items-center gap-8">{children}</div>}
     </div>
   );
 }

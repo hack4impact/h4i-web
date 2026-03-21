@@ -35,7 +35,7 @@ function UserMenu() {
 
       <Popover.Portal>
         <Popover.Positioner align="start" sideOffset={4} className="z-50">
-          <Popover.Popup className="min-w-35 border border-(--border) bg-(--surface-raised) p-1 shadow-sm">
+          <Popover.Popup className="bg-panel border-separator min-w-35 border p-1 shadow-sm">
             <div className="px-3 py-1.5 text-(--text-secondary)">
               Signed in as
               <br />
@@ -75,46 +75,21 @@ function NavItem({ href, label, icon, count }: NavItemProps) {
   const isActive = pathname === href || pathname.startsWith(href + "/");
 
   return (
-    <li>
-      <Link
-        href={href}
-        className={cn(
-          "flex h-7 items-center gap-1.5 px-2",
-          isActive
-            ? "bg-(--active-bg) font-medium"
-            : "text-(--text-secondary) hover:bg-(--hover-bg) hover:text-(--text-primary)"
-        )}
-      >
-        <span className="shrink-0">{icon}</span>
-        <span className="flex-1">{label}</span>
-        {count !== undefined && (
-          <span className="tabular-nums">{count.toLocaleString()}</span>
-        )}
-      </Link>
-    </li>
-  );
-}
-
-// Section label
-
-function SectionLabel({ children }: { children: React.ReactNode }) {
-  return <p className="section-label mb-1 px-2">{children}</p>;
-}
-
-// Nav section
-
-function NavSection({
-  label,
-  children,
-}: {
-  label: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <div>
-      <SectionLabel>{label}</SectionLabel>
-      <ul className="flex flex-col gap-0.5">{children}</ul>
-    </div>
+    <Link
+      href={href}
+      className={cn(
+        "flex h-8 items-center gap-2 px-2",
+        isActive
+          ? "bg-(--active-bg) font-medium"
+          : "text-lg hover:bg-(--hover-bg) hover:text-(--text-primary)"
+      )}
+    >
+      <span className="shrink-0">{icon}</span>
+      <span className="flex-1">{label}</span>
+      {count !== undefined && (
+        <span className="tabular-nums">{count.toLocaleString()}</span>
+      )}
+    </Link>
   );
 }
 
@@ -122,40 +97,40 @@ function NavSection({
 
 export function Sidebar() {
   return (
-    <aside className="flex h-full w-60 shrink-0 flex-col border-r border-(--border) bg-(--color-panel) text-[length:var(--text-lg)]">
-      <nav aria-label="Main" className="flex h-full flex-col">
-        <div className="shrink-0 px-2 py-4">
-          <UserMenu />
-        </div>
+    <aside className="bg-panel border-separator flex h-full w-60 shrink-0 flex-col gap-6 border-r text-lg">
+      <div className="shrink-0 px-2 py-4">
+        <UserMenu />
+      </div>
+      <nav
+        aria-label="Main"
+        className="flex h-full flex-1 flex-col gap-1 overflow-y-auto px-2 pb-4"
+      >
+        <NavItem
+          href="/dashboard"
+          label="Dashboard"
+          icon={<LayoutDashboard size={15} strokeWidth={1.5} />}
+        />
 
-        <ul className="flex flex-1 flex-col gap-1 overflow-y-auto px-2 pb-4">
-          <NavItem
-            href="/dashboard"
-            label="Dashboard"
-            icon={<LayoutDashboard size={15} strokeWidth={1.5} />}
-          />
-
-          <NavItem
-            href="/chapters"
-            label="Chapters"
-            icon={<Building2 size={15} strokeWidth={1.5} />}
-          />
-          <NavItem
-            href="/partners"
-            label="Partners"
-            icon={<Handshake size={15} strokeWidth={1.5} />}
-          />
-          <NavItem
-            href="/projects"
-            label="Projects"
-            icon={<FolderOpen size={15} strokeWidth={1.5} />}
-          />
-          <NavItem
-            href="/volunteers"
-            label="Volunteers"
-            icon={<Users size={15} strokeWidth={1.5} />}
-          />
-        </ul>
+        <NavItem
+          href="/chapters"
+          label="Chapters"
+          icon={<Building2 size={15} strokeWidth={1.5} />}
+        />
+        <NavItem
+          href="/partners"
+          label="Partners"
+          icon={<Handshake size={15} strokeWidth={1.5} />}
+        />
+        <NavItem
+          href="/projects"
+          label="Projects"
+          icon={<FolderOpen size={15} strokeWidth={1.5} />}
+        />
+        <NavItem
+          href="/volunteers"
+          label="Volunteers"
+          icon={<Users size={15} strokeWidth={1.5} />}
+        />
       </nav>
     </aside>
   );

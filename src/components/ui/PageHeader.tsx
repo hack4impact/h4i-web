@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 
 type PageHeaderProps = {
+  className?: string;
   title: string;
   subtitle?: string;
   children?: ReactNode;
@@ -8,7 +9,7 @@ type PageHeaderProps = {
 
 export function PageHeader({ title, subtitle, children }: PageHeaderProps) {
   return (
-    <div className="flex items-center justify-between px-4 pt-5 pb-4">
+    <div className="flex items-center justify-between px-8 pt-8">
       <div>
         <h1>{title}</h1>
         {subtitle && <p className="mt-0.5">{subtitle}</p>}

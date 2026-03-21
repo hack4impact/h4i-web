@@ -11,7 +11,7 @@ export default async function VolunteersPage() {
       <PageHeader title="Volunteers Directory">
         <Button>+ Add Volunteer</Button>
       </PageHeader>
-      <div className="flex min-h-0 flex-1 px-4 pb-4">
+      <div className="flex min-h-0 flex-1 p-8">
         <VolunteersTable data={rows} />
       </div>
     </div>

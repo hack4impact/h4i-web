@@ -4,63 +4,15 @@
   color-scheme: light dark;
 
   /* Surfaces */
-  --color--root: light-dark(#fff, #222);
-  --color-panel: light-dark(#f2f2f2, #2a2a2a);
-  --color-panel-highlight-1: light-dark(#e8e8e8, #333);
-  --color-panel-highlight-2: light-dark(#ddd, #3c3c3c);
-  --color-panel-header: light-dark(#eee, #272727);
-  --color-canvas-light: #eee;
-  --color-canvas-dark: #282828;
-
   --surface-canvas: light-dark(#eeeeee, #282828);
   --surface-panel: light-dark(#ffffff, #333333);
   --surface-raised: light-dark(#ffffff, #3c3c3c);
 
-  /* Text */
-  --text-primary: light-dark(oklab(0% none none / 0.8), oklab(100% 0 0 / 0.9));
-  --text-secondary: light-dark(
-    oklab(0% none none / 0.6),
-    oklab(100% 0 0 / 0.65)
-  );
-  --text-3: light-dark(oklab(0% none none / 0.5), oklab(100% 0 0 / 0.575));
-  --text-4: light-dark(oklab(0% none none / 0.4), oklab(100% 0 0 / 0.5));
-  --text-5: light-dark(oklab(0% none none / 0.1), oklab(100% 0 0 / 0.1));
-  --color-inverse: light-dark(black, white);
-
-  --text-sm: 10px;
-  --text-base: 12px;
-  --text-lg: 13px;
-  --text-xl: 18px;
-  --text-2xl: 24px;
-  --text-3xl: 30px;
-
-  --lh-xl: 28px;
-  --lh-2xl: 32px;
-  --lh-3xl: 38px;
-
   /* Borders */
   --border: light-dark(#e2e2e2, #373737);
 
-  /* Interactive */
-  ---color-focus: light-dark(oklch(74% 0.12 258/0.95), oklch(60% 0.15 258/0.95))
-    --color-selection: light-dark(
-      oklch(78% 0.12 258/0.5),
-      oklch(74% 0.3 258/0.3)
-    )
-    --color-ghost-hover: light-dark(
-      oklab(0% none none/.06),
-      oklab(100%.../0.06)
-    );
-  --color-ghost-pressed: light-dark(
-    oklab(0% none none/.085),
-    oklab(100%.../0.085)
-  );
-
   --hover-bg: light-dark(rgb(0 0 0 / 0.05), rgb(255 255 255 / 0.05));
   --active-bg: light-dark(rgb(0 0 0 / 0.08), rgb(255 255 255 / 0.08));
-
-  /* Controls */
-  --color-control: light-dark(#f9f9f9, #373737);
 
   /* Brand */
   --accent: oklch(55% 0.2 258);
@@ -84,13 +36,95 @@
   --badge-pink-fg: light-dark(#be185d, #f9a8d4);
   --badge-grey-bg: light-dark(rgb(0 0 0 / 0.06), rgb(255 255 255 / 0.06));
   --badge-grey-fg: light-dark(rgb(0 0 0 / 0.5), rgb(255 255 255 / 0.5));
-
-  /* Layout */
-  --lh: 16px;
 }
 
 @theme {
   --font-sans: "Inclusive Sans", system-ui, sans-serif;
+
+  /* Surfaces */
+  --color-panel: light-dark(#f2f2f2, #2a2a2a);
+  --color-root: light-dark(#fff, #222);
+  --color-panel: light-dark(#f2f2f2, #2a2a2a);
+  --color-panel-highlight-1: light-dark(#e8e8e8, #333);
+  --color-panel-highlight-2: light-dark(#ddd, #3c3c3c);
+  --color-panel-header: light-dark(#eee, #272727);
+  --color-canvas-light: #eee;
+  --color-canvas-dark: #282828;
+  --color-canvas: light-dark(--color-canvas-light, --color-canvas-dark);
+
+  /* Text */
+  --color-text-primary: light-dark(
+    oklab(0% none none / 0.8),
+    oklab(100% 0 0 / 0.9)
+  );
+  --color-text-secondary: light-dark(
+    oklab(0% none none / 0.6),
+    oklab(100% 0 0 / 0.65)
+  );
+  --color-text-3: light-dark(
+    oklab(0% none none / 0.5),
+    oklab(100% 0 0 / 0.575)
+  );
+  --color-text-4: light-dark(oklab(0% none none / 0.4), oklab(100% 0 0 / 0.5));
+  --color-text-5: light-dark(oklab(0% none none / 0.1), oklab(100% 0 0 / 0.1));
+  --color-text-inverse: light-dark(black, white);
+
+  --text-sm: 10px;
+  --text-base: 12px;
+  --text-lg: 13px;
+  --text-xl: 18px;
+  --text-2xl: 24px;
+  --text-3xl: 30px;
+
+  /* Layout */
+  --leading-base: 16px;
+  --leading-xl: 28px;
+  --leading-2xl: 32px;
+  --leading-3xl: 38px;
+
+  /* Structural */
+  --color-separator: light-dark(#e2e2e2, #373737);
+  --color-button-high-contrast: light-dark(#1e1e1e, #f9f9f9);
+  --color-button-high-contrast-pressed: light-dark(#333, #d4d4d4);
+  --color-checkbox-outline: light-dark(#d8d8d8, #444);
+  --color-drop-indicator: light-dark(#333, #eee);
+
+  /* Controls */
+  --color-control: light-dark(#f9f9f9, #373737);
+  --color-control-border: light-dark(--color-separator, transparent);
+  --color-control-separator: light-dark(transparent, #444);
+
+  /* Interactive */
+  ---color-focus: light-dark(
+    oklch(74% 0.12 258/0.95),
+    oklch(60% 0.15 258/0.95)
+  );
+  --color-selection: light-dark(
+    oklch(78% 0.12 258/0.5),
+    oklch(74% 0.3 258/0.3)
+  );
+  --color-ghost-hover: light-dark(oklab(0% none none/.06), oklab(100%.../0.06));
+  --color-ghost-pressed: light-dark(
+    oklab(0% none none/.085),
+    oklab(100%.../0.085)
+  );
+
+  /* Popups / Overlays */
+  --color-popup: --color-panel;
+  --color-popup-header: light-dark(--color-panel-highlight-2, --color-root);
+  --color-popup-outline: light-dark(#0000001a, #444);
+  --color-tooltip-border: light-dark(none, #555);
+  --color-menu: color-mix(
+    in oklab,
+    light-dark(#f2f2f2, #2a2a2a) 92%,
+    transparent
+  );
+  --color-menu-highlight: light-dark(--color-panel-highlight, --color-root);
+  --color-toast: color-mix(
+    in oklab,
+    light-dark(#f2f2f2, #2a2a2a) 92%,
+    transparent
+  );
 }
 
 @layer base {
@@ -105,7 +139,7 @@
     color: var(--text-primary);
     font-family: var(--font-sans);
     font-size: var(--text-base);
-    line-height: var(--lh);
+    line-height: var(--leading-base);
     -webkit-font-smoothing: antialiased;
   }
 
@@ -122,9 +156,9 @@
   }
 
   h1 {
-    font-size: 15px;
+    font-size: var(--text-2xl);
     font-weight: 500;
-    line-height: var(--lh);
+    line-height: var(--leading-base);
   }
 
   hr,
@@ -136,13 +170,6 @@
 }
 
 @layer components {
-  .section-label {
-    font-size: 11px;
-    font-weight: 500;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    color: var(--text-secondary);
-  }
 }
 
 @media (prefers-reduced-motion: no-preference) {

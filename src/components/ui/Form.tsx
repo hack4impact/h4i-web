@@ -49,7 +49,7 @@ export function FormInput({
   return (
     <BaseInput
       className={cn(
-        "h-8 w-full border border-(--border) bg-(--surface-panel) px-3",
+        "border-separator bg-panel h-8 w-full border px-3",
         "placeholder:text-(--text-secondary)",
         "focus:border-(--accent) focus:outline-none",
         "disabled:cursor-not-allowed disabled:opacity-50",

@@ -34,8 +34,7 @@ const toolbarBtn =
 const menuItemCls =
   "flex w-full items-center px-2.5 py-1.5 text-left cursor-default select-none data-[highlighted]:bg-(--hover-bg)";
 
-const menuPopupCls =
-  "w-52 border border-(--border) bg-(--surface-raised) p-1 shadow-sm";
+const menuPopupCls = "w-52 border border-separator bg-popup p-1 shadow-sm";
 
 const menuPositionerCls = "z-50";
 
@@ -137,8 +136,8 @@ export function DataTable({
   }
 
   return (
-    <div className="flex max-h-full flex-1 flex-col self-start overflow-hidden border border-(--border) bg-(--surface-panel)">
-      <div className="flex shrink-0 items-center gap-2 border-b border-(--border) px-3 py-2">
+    <div className="border-separator bg-panel flex max-h-full flex-1 flex-col self-start overflow-hidden border">
+      <div className="border-separator flex shrink-0 items-center gap-2 border-b px-3 py-2">
         <span className="whitespace-nowrap text-(--text-secondary)">
           {countLabel}
         </span>
@@ -153,7 +152,7 @@ export function DataTable({
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder={`Search ${noun}s...`}
-            className="h-8 w-full border border-(--border) bg-(--surface-panel) py-1 pr-3 pl-7 placeholder:text-(--text-secondary) focus:border-(--accent) focus:outline-none"
+            className="border-separator bg-panel h-8 w-full border py-1 pr-3 pl-7 placeholder:text-(--text-secondary) focus:border-(--accent) focus:outline-none"
           />
         </div>
 
@@ -284,7 +283,7 @@ export function DataTable({
 
       <div className="flex-1 overflow-auto overscroll-none">
         <table className="w-full min-w-max">
-          <thead className="sticky top-0 z-10 border-b border-(--border) bg-(--surface-panel)">
+          <thead className="border-separator bg-panel sticky top-0 z-10 border-b">
             <tr>
               {columns.map((col) => (
                 <th
@@ -300,7 +299,7 @@ export function DataTable({
             {processed.map((row, i) => (
               <tr
                 key={row[rowKey] ?? i}
-                className="border-b border-(--border) hover:bg-(--hover-bg)"
+                className="border-separator border-b hover:bg-(--hover-bg)"
               >
                 {columns.map((col) => (
                   <td key={col.key} className="px-3 py-[7px]">

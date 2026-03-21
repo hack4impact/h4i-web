@@ -11,7 +11,7 @@ export default async function ProjectsPage() {
       <PageHeader title="Projects Directory">
         <Button>+ Add Project</Button>
       </PageHeader>
-      <div className="flex min-h-0 flex-1 px-4 pb-4">
+      <div className="flex min-h-0 flex-1 p-8">
         <ProjectsTable data={rows} />
       </div>
     </div>

@@ -78,7 +78,7 @@ function NavItem({ href, label, icon, count }: NavItemProps) {
     <Link
       href={href}
       className={cn(
-        "flex h-32 items-center gap-8 px-8",
+        "flex h-32 w-full cursor-default items-center gap-8 px-8 text-lg",
         isActive
           ? "bg-(--active-bg) font-medium"
           : "text-lg hover:bg-(--hover-bg) hover:text-(--text-primary)"
@@ -97,41 +97,38 @@ function NavItem({ href, label, icon, count }: NavItemProps) {
 
 export function Sidebar() {
   return (
-    <aside className="bg-panel border-separator flex h-full w-240 shrink-0 flex-col gap-24 border-r text-lg">
-      <div className="shrink-0 px-8 py-16">
+    <aside className="bg-panel border-separator flex h-full w-240 flex-none shrink-0 flex-col gap-24 border-r text-lg">
+      <div className="flex flex-1 flex-col gap-24 p-12">
         <UserMenu />
-      </div>
-      <nav
-        aria-label="Main"
-        className="flex h-full flex-1 flex-col gap-1 overflow-y-auto px-8 pb-16"
-      >
-        <NavItem
-          href="/dashboard"
-          label="Dashboard"
-          icon={<LayoutDashboard size={15} strokeWidth={1.5} />}
-        />
+        <nav aria-label="Main" className="space-y-2">
+          <NavItem
+            href="/dashboard"
+            label="Dashboard"
+            icon={<LayoutDashboard size={15} strokeWidth={1.5} />}
+          />
 
-        <NavItem
-          href="/chapters"
-          label="Chapters"
-          icon={<Building2 size={15} strokeWidth={1.5} />}
-        />
-        <NavItem
-          href="/partners"
-          label="Partners"
-          icon={<Handshake size={15} strokeWidth={1.5} />}
-        />
-        <NavItem
-          href="/projects"
-          label="Projects"
-          icon={<FolderOpen size={15} strokeWidth={1.5} />}
-        />
-        <NavItem
-          href="/volunteers"
-          label="Volunteers"
-          icon={<Users size={15} strokeWidth={1.5} />}
-        />
-      </nav>
+          <NavItem
+            href="/chapters"
+            label="Chapters"
+            icon={<Building2 size={15} strokeWidth={1.5} />}
+          />
+          <NavItem
+            href="/partners"
+            label="Partners"
+            icon={<Handshake size={15} strokeWidth={1.5} />}
+          />
+          <NavItem
+            href="/projects"
+            label="Projects"
+            icon={<FolderOpen size={15} strokeWidth={1.5} />}
+          />
+          <NavItem
+            href="/volunteers"
+            label="Volunteers"
+            icon={<Users size={15} strokeWidth={1.5} />}
+          />
+        </nav>
+      </div>
     </aside>
   );
 }

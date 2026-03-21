@@ -250,7 +250,7 @@ export function DataTable({
                             closeOnClick={false}
                             className={cn(menuItemCls, "gap-2")}
                           >
-                            <span className="border-separator flex h-14 w-14 shrink-0 items-center justify-center border">
+                            <span className="border-checkbox-outline flex h-14 w-14 shrink-0 items-center justify-center border">
                               <Menu.CheckboxItemIndicator>
                                 ✓
                               </Menu.CheckboxItemIndicator>

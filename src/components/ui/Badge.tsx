@@ -21,7 +21,7 @@ export function Badge({ label, color }: { label: string; color: BadgeColor }) {
   return (
     <span
       className={cn(
-        "inline-flex h-4 items-center px-[6px] text-[11px] font-medium",
+        "font-caption inline-flex h-16 items-center border border-black/10 px-4 text-[11px]/16 dark:border-white/10",
         colorClasses[color]
       )}
     >

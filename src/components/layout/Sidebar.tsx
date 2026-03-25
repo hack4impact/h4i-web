@@ -25,31 +25,30 @@ function UserMenu() {
 
   return (
     <Popover.Root>
-      <Popover.Trigger className="flex h-32 w-full cursor-pointer items-center gap-6 px-8 hover:bg-(--hover-bg)">
-        <Avatar.Root className="flex h-18 w-18 shrink-0 items-center justify-center bg-(--accent) text-[10px] font-medium text-white">
+      <Popover.Trigger className="hover:bg-ghost-hover data-popup-open:bg-ghost-hover flex w-fit cursor-pointer items-center gap-10 px-4 py-4 pr-8">
+        <Avatar.Root className="flex size-24 shrink-0 items-center justify-center bg-(--accent) text-sm font-medium text-white">
           <Avatar.Fallback className="leading-none">{initials}</Avatar.Fallback>
         </Avatar.Root>
-        <span className="flex-1 text-left">{name}</span>
+        <span className="flex-1 text-left font-medium">{name}</span>
         <ChevronDown size={12} strokeWidth={1} />
       </Popover.Trigger>
 
       <Popover.Portal>
         <Popover.Positioner align="start" sideOffset={4} className="z-50">
-          <Popover.Popup className="bg-panel border-separator min-w-140 border p-4 shadow-sm">
-            <div className="px-12 py-6 text-(--text-secondary)">
-              Signed in as
-              <br />
-              {email}
+          <Popover.Popup className="bg-panel border-separator max-w-224 border p-4 shadow-sm">
+            <div className="text-secondary flex flex-col gap-2 px-12 py-4">
+              <span className="text-text-3">Signed in as</span>
+              <span className="text-text-primary">{email}</span>
             </div>
             <Separator className="my-4" />
             <Link
               href="/settings"
-              className="flex w-full items-center px-12 py-6 hover:bg-(--hover-bg)"
+              className="hover:bg-ghost-hover flex w-full items-center px-12 py-4"
             >
               Settings
             </Link>
             <Popover.Close
-              className="flex w-full cursor-pointer items-center px-12 py-6 hover:bg-(--hover-bg)"
+              className="hover:bg-ghost-hover flex w-full cursor-pointer items-center px-12 py-4"
               onClick={() => credentialsSignOut()}
             >
               Sign out

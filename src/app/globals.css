@@ -53,14 +53,8 @@
   --color-canvas: light-dark(--color-canvas-light, --color-canvas-dark);
 
   /* Text */
-  --color-text-primary: light-dark(
-    oklab(0% none none / 0.8),
-    oklab(100% 0 0 / 0.9)
-  );
-  --color-text-secondary: light-dark(
-    oklab(0% none none / 0.6),
-    oklab(100% 0 0 / 0.65)
-  );
+  --color-gray-1: light-dark(oklab(0% none none / 0.8), oklab(100% 0 0 / 0.9));
+  --color-gray-2: light-dark(oklab(0% none none / 0.6), oklab(100% 0 0 / 0.65));
   --color-text-3: light-dark(
     oklab(0% none none / 0.5),
     oklab(100% 0 0 / 0.575)
@@ -150,7 +144,7 @@
 
   body {
     background-color: var(--color-root);
-    color: var(--text-primary);
+    color: var(--color-gray-1);
     font-family: var(--font-sans);
     font-size: var(--text-base);
     font-weight: var(--font-weight-medium);

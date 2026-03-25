@@ -138,9 +138,7 @@ export function DataTable({
   return (
     <div className="border-separator bg-panel flex max-h-full flex-1 flex-col self-start overflow-hidden border">
       <div className="border-separator flex shrink-0 items-center gap-8 border-b px-12 py-8">
-        <span className="whitespace-nowrap text-(--text-secondary)">
-          {countLabel}
-        </span>
+        <span className="text-gray-2 whitespace-nowrap">{countLabel}</span>
 
         <div className="relative flex-1">
           <Search
@@ -161,7 +159,7 @@ export function DataTable({
             <ArrowUpDown size={13} strokeWidth={1} />
             Sort
             {sort && (
-              <span className="text-(--text-secondary)">
+              <span className="text-gray-2">
                 · {sort.key} {sort.dir === "asc" ? "↑" : "↓"}
               </span>
             )}
@@ -189,7 +187,7 @@ export function DataTable({
                         >
                           {col.label}
                           {active && (
-                            <span className="ml-auto text-(--text-secondary)">
+                            <span className="text-gray-2 ml-auto">
                               {sort!.dir === "asc" ? "↑ A→Z" : "↓ Z→A"}
                             </span>
                           )}
@@ -222,9 +220,7 @@ export function DataTable({
               <ListFilter size={13} strokeWidth={1} />
               Filter
               {activeFilterCount > 0 && (
-                <span className="text-(--text-secondary)">
-                  · {activeFilterCount}
-                </span>
+                <span className="text-gray-2">· {activeFilterCount}</span>
               )}
             </Menu.Trigger>
             <Menu.Portal>

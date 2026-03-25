@@ -11,7 +11,7 @@ export default async function ChaptersPage() {
       <PageHeader title="Chapters Directory">
         <Button>+ Add Chapter</Button>
       </PageHeader>
-      <div className="flex min-h-0 flex-1 p-8">
+      <div className="flex min-h-0 flex-1 p-32">
         <ChaptersTable data={rows} />
       </div>
     </div>

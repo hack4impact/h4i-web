@@ -11,7 +11,7 @@ export default async function PartnersPage() {
       <PageHeader title="Partners Directory">
         <Button>+ Add Partner</Button>
       </PageHeader>
-      <div className="flex min-h-0 flex-1 p-8">
+      <div className="flex min-h-0 flex-1 p-32">
         <PartnersTable data={rows} />
       </div>
     </div>

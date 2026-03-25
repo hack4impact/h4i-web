@@ -3,7 +3,7 @@ export default function DashboardPage() {
   return (
     <div>
       <PageHeader title="Dashboard">
-        <div className="h-9" />
+        <div className="h-36" />
       </PageHeader>
     </div>
   );

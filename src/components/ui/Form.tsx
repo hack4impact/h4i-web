@@ -36,7 +36,7 @@ export function FormLabel({
 }: WithStringClassName<ComponentPropsWithoutRef<typeof Field.Label>>) {
   return (
     <Field.Label
-      className={cn("font-medium text-(--text-primary)", className)}
+      className={cn("text-gray-1 font-medium", className)}
       {...props}
     />
   );
@@ -50,7 +50,7 @@ export function FormInput({
     <BaseInput
       className={cn(
         "border-separator bg-panel h-8 w-full border px-3",
-        "placeholder:text-(--text-secondary)",
+        "placeholder:text-gray-2",
         "focus:border-(--accent) focus:outline-none",
         "disabled:cursor-not-allowed disabled:opacity-50",
         className

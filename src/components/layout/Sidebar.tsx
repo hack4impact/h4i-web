@@ -35,20 +35,20 @@ function UserMenu() {
 
       <Popover.Portal>
         <Popover.Positioner align="start" sideOffset={4} className="z-50">
-          <Popover.Popup className="bg-panel border-separator max-w-224 border p-4 shadow-sm">
-            <div className="text-secondary flex flex-col gap-2 px-12 py-4">
+          <Popover.Popup className="bg-panel border-separator flex max-w-224 flex-col border py-4 shadow-lg">
+            <div className="text-gray-2 flex flex-col gap-2 px-12 py-4">
               <span className="text-text-3">Signed in as</span>
-              <span className="text-text-primary">{email}</span>
+              <span className="text-gray-1">{email}</span>
             </div>
             <Separator className="my-4" />
-            <Link
+            {/*<Link
               href="/settings"
-              className="hover:bg-ghost-hover flex w-full items-center px-12 py-4"
+              className="hover:bg-ghost-hover flex min-h-24 w-full items-center px-12 py-4"
             >
               Settings
-            </Link>
+            </Link>*/}
             <Popover.Close
-              className="hover:bg-ghost-hover flex w-full cursor-pointer items-center px-12 py-4"
+              className="hover:bg-ghost-hover w-fill mx-4 flex min-h-24 cursor-pointer items-center px-8 py-4"
               onClick={() => credentialsSignOut()}
             >
               Sign out
@@ -78,9 +78,7 @@ function NavItem({ href, label, icon, count }: NavItemProps) {
       href={href}
       className={cn(
         "flex h-32 w-full cursor-default items-center gap-8 px-8 text-lg",
-        isActive
-          ? "bg-(--active-bg) font-medium"
-          : "text-lg hover:bg-(--hover-bg) hover:text-(--text-primary)"
+        isActive ? "bg-ghost-hover" : "hover:bg-ghost-hover text-gray-2 text-lg"
       )}
     >
       <span className="shrink-0">{icon}</span>

@@ -28,20 +28,12 @@ export default function SignInForm() {
   }
 
   return (
-    <Card className="w-100">
-      <div className="mb-5">
-        <p className="mb-1">Hack for Impact</p>
-        <p>Volunteer Platform</p>
-      </div>
+    <Card className="min-w-520">
+      <CardDivider className="mb-20" />
 
-      <CardDivider className="mb-5" />
+      <h1 className="mb-32">Sign in</h1>
 
-      <h1 className="mb-1">Sign in to your account</h1>
-      <p className="mb-5">
-        Admin access only. Contact your administrator if you need help.
-      </p>
-
-      <Form onSubmit={handleSubmit} noValidate className="flex flex-col gap-3">
+      <Form onSubmit={handleSubmit} noValidate className="flex flex-col gap-12">
         <FormField
           name="email"
           validate={(v) => {
@@ -53,6 +45,7 @@ export default function SignInForm() {
         >
           <FormLabel>Email</FormLabel>
           <FormInput
+            className="h-32 pr-64"
             type="email"
             name="email"
             placeholder="you@email.com"
@@ -76,7 +69,7 @@ export default function SignInForm() {
             <FormInput
               type={showPassword ? "text" : "password"}
               name="password"
-              className="pr-16"
+              className="h-32 pr-64"
               autoComplete="current-password"
               disabled={isPending}
             />
@@ -84,7 +77,7 @@ export default function SignInForm() {
               variant="ghost"
               type="button"
               onClick={() => setShowPassword((v) => !v)}
-              className="absolute top-1/2 right-1 -translate-y-1/2 px-2 text-[11px]"
+              className="absolute top-1/2 right-1 -translate-y-1/2 px-8 text-[11px]"
               tabIndex={-1}
               aria-label={showPassword ? "Hide password" : "Show password"}
             >
@@ -96,12 +89,12 @@ export default function SignInForm() {
 
         {error && <p>{error}</p>}
 
-        <Button type="submit" className="mt-1 w-full" disabled={isPending}>
+        <Button type="submit" className="mt-4 w-full" disabled={isPending}>
           {isPending ? "Signing in…" : "Sign In"}
         </Button>
       </Form>
 
-      <div className="my-4 flex items-center gap-3">
+      <div className="my-16 flex items-center gap-3">
         <CardDivider className="flex-1" />
         <span>or</span>
         <CardDivider className="flex-1" />

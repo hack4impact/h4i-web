@@ -208,6 +208,7 @@
 }
 
 @layer components {
+  /* Button base */
   .btn {
     border-top-left-radius: var(
       --field-control-top-left-radius,
@@ -259,6 +260,7 @@
     color: var(--color-gray-3);
   }
 
+  /* Ghost button */
   .btn-ghost {
     color: var(--color-gray-2);
     background-color: transparent;
@@ -309,6 +311,7 @@
     outline: 2px solid var(--color-focus);
   }
 
+  /* High contrast button */
   .btn-high-contrast {
     color: var(--color-control);
     background-color: var(--color-button-high-contrast);
@@ -329,6 +332,7 @@
     background-color: var(--color-gray-2);
   }
 
+  /* Button sizes */
   .btn-xs {
     height: 16px;
     padding-inline: 3px;
@@ -356,6 +360,7 @@
     cursor: pointer;
   }
 
+  /* Field group */
   .field-group {
     display: flex;
     flex: 1;
@@ -381,6 +386,67 @@
     top: 0;
     bottom: 0;
     left: 0;
+  }
+
+  /* Menu popups */
+  .menu-popup {
+    background-color: var(--color-menu);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-radius: var(--radius-6);
+    padding-block: 4px;
+    min-width: var(--anchor-width, auto);
+    box-shadow:
+      0 0 0 1px var(--color-popup-outline),
+      0 4px 20px -2px rgb(0 0 0 / 0.25);
+    outline: none;
+    overflow: hidden auto;
+    scrollbar-width: none;
+  }
+
+  .menu-item {
+    min-height: 24px;
+    padding-block: 4px;
+    padding-inline: 12px;
+    cursor: default;
+    outline: none;
+    display: flex;
+    align-items: center;
+    line-height: normal;
+    position: relative;
+  }
+
+  .menu-item[data-highlighted] {
+    color: #fff;
+    z-index: 0;
+  }
+
+  .menu-item[data-highlighted]::before {
+    content: "";
+    background-color: var(--color-menu-highlight);
+    border-radius: 3px;
+    position: absolute;
+    inset-block: 0;
+    inset-inline: 4px;
+    z-index: -1;
+  }
+
+  .menu-item[data-disabled] {
+    color: var(--color-gray-3);
+  }
+
+  .menu-separator {
+    height: 1px;
+    background-color: var(--color-gray-5);
+    margin-block: 6px;
+    margin-inline: 12px 8px;
+  }
+
+  .menu-caption {
+    padding-block: 4px;
+    padding-inline: 12px;
+    color: var(--color-gray-2);
+    cursor: default;
   }
 }
 

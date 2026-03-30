@@ -1,9 +1,7 @@
 "use client";
-
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Popover } from "@base-ui/react/popover";
-import { Avatar } from "@base-ui/react/avatar";
+import { Menu } from "@base-ui/react/menu";
 import {
   LayoutDashboard,
   Building2,
@@ -12,11 +10,8 @@ import {
   Users,
   ChevronDown,
 } from "lucide-react";
-import { Separator } from "@base-ui/react/separator";
 import { credentialsSignOut } from "@/actions/auth";
 import { cn } from "@/lib/utils";
-
-// User menu
 
 function UserMenu() {
   const initials = "AD";
@@ -24,37 +19,42 @@ function UserMenu() {
   const email = "admin@hack4impact.org";
 
   return (
-    <Popover.Root>
-      <Popover.Trigger className="hover:bg-ghost-hover data-popup-open:bg-ghost-hover flex w-fit cursor-pointer items-center gap-10 px-4 py-4 pr-8">
-        <Avatar.Root className="flex size-24 shrink-0 items-center justify-center bg-(--accent) text-sm font-medium text-white">
-          <Avatar.Fallback className="leading-none">{initials}</Avatar.Fallback>
-        </Avatar.Root>
-        <span className="flex-1 text-left font-medium">{name}</span>
-        <ChevronDown size={12} strokeWidth={1} />
-      </Popover.Trigger>
+    <Menu.Root>
+      <Menu.Trigger className="rounded-4 hover:bg-ghost-hover data-[popup-open]:bg-ghost-hover flex w-fit max-w-full items-center gap-10 px-4 py-4 pr-8 outline-none focus-visible:outline-2 focus-visible:outline-[var(--color-focus)]">
+        <div
+          className="bg-blue-3 flex shrink-0 items-center justify-center rounded-full text-[11px] font-medium text-white"
+          style={{ width: 24, height: 24 }}
+        >
+          {initials}
+        </div>
+        <span className="text-gray-1 truncate text-lg font-medium">{name}</span>
+        <ChevronDown
+          size={8}
+          strokeWidth={1.5}
+          className="text-gray-4 shrink-0"
+        />
+      </Menu.Trigger>
 
-      <Popover.Portal>
-        <Popover.Positioner align="start" sideOffset={4} className="z-50">
-          <Popover.Popup className="bg-panel border-separator flex max-w-224 flex-col border py-4 shadow-lg">
-            <div className="text-gray-2 flex flex-col gap-2 px-12 py-4">
-              <span className="text-gray-3">Signed in as</span>
-              <span className="text-gray-1">{email}</span>
+      <Menu.Portal>
+        <Menu.Positioner align="start" sideOffset={4} className="z-50">
+          <Menu.Popup className="menu-popup w-224">
+            <div className="flex flex-col gap-2 px-12 py-4">
+              <span className="text-gray-3 text-sm">Signed in as</span>
+              <span className="text-gray-1 truncate">{email}</span>
             </div>
-            <Separator className="my-4" />
-            <Popover.Close
-              className="hover:bg-ghost-hover w-fill mx-4 flex min-h-24 cursor-pointer items-center px-8 py-4"
+            <div className="menu-separator mx-0" />
+            <Menu.Item
+              className="menu-item"
               onClick={() => credentialsSignOut()}
             >
               Sign out
-            </Popover.Close>
-          </Popover.Popup>
-        </Popover.Positioner>
-      </Popover.Portal>
-    </Popover.Root>
+            </Menu.Item>
+          </Menu.Popup>
+        </Menu.Positioner>
+      </Menu.Portal>
+    </Menu.Root>
   );
 }
-
-// Nav item
 
 type NavItemProps = {
   href: string;
@@ -71,24 +71,26 @@ function NavItem({ href, label, icon, count }: NavItemProps) {
     <Link
       href={href}
       className={cn(
-        "flex h-32 w-full cursor-default items-center gap-8 px-8 text-lg",
-        isActive ? "bg-ghost-hover" : "hover:bg-ghost-hover text-gray-2 text-lg"
+        "rounded-4 flex h-32 w-full cursor-default items-center gap-8 px-8 text-lg outline-none focus-visible:outline-2 focus-visible:outline-[var(--color-focus)]",
+        isActive
+          ? "bg-ghost-hover text-gray-1"
+          : "text-gray-2 hover:bg-ghost-hover"
       )}
     >
       <span className="shrink-0">{icon}</span>
       <span className="flex-1">{label}</span>
       {count !== undefined && (
-        <span className="tabular-nums">{count.toLocaleString()}</span>
+        <span className="text-gray-3 tabular-nums">
+          {count.toLocaleString()}
+        </span>
       )}
     </Link>
   );
 }
 
-// Sidebar
-
 export function Sidebar() {
   return (
-    <aside className="bg-panel border-separator flex h-full w-240 flex-none shrink-0 flex-col gap-24 border-r text-lg">
+    <aside className="border-separator bg-panel flex h-full w-240 flex-none flex-col border-r">
       <div className="flex flex-1 flex-col gap-24 p-12">
         <UserMenu />
         <nav aria-label="Main" className="space-y-2">
@@ -97,7 +99,6 @@ export function Sidebar() {
             label="Dashboard"
             icon={<LayoutDashboard size={15} strokeWidth={1.5} />}
           />
-
           <NavItem
             href="/chapters"
             label="Chapters"

@@ -37,16 +37,10 @@ function UserMenu() {
         <Popover.Positioner align="start" sideOffset={4} className="z-50">
           <Popover.Popup className="bg-panel border-separator flex max-w-224 flex-col border py-4 shadow-lg">
             <div className="text-gray-2 flex flex-col gap-2 px-12 py-4">
-              <span className="text-text-3">Signed in as</span>
+              <span className="text-gray-3">Signed in as</span>
               <span className="text-gray-1">{email}</span>
             </div>
             <Separator className="my-4" />
-            {/*<Link
-              href="/settings"
-              className="hover:bg-ghost-hover flex min-h-24 w-full items-center px-12 py-4"
-            >
-              Settings
-            </Link>*/}
             <Popover.Close
               className="hover:bg-ghost-hover w-fill mx-4 flex min-h-24 cursor-pointer items-center px-8 py-4"
               onClick={() => credentialsSignOut()}

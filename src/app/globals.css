@@ -55,13 +55,13 @@
   /* Text */
   --color-gray-1: light-dark(oklab(0% none none / 0.8), oklab(100% 0 0 / 0.9));
   --color-gray-2: light-dark(oklab(0% none none / 0.6), oklab(100% 0 0 / 0.65));
-  --color-text-3: light-dark(
+  --color-gray-3: light-dark(
     oklab(0% none none / 0.5),
     oklab(100% 0 0 / 0.575)
   );
-  --color-text-4: light-dark(oklab(0% none none / 0.4), oklab(100% 0 0 / 0.5));
-  --color-text-5: light-dark(oklab(0% none none / 0.1), oklab(100% 0 0 / 0.1));
-  --color-text-inverse: light-dark(black, white);
+  --color-gray-4: light-dark(oklab(0% none none / 0.4), oklab(100% 0 0 / 0.5));
+  --color-gray-5: light-dark(oklab(0% none none / 0.1), oklab(100% 0 0 / 0.1));
+  --color-inverse: light-dark(black, white);
 
   --text-sm: 10px;
   --text-base: 12px;

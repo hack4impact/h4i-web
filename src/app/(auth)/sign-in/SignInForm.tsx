@@ -99,7 +99,7 @@ export default function SignInForm() {
         <CardDivider className="flex-1" />
       </div>
 
-      <Button variant="secondary" className="w-full" type="button">
+      <Button className="w-full" type="button">
         Continue with Google
       </Button>
     </Card>

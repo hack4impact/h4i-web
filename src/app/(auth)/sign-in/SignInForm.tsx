@@ -74,7 +74,6 @@ export default function SignInForm() {
               disabled={isPending}
             />
             <Button
-              variant="ghost"
               type="button"
               onClick={() => setShowPassword((v) => !v)}
               className="absolute top-1/2 right-1 -translate-y-1/2 px-8 text-[11px]"

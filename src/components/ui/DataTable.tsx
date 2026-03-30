@@ -29,10 +29,10 @@ type DataTableProps = {
 };
 
 const toolbarBtn =
-  "inline-flex h-32 cursor-pointer items-center gap-6 px-12 hover:bg-(--hover-bg)";
+  "inline-flex h-32 cursor-pointer items-center gap-6 px-12 hover:bg-ghost-hover";
 
 const menuItemCls =
-  "flex w-full items-center px-10 py-6 text-left cursor-default select-none data-[highlighted]:bg-(--hover-bg)";
+  "flex w-full items-center px-10 py-6 text-left cursor-default select-none data-[highlighted]:bg-ghost-hover";
 
 const menuPopupCls = "w-208 border border-separator bg-popup p-4 shadow-sm";
 
@@ -295,7 +295,7 @@ export function DataTable({
             {processed.map((row, i) => (
               <tr
                 key={row[rowKey] ?? i}
-                className="border-separator border-b hover:bg-(--hover-bg)"
+                className="border-separator hover:bg-ghost-hover border-b"
               >
                 {columns.map((col) => (
                   <td key={col.key} className="px-12 py-7">

@@ -1,26 +1,43 @@
 "use client";
 
 import { Button as ButtonPrimitive } from "@base-ui/react/button";
-
 import { cn } from "@/lib/utils";
 
-function Button({ className, ...props }: ButtonPrimitive.Props) {
+type ButtonVariant = "default" | "ghost" | "high-contrast";
+type ButtonSize = "xs" | "default" | "lg" | "xl";
+
+const variantClass: Record<ButtonVariant, string> = {
+  default: "",
+  ghost: "btn-ghost",
+  "high-contrast": "btn-high-contrast",
+};
+
+const sizeClass: Record<ButtonSize, string> = {
+  xs: "btn-xs",
+  default: "",
+  lg: "btn-lg",
+  xl: "btn-xl",
+};
+
+interface ButtonProps extends ButtonPrimitive.Props {
+  variant?: ButtonVariant;
+  size?: ButtonSize;
+}
+
+function Button({
+  variant = "default",
+  size = "default",
+  className,
+  ...props
+}: ButtonProps) {
   return (
     <ButtonPrimitive
       data-slot="button"
-      className={cn(
-        "inline-flex h-36 shrink-0 cursor-default items-center justify-center gap-6 rounded-md border border-transparent bg-clip-padding px-10 text-sm font-medium whitespace-nowrap select-none",
-        "bg-gray-1 text-gray-1-dark hover:bg-gray-1/80",
-        "transition-all outline-none active:translate-y-px",
-        "focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-3",
-        "disabled:pointer-events-none disabled:opacity-50",
-        "aria-invalid:border-destructive aria-invalid:ring-destructive/20 aria-invalid:ring-3",
-        "[&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-16",
-        className
-      )}
+      className={cn("btn", variantClass[variant], sizeClass[size], className)}
       {...props}
     />
   );
 }
 
 export { Button };
+export type { ButtonProps };

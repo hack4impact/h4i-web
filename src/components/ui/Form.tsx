@@ -15,7 +15,7 @@ export function Form({
   ...props
 }: WithStringClassName<ComponentPropsWithoutRef<typeof BaseForm>>) {
   return (
-    <BaseForm className={cn("flex flex-col gap-4", className)} {...props} />
+    <BaseForm className={cn("flex flex-col gap-16", className)} {...props} />
   );
 }
 
@@ -26,7 +26,7 @@ export function FormField({
   ...props
 }: WithStringClassName<ComponentPropsWithoutRef<typeof Field.Root>>) {
   return (
-    <Field.Root className={cn("flex flex-col gap-1.5", className)} {...props} />
+    <Field.Root className={cn("flex flex-col gap-6", className)} {...props} />
   );
 }
 
@@ -49,7 +49,7 @@ export function FormInput({
   return (
     <BaseInput
       className={cn(
-        "border-separator bg-panel h-8 w-full border px-3",
+        "border-separator bg-panel h-32 w-full border px-12",
         "placeholder:text-gray-2",
         "focus:border-(--accent) focus:outline-none",
         "disabled:cursor-not-allowed disabled:opacity-50",

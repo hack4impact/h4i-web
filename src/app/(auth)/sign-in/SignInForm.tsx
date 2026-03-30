@@ -33,7 +33,7 @@ export default function SignInForm() {
 
       <h1 className="mb-32">Sign in</h1>
 
-      <Form onSubmit={handleSubmit} noValidate className="flex flex-col gap-12">
+      <Form onSubmit={handleSubmit} noValidate>
         <FormField
           name="email"
           validate={(v) => {
@@ -45,7 +45,6 @@ export default function SignInForm() {
         >
           <FormLabel>Email</FormLabel>
           <FormInput
-            className="h-32 pr-64"
             type="email"
             name="email"
             placeholder="you@email.com"
@@ -69,14 +68,16 @@ export default function SignInForm() {
             <FormInput
               type={showPassword ? "text" : "password"}
               name="password"
-              className="h-32 pr-64"
+              className="pr-44"
               autoComplete="current-password"
               disabled={isPending}
             />
             <Button
+              variant="ghost"
+              size="xs"
               type="button"
               onClick={() => setShowPassword((v) => !v)}
-              className="absolute top-1/2 right-1 -translate-y-1/2 px-8 text-[11px]"
+              className="absolute top-1/2 right-6 -translate-y-1/2"
               tabIndex={-1}
               aria-label={showPassword ? "Hide password" : "Show password"}
             >
@@ -88,12 +89,17 @@ export default function SignInForm() {
 
         {error && <p>{error}</p>}
 
-        <Button type="submit" className="mt-4 w-full" disabled={isPending}>
+        <Button
+          variant="high-contrast"
+          type="submit"
+          className="w-full"
+          disabled={isPending}
+        >
           {isPending ? "Signing in…" : "Sign In"}
         </Button>
       </Form>
 
-      <div className="my-16 flex items-center gap-3">
+      <div className="my-16 flex items-center gap-8">
         <CardDivider className="flex-1" />
         <span>or</span>
         <CardDivider className="flex-1" />

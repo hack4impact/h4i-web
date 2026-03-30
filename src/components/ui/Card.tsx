@@ -5,7 +5,7 @@ import type { HTMLAttributes, ComponentPropsWithoutRef } from "react";
 export function Card({ className, ...props }: HTMLAttributes<HTMLDivElement>) {
   return (
     <div
-      className={cn("border-separator bg-panel border p-6", className)}
+      className={cn("border-separator bg-panel border p-24", className)}
       {...props}
     />
   );

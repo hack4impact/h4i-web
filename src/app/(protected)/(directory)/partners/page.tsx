@@ -7,9 +7,11 @@ export default async function PartnersPage() {
   const { rows } = await getPartners();
 
   return (
-    <div className="flex h-full flex-col">
+    <div className="flex h-full flex-col pt-32">
       <PageHeader title="Partners Directory">
-        <Button>+ Add Partner</Button>
+        <Button variant="high-contrast" className="h-full">
+          + Add Partner
+        </Button>
       </PageHeader>
       <div className="flex min-h-0 flex-1 p-32">
         <PartnersTable data={rows} />

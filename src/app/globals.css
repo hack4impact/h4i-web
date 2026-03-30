@@ -395,6 +395,7 @@
     -webkit-backdrop-filter: blur(12px);
     border-radius: var(--radius-6);
     padding-block: 4px;
+    width: max-content;
     min-width: var(--anchor-width, auto);
     box-shadow:
       0 0 0 1px var(--color-popup-outline),

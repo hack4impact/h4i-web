@@ -7,9 +7,11 @@ export default async function VolunteersPage() {
   const { rows } = await getVolunteers();
 
   return (
-    <div className="flex h-full flex-col">
+    <div className="flex h-full flex-col pt-32">
       <PageHeader title="Volunteers Directory">
-        <Button>+ Add Volunteer</Button>
+        <Button variant="high-contrast" className="h-full">
+          + Add Volunteer
+        </Button>
       </PageHeader>
       <div className="flex min-h-0 flex-1 p-32">
         <VolunteersTable data={rows} />

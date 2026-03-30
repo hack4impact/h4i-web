@@ -37,9 +37,9 @@ function UserMenu() {
 
       <Menu.Portal>
         <Menu.Positioner align="start" sideOffset={4} className="z-50">
-          <Menu.Popup className="menu-popup w-224">
+          <Menu.Popup className="menu-popup max-w-224">
             <div className="flex flex-col gap-2 px-12 py-4">
-              <span className="text-gray-3 text-sm">Signed in as</span>
+              <span className="text-gray-3">Signed in as</span>
               <span className="text-gray-1 truncate">{email}</span>
             </div>
             <div className="menu-separator mx-0" />

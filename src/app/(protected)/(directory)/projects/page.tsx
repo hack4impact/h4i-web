@@ -10,7 +10,7 @@ export default async function ProjectsPage() {
     <div className="flex h-full flex-col pt-32">
       <PageHeader title="Projects Directory">
         <Button variant="high-contrast" className="h-full">
-          Add Project
+          + Add Project
         </Button>
       </PageHeader>
       <div className="flex min-h-0 flex-1 p-32">

@@ -3,7 +3,7 @@
 import { useState, useMemo } from "react";
 import { Menu } from "@base-ui/react/menu";
 import { Input } from "@base-ui/react/input";
-import { Search, ArrowUpDown, ListFilter } from "lucide-react";
+import { Search, ArrowUpDown, ListFilter, Check } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export type FilterField = {
@@ -31,20 +31,11 @@ type DataTableProps = {
 const toolbarBtn =
   "inline-flex h-32 cursor-pointer items-center gap-6 px-12 hover:bg-ghost-hover";
 
-const menuItemCls =
-  "flex w-full items-center px-10 py-6 text-left cursor-default select-none data-[highlighted]:bg-ghost-hover";
+const menuItemCls = "menu-item text-left select-none";
 
-const menuPopupCls = "w-208 border border-separator bg-popup p-4 shadow-sm";
+const menuPopupCls = "menu-popup";
 
 const menuPositionerCls = "z-50";
-
-function MenuSectionLabel({ children }: { children: React.ReactNode }) {
-  return (
-    <div className="px-3 py-2">
-      <span className="section-label">{children}</span>
-    </div>
-  );
-}
 
 export function DataTable({
   data,
@@ -172,41 +163,39 @@ export function DataTable({
               sideOffset={4}
             >
               <Menu.Popup className={menuPopupCls}>
-                <MenuSectionLabel>Sort by</MenuSectionLabel>
-                <div className="flex flex-col gap-2 p-6">
-                  <Menu.RadioGroup value={sort?.key ?? ""}>
-                    {columns.map((col) => {
-                      const active = sort?.key === col.key;
-                      return (
-                        <Menu.RadioItem
-                          key={col.key}
-                          value={col.key}
-                          closeOnClick={false}
-                          onClick={() => cycleSort(col.key)}
-                          className={menuItemCls}
+                <div className="menu-caption text-gray-3">Sort by</div>
+                <Menu.RadioGroup value={sort?.key ?? ""}>
+                  {columns.map((col) => {
+                    const active = sort?.key === col.key;
+                    return (
+                      <Menu.RadioItem
+                        key={col.key}
+                        value={col.key}
+                        closeOnClick={false}
+                        onClick={() => cycleSort(col.key)}
+                        className={cn(menuItemCls, "justify-between gap-16")}
+                      >
+                        {col.label}
+                        <span
+                          className={
+                            active ? "text-gray-2" : "text-transparent"
+                          }
                         >
-                          {col.label}
-                          {active && (
-                            <span className="text-gray-2 ml-auto">
-                              {sort!.dir === "asc" ? "↑ A→Z" : "↓ Z→A"}
-                            </span>
-                          )}
-                        </Menu.RadioItem>
-                      );
-                    })}
-                  </Menu.RadioGroup>
-                </div>
+                          {active && sort!.dir === "desc" ? "↓ Z→A" : "↑ A→Z"}
+                        </span>
+                      </Menu.RadioItem>
+                    );
+                  })}
+                </Menu.RadioGroup>
                 {sort && (
                   <>
-                    <Menu.Separator className="my-4" />
-                    <div className="p-6">
-                      <Menu.Item
-                        onClick={() => setSort(null)}
-                        className={menuItemCls}
-                      >
-                        Clear sort
-                      </Menu.Item>
-                    </div>
+                    <div className="menu-separator" />
+                    <Menu.Item
+                      onClick={() => setSort(null)}
+                      className={menuItemCls}
+                    >
+                      Clear sort
+                    </Menu.Item>
                   </>
                 )}
               </Menu.Popup>
@@ -232,42 +221,38 @@ export function DataTable({
               >
                 <Menu.Popup className={menuPopupCls}>
                   {filterFields.map((field, i) => (
-                    <div
-                      key={field.key}
-                      className={cn(i > 0 && "border-separator border-t")}
-                    >
-                      <MenuSectionLabel>{field.label}</MenuSectionLabel>
-                      <div className="flex flex-col gap-2 p-6">
-                        {(filterOptions[field.key] ?? []).map((opt) => (
-                          <Menu.CheckboxItem
-                            key={opt}
-                            checked={filters[field.key]?.has(opt) ?? false}
-                            onCheckedChange={() => toggleFilter(field.key, opt)}
-                            closeOnClick={false}
-                            className={cn(menuItemCls, "gap-2")}
-                          >
-                            <span className="border-checkbox-outline flex h-14 w-14 shrink-0 items-center justify-center border">
-                              <Menu.CheckboxItemIndicator>
-                                ✓
-                              </Menu.CheckboxItemIndicator>
-                            </span>
-                            <span>{opt}</span>
-                          </Menu.CheckboxItem>
-                        ))}
+                    <div key={field.key}>
+                      {i > 0 && <div className="menu-separator" />}
+                      <div className="menu-caption text-gray-3">
+                        {field.label}
                       </div>
+                      {(filterOptions[field.key] ?? []).map((opt) => (
+                        <Menu.CheckboxItem
+                          key={opt}
+                          checked={filters[field.key]?.has(opt) ?? false}
+                          onCheckedChange={() => toggleFilter(field.key, opt)}
+                          closeOnClick={false}
+                          className={cn(menuItemCls, "gap-8")}
+                        >
+                          <span className="border-checkbox-outline flex h-14 w-14 shrink-0 items-center justify-center border">
+                            <Menu.CheckboxItemIndicator>
+                              <Check size={10} strokeWidth={2.5} />
+                            </Menu.CheckboxItemIndicator>
+                          </span>
+                          <span>{opt}</span>
+                        </Menu.CheckboxItem>
+                      ))}
                     </div>
                   ))}
                   {activeFilterCount > 0 && (
                     <>
-                      <Menu.Separator className="my-4" />
-                      <div className="p-6">
-                        <Menu.Item
-                          onClick={() => setFilters({})}
-                          className={menuItemCls}
-                        >
-                          Clear filters
-                        </Menu.Item>
-                      </div>
+                      <div className="menu-separator" />
+                      <Menu.Item
+                        onClick={() => setFilters({})}
+                        className={menuItemCls}
+                      >
+                        Clear filters
+                      </Menu.Item>
                     </>
                   )}
                 </Menu.Popup>

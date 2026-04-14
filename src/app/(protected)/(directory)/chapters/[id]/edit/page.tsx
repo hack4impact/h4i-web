@@ -9,10 +9,7 @@ export default async function EditChapterPage({
   await params;
   return (
     <div>
-      <PageHeader title="Chapter">
-        <Button variant="secondary">Cancel</Button>
-        <Button variant="dark">Save Changes</Button>
-      </PageHeader>
+      <PageHeader title="Chapter"></PageHeader>
     </div>
   );
 }

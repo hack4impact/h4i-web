@@ -9,10 +9,7 @@ export default async function EditPartnerPage({
   await params;
   return (
     <div>
-      <PageHeader title="Partner">
-        <Button variant="secondary">Cancel</Button>
-        <Button variant="dark">Save Changes</Button>
-      </PageHeader>
+      <PageHeader title="Partner"></PageHeader>
     </div>
   );
 }

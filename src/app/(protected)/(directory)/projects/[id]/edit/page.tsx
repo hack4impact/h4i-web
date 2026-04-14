@@ -9,10 +9,7 @@ export default async function EditProjectPage({
   await params;
   return (
     <div>
-      <PageHeader title="Project">
-        <Button variant="secondary">Cancel</Button>
-        <Button variant="dark">Save Changes</Button>
-      </PageHeader>
+      <PageHeader title="Project"></PageHeader>
     </div>
   );
 }

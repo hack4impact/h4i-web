@@ -9,10 +9,7 @@ export default async function EditVolunteerPage({
   await params;
   return (
     <div>
-      <PageHeader title="Volunteer">
-        <Button variant="secondary">Cancel</Button>
-        <Button variant="dark">Save Changes</Button>
-      </PageHeader>
+      <PageHeader title="Volunteer"></PageHeader>
     </div>
   );
 }

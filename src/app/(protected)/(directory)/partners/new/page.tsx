@@ -5,7 +5,6 @@ export default function NewPartnerPage() {
   return (
     <div>
       <PageHeader title="Add Partner">
-        <Button variant="secondary">Cancel</Button>
         <Button>+ Add Partner</Button>
       </PageHeader>
     </div>

@@ -8,6 +8,7 @@ const DEV_EMAIL = "admin@hack4impact.org";
 const DEV_PASSWORD = "password";
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
+  trustHost: true,
   session: { strategy: "jwt" },
   providers: [
     Credentials({

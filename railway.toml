@@ -1,6 +1,6 @@
 [build]
 builder = "RAILPACK"
-buildCommand = "pnpm build"
+buildCommand = "pnpm db:generate && pnpm build"
 
 [deploy]
 startCommand = "pnpm start"

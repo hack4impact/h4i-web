@@ -6,18 +6,54 @@ datasource db {
   provider = "postgresql"
 }
 
+// Mirrors the role hierarchy in the operations-api.
+// Temporarily stored here until ops-api exposes role assignment endpoints.
+// TODO: once GET /volunteers?email= and GET /volunteers/:id/roles exist,
+// remove role + operationsChapterId and resolve dynamically at sign-in.
 enum Role {
-  ADMIN
-  CHAPTER_LEADER
-  VOLUNTEER
+  NATIONAL_ADMIN
+  CHAPTER_LEAD  // upload, edit, delete within their chapter
+  PROJECT_LEAD  // upload and edit within their chapter, no delete
+  MEMBER        // read only
 }
 
 model User {
-  id        String   @id @default(cuid())
-  name      String?
-  email     String   @unique
-  password  String?
-  role      Role     @default(ADMIN)
+  id                   String   @id @default(cuid())
+  email                String   @unique
+  passwordHash         String?
+  role                 Role     @default(MEMBER)
+  // Links this auth record to the volunteer record in the operations-api
+  operationsId         String?  @unique
+  // Cached from ops-api — the chapter this user belongs to
+  // TODO: remove once ops-api exposes role/assignment endpoints
+  operationsChapterId  String?
+  // User preference — controls whether they appear in the national directory
+  directoryOptIn       Boolean  @default(false)
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+
+  sessions        Session[]
+  magicLinkTokens MagicLinkToken[]
+}
+
+// Stores active login sessions — one row per logged-in device/browser
+model Session {
+  id        String   @id @default(cuid()) // opaque token sent as a cookie
+  userId    String
+  expiresAt DateTime
   createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// One-time tokens sent via magic link email
+model MagicLinkToken {
+  id        String    @id @default(cuid()) // token sent in the email link
+  email     String
+  userId    String?
+  expiresAt DateTime
+  usedAt    DateTime? // null until clicked; stamped on use to prevent reuse
+  createdAt DateTime  @default(now())
+
+  user User? @relation(fields: [userId], references: [id], onDelete: Cascade)
 }

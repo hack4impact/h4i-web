@@ -11,17 +11,17 @@ datasource db {
 // TODO: once GET /volunteers?email= and GET /volunteers/:id/roles exist,
 // remove role + operationsChapterId and resolve dynamically at sign-in.
 enum Role {
-  NATIONAL_ADMIN
-  CHAPTER_LEAD  // upload, edit, delete within their chapter
-  PROJECT_LEAD  // upload and edit within their chapter, no delete
-  MEMBER        // read only
+  ADMIN
+  CHAPTER_LEAD
+  PROJECT_LEAD
+  VOLUNTEER
 }
 
 model User {
   id                   String   @id @default(cuid())
   email                String   @unique
   passwordHash         String?
-  role                 Role     @default(MEMBER)
+  role                 Role     @default(VOLUNTEER)
   // Links this auth record to the volunteer record in the operations-api
   operationsId         String?  @unique
   // Cached from ops-api — the chapter this user belongs to

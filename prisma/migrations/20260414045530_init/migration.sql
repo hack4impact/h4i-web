@@ -1,12 +1,12 @@
 -- CreateEnum
-CREATE TYPE "Role" AS ENUM ('ADMIN', 'CHAPTER_LEAD', 'PROJECT_LEAD', 'VOLUNTEER');
+CREATE TYPE "Role" AS ENUM ('NATIONAL_ADMIN', 'CHAPTER_LEAD', 'PROJECT_LEAD', 'MEMBER');
 
 -- CreateTable
 CREATE TABLE "User" (
     "id" TEXT NOT NULL,
     "email" TEXT NOT NULL,
     "passwordHash" TEXT,
-    "role" "Role" NOT NULL DEFAULT 'VOLUNTEER',
+    "role" "Role" NOT NULL DEFAULT 'MEMBER',
     "operationsId" TEXT,
     "operationsChapterId" TEXT,
     "directoryOptIn" BOOLEAN NOT NULL DEFAULT false,

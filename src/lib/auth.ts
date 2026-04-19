@@ -2,8 +2,6 @@ import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import type { AppRole } from "@/types";
 import { loginRequestSchema } from "@/lib/validators/auth";
-import { z } from "zod";
-import { db } from "@/lib/db";
 
 // TODO: replace with real database auth
 const DEV_EMAIL = "admin@hack4impact.org";

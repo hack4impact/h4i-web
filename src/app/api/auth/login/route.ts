@@ -2,18 +2,21 @@ import { db } from "@/lib/db";
 import { loginRequestSchema } from "@/lib/validators/auth";
 import { NextResponse } from "next/server";
 import { verifyPassword } from "@/lib/password";
+import { request } from "https";
 
 export async function POST(request: Request) {
+  const errorResponse = NextResponse.json(
+    { error: "Invalid email or password" },
+    { status: 401 }
+  );
+
   try {
     const body = await request.json();
     try {
       const login = loginRequestSchema.parse(body);
       const user = await db.user.findUnique({ where: { email: login.email } });
       if (user == null || user.passwordHash == null) {
-        return NextResponse.json(
-          { error: "Invalid email or password" },
-          { status: 401 }
-        );
+        return errorResponse;
       }
       const verified = await verifyPassword(login.password, user.passwordHash);
 
@@ -32,21 +35,12 @@ export async function POST(request: Request) {
           }
         );
       } else {
-        return NextResponse.json(
-          { error: "Invalid email or password" },
-          { status: 401 }
-        );
+        return errorResponse;
       }
     } catch {
-      return NextResponse.json(
-        { error: "Invalid email or password" },
-        { status: 401 }
-      );
+      return errorResponse;
     }
   } catch (error) {
-    return NextResponse.json(
-      { error: "Invalid email or password" },
-      { status: 401 }
-    );
+    return errorResponse;
   }
 }

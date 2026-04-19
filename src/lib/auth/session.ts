@@ -1,6 +1,6 @@
 import { db } from "@/lib/db";
 
-function getSession(request: Request) {
+export function getSession(request: Request) {
   const cookie = request.headers.get("cookie");
   if (!cookie) {
     return null;

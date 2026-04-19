@@ -1,5 +1,19 @@
 import { db } from "@/lib/db";
+import { getSession } from "@/lib/auth/session";
 
 export async function POST(request: Request) {
-  return new Response(null, { status: 200 });
+  const session = await getSession(request);
+
+  if (session) {
+    try {
+      await db.session.delete({ where: { id: session.id } });
+    } catch {
+      //cookie already cleared
+    }
+  }
+
+  return new Response(null, {
+    status: 200,
+    headers: { "Set-Cookie": "session=; Max-Age=0; Path=/; HttpOnly" },
+  });
 }

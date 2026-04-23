@@ -24,6 +24,10 @@
 .DS_Store
 *.pem
 
+# package manager lockfiles (use pnpm-lock.yaml only)
+package-lock.json
+yarn.lock
+
 # debug
 npm-debug.log*
 yarn-debug.log*

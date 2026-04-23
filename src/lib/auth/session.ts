@@ -5,7 +5,7 @@ export async function getSession(request: Request) {
   if (!cookie) {
     return null;
   }
-  const match = cookie.match(/session=([^;]+)/);
+  const match = cookie.match(/sessionToken=([^;]+)/);
   if (!match) {
     return null;
   }

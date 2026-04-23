@@ -1,6 +1,6 @@
 import { db } from "@/lib/db";
 
-export function getSession(request: Request) {
+export async function getSession(request: Request) {
   const cookie = request.headers.get("cookie");
   if (!cookie) {
     return null;
@@ -10,5 +10,12 @@ export function getSession(request: Request) {
     return null;
   }
   const sessionId = match[1];
-  return db.session.findUnique({ where: { id: sessionId } });
+  const session = await db.session.findUnique({
+    where: { id: sessionId },
+    include: { user: true },
+  });
+  if (!session || session.expiresAt < new Date()) {
+    return null;
+  }
+  return session;
 }

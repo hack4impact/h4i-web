@@ -7,9 +7,7 @@ export async function POST(request: Request) {
   if (session) {
     try {
       await db.session.delete({ where: { id: session.id } });
-    } catch {
-      //cookie already cleared
-    }
+    } catch {}
   }
 
   return new Response(null, {

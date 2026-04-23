@@ -2,7 +2,6 @@ import { db } from "@/lib/db";
 import { loginRequestSchema } from "@/lib/validators/auth";
 import { NextResponse } from "next/server";
 import { verifyPassword } from "@/lib/password";
-import { request } from "https";
 
 export async function POST(request: Request) {
   const errorResponse = NextResponse.json(
@@ -22,15 +21,16 @@ export async function POST(request: Request) {
 
       if (verified) {
         const expiry = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
-        const session = await db.session.create({ data: { userId: user.id, expiry } });
+        const session = await db.session.create({
+          data: { userId: user.id, expiry },
+        });
 
         return NextResponse.json(
           { message: "Logged in" },
           {
             status: 200,
             headers: {
-              "Set-Cookie":
-                "session=${session.id}; HttpOnly; path=/; SameSite=Lax; Max-Age=2592000",
+              "Set-Cookie": `session=${session.id}; HttpOnly; path=/; SameSite=Lax; Max-Age=2592000`,
             },
           }
         );

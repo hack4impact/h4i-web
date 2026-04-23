@@ -40,6 +40,10 @@
     "onlyBuiltDependencies": [
       "@prisma/engines",
       "prisma"
+    ],
+    "ignoredBuiltDependencies": [
+      "sharp",
+      "unrs-resolver"
     ]
   },
   "devDependencies": {

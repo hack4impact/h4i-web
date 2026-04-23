@@ -22,7 +22,7 @@ export async function POST(request: Request) {
 
       if (verified) {
         const expiry = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
-        db.session.create({ data: { userId: user.id, expiry } });
+        const session = await db.session.create({ data: { userId: user.id, expiry } });
 
         return NextResponse.json(
           { message: "Logged in" },
@@ -30,7 +30,7 @@ export async function POST(request: Request) {
             status: 200,
             headers: {
               "Set-Cookie":
-                "session=<session.id>; HttpOnly; path=/; SameSite=Lax; Max-Age=2592000",
+                "session=${session.id}; HttpOnly; path=/; SameSite=Lax; Max-Age=2592000",
             },
           }
         );

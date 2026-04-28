@@ -5,19 +5,30 @@ import bcrypt from "bcryptjs";
 const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL! });
 const db = new PrismaClient({ adapter });
 
-async function main() {
-  await db.user.upsert({
-    where: { email: "admin@hack4impact.org" },
-    update: {},
-    create: {
-      name: "Admin",
-      email: "admin@hack4impact.org",
-      password: await bcrypt.hash("password", 10),
-      role: "ADMIN",
-    },
-  });
+const users = [
+  { name: "Admin", email: "admin@hack4impact.org", role: "ADMIN" as const },
+  {
+    name: "Chapter Leader",
+    email: "chapter@hack4impact.org",
+    role: "CHAPTER_LEADER" as const,
+  },
+  {
+    name: "Volunteer",
+    email: "volunteer@hack4impact.org",
+    role: "VOLUNTEER" as const,
+  },
+];
 
-  console.log("Seed complete");
+async function main() {
+  const password = await bcrypt.hash("password", 10);
+  for (const user of users) {
+    await db.user.upsert({
+      where: { email: user.email },
+      update: {},
+      create: { ...user, password },
+    });
+  }
+  console.log("Seeded", users.length, "users");
 }
 
 main()

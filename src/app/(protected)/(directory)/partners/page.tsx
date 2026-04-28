@@ -1,11 +1,9 @@
 import { PageHeader } from "@/components/ui/PageHeader";
 import { Button } from "@/components/ui/Button";
-import { getPartners } from "@/actions/partners";
+import { partners } from "@/lib/data";
 import { PartnersTable } from "./PartnersTable";
 
-export default async function PartnersPage() {
-  const { rows } = await getPartners();
-
+export default function PartnersPage() {
   return (
     <div className="flex h-full flex-col pt-32">
       <PageHeader title="Partners Directory">
@@ -14,7 +12,7 @@ export default async function PartnersPage() {
         </Button>
       </PageHeader>
       <div className="flex min-h-0 flex-1 p-32">
-        <PartnersTable data={rows} />
+        <PartnersTable data={partners} />
       </div>
     </div>
   );

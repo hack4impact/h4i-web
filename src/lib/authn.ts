@@ -5,7 +5,7 @@ import { PrismaAdapter } from "@auth/prisma-adapter";
 import { z } from "zod";
 import bcrypt from "bcryptjs";
 import { db } from "@/lib/db";
-import { authConfig } from "@/lib/auth.config";
+import { authConfig } from "@/lib/authn.config";
 import type { AppRole } from "@/types";
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
@@ -58,7 +58,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         token.role = user.role;
         token.chapterId = user.chapterId;
 
-        // OAuth sign-ins: role/chapterId may not be on the user object,
+        // OAuth sign-ins: role/chapterId may not be on the user object —
         // fetch from DB to pick up the persisted defaults.
         if (!token.role && user.id) {
           const dbUser = await db.user.findUnique({

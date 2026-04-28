@@ -1,11 +1,9 @@
 import { PageHeader } from "@/components/ui/PageHeader";
 import { Button } from "@/components/ui/Button";
-import { getVolunteers } from "@/actions/volunteers";
+import { volunteers } from "@/lib/data";
 import { VolunteersTable } from "./VolunteersTable";
 
-export default async function VolunteersPage() {
-  const { rows } = await getVolunteers();
-
+export default function VolunteersPage() {
   return (
     <div className="flex h-full flex-col pt-32">
       <PageHeader title="Volunteers Directory">
@@ -14,7 +12,7 @@ export default async function VolunteersPage() {
         </Button>
       </PageHeader>
       <div className="flex min-h-0 flex-1 p-32">
-        <VolunteersTable data={rows} />
+        <VolunteersTable data={volunteers} />
       </div>
     </div>
   );

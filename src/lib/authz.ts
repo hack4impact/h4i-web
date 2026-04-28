@@ -1,4 +1,4 @@
-import { auth } from "@/lib/auth";
+import { auth } from "@/lib/authn";
 import type { AppRole } from "@/types";
 
 export async function requireRole(...roles: AppRole[]) {

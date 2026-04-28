@@ -10,7 +10,7 @@ import {
   FormInput,
   FormError,
 } from "@/components/ui/Form";
-import { credentialsSignIn } from "@/actions/auth";
+import { credentialsSignIn } from "@/actions/authn";
 
 export default function SignInForm() {
   const [showPassword, setShowPassword] = useState(false);
@@ -28,10 +28,8 @@ export default function SignInForm() {
   }
 
   return (
-    <Card className="min-w-520">
-      <CardDivider className="mb-20" />
-
-      <h1 className="mb-32">Sign in</h1>
+    <Card className="min-w-400">
+      <h1 className="mb-32">Sign In</h1>
 
       <Form onSubmit={handleSubmit} noValidate>
         <FormField
@@ -47,6 +45,7 @@ export default function SignInForm() {
           <FormInput
             type="email"
             name="email"
+            className="bg-root"
             placeholder="you@email.com"
             autoComplete="email"
             disabled={isPending}
@@ -68,7 +67,7 @@ export default function SignInForm() {
             <FormInput
               type={showPassword ? "text" : "password"}
               name="password"
-              className="pr-44"
+              className="bg-root pr-44"
               autoComplete="current-password"
               disabled={isPending}
             />

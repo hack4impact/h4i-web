@@ -1,9 +1,9 @@
 import type { NextAuthConfig } from "next-auth";
 import type { AppRole } from "@/types";
 
-// Edge-safe base config. No DB, no bcrypt, no Node.js-only imports.
+// Edge-safe base config — no DB, no bcrypt, no Node.js-only imports.
 // Middleware creates a NextAuth instance from this directly.
-// auth.ts spreads this and adds the adapter + providers.
+// authn.ts spreads this and adds the adapter + providers.
 export const authConfig = {
   trustHost: true,
   session: { strategy: "jwt" },

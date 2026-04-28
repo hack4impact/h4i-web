@@ -131,7 +131,7 @@ export function DataTable({
       <div className="border-separator flex shrink-0 items-center gap-8 border-b px-12 py-8">
         <span className="text-gray-2 whitespace-nowrap">{countLabel}</span>
 
-        <div className="relative flex-1">
+        <div className="bg-ghost-hover relative flex-1">
           <Search
             size={13}
             strokeWidth={1}
@@ -141,7 +141,7 @@ export function DataTable({
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder={`Search ${noun}s...`}
-            className="border-separator bg-panel h-32 w-full border py-4 pr-12 pl-28 placeholder:text-(--text-secondary) focus:border-(--accent) focus:outline-none"
+            className="border-separator bg-gray h-32 w-full border py-4 pr-12 pl-28 placeholder:text-(--text-secondary) focus:border-(--accent) focus:outline-none"
           />
         </div>
 

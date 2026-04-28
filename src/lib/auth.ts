@@ -1,15 +1,16 @@
 import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
+import Google from "next-auth/providers/google";
+import { PrismaAdapter } from "@auth/prisma-adapter";
 import { z } from "zod";
+import bcrypt from "bcryptjs";
+import { db } from "@/lib/db";
+import { authConfig } from "@/lib/auth.config";
 import type { AppRole } from "@/types";
 
-// TODO: replace with real database auth
-const DEV_EMAIL = "admin@hack4impact.org";
-const DEV_PASSWORD = "password";
-
 export const { handlers, auth, signIn, signOut } = NextAuth({
-  trustHost: true,
-  session: { strategy: "jwt" },
+  ...authConfig,
+  adapter: PrismaAdapter(db),
   providers: [
     Credentials({
       credentials: {
@@ -23,34 +24,52 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 
         if (!parsed.success) return null;
 
-        if (
-          parsed.data.email !== DEV_EMAIL ||
-          parsed.data.password !== DEV_PASSWORD
-        )
-          return null;
+        const user = await db.user.findUnique({
+          where: { email: parsed.data.email },
+        });
+
+        if (!user?.password) return null;
+
+        const valid = await bcrypt.compare(parsed.data.password, user.password);
+        if (!valid) return null;
 
         return {
-          id: "dev-admin",
-          name: "Admin",
-          email: DEV_EMAIL,
-          role: "ADMIN",
+          id: user.id,
+          name: user.name,
+          email: user.email,
+          role: user.role as AppRole,
+          chapterId: user.chapterId,
         };
       },
     }),
+    ...(process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET
+      ? [
+          Google({
+            clientId: process.env.GOOGLE_CLIENT_ID,
+            clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+          }),
+        ]
+      : []),
   ],
   callbacks: {
-    jwt({ token, user }) {
-      if (user) {
-        token.role = (user as { role?: AppRole }).role ?? "ADMIN";
+    ...authConfig.callbacks,
+    async jwt({ token, user, trigger }) {
+      if (trigger === "signIn" && user) {
+        token.role = user.role;
+        token.chapterId = user.chapterId;
+
+        // OAuth sign-ins: role/chapterId may not be on the user object,
+        // fetch from DB to pick up the persisted defaults.
+        if (!token.role && user.id) {
+          const dbUser = await db.user.findUnique({
+            where: { id: user.id },
+            select: { role: true, chapterId: true },
+          });
+          token.role = (dbUser?.role as AppRole) ?? "VOLUNTEER";
+          token.chapterId = dbUser?.chapterId ?? null;
+        }
       }
       return token;
     },
-    session({ session, token }) {
-      session.user.role = token.role as AppRole;
-      return session;
-    },
-  },
-  pages: {
-    signIn: "/sign-in",
   },
 });

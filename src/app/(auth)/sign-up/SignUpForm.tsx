@@ -128,7 +128,7 @@ export default function SignUpForm() {
           className="w-full"
           disabled={isPending}
         >
-          {isPending ? "Creating account…" : "Create Account"}
+          {isPending ? "Signing up…" : "Sign Up"}
         </Button>
       </Form>
 

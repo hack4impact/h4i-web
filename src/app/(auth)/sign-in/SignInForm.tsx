@@ -86,7 +86,7 @@ export default function SignInForm() {
           <FormError />
         </FormField>
 
-        {error && <p>{error}</p>}
+        {error && <p className="text-sm text-red-600">{error}</p>}
 
         <Button
           variant="high-contrast"

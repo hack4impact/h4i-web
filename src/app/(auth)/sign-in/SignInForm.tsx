@@ -107,6 +107,13 @@ export default function SignInForm() {
       <Button className="w-full" type="button">
         Continue with Google
       </Button>
+
+      <p className="mt-16 text-center text-sm">
+        Don&apos;t have an account?{" "}
+        <a href="/sign-up" className="font-medium">
+          Sign up
+        </a>
+      </p>
     </Card>
   );
 }

@@ -68,6 +68,12 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           token.role = (dbUser?.role as AppRole) ?? "VOLUNTEER";
           token.chapterId = dbUser?.chapterId ?? null;
         }
+      } else if (token.sub) {
+        const exists = await db.user.findUnique({
+          where: { id: token.sub },
+          select: { id: true },
+        });
+        if (!exists) return null;
       }
       return token;
     },

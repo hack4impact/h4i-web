@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { DataTable } from "@/components/ui/DataTable";
 import { Badge, BadgeColor } from "@/components/ui/Badge";
 
@@ -14,6 +15,8 @@ const statusColors: Record<string, BadgeColor> = {
 };
 
 export function ChaptersTable({ data }: Props) {
+  const router = useRouter();
+
   return (
     <DataTable
       data={data}
@@ -30,6 +33,7 @@ export function ChaptersTable({ data }: Props) {
           ),
         },
       ]}
+      onRowClick={(row) => router.push(`/chapters/${row.id}`)}
     />
   );
 }

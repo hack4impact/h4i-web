@@ -26,15 +26,12 @@ type DataTableProps = {
   filterFields?: FilterField[];
   columnConfig?: ColumnConfig[];
   defaultSort?: SortState;
+  onRowClick?: (row: Record<string, string>) => void;
 };
 
-const toolbarBtn =
-  "inline-flex h-32 cursor-pointer items-center gap-6 px-12 hover:bg-ghost-hover";
-
+const toolbarBtn = "btn btn-ghost btn-lg";
 const menuItemCls = "menu-item text-left select-none";
-
 const menuPopupCls = "menu-popup";
-
 const menuPositionerCls = "z-50";
 
 export function DataTable({
@@ -45,6 +42,7 @@ export function DataTable({
   filterFields,
   columnConfig,
   defaultSort = null,
+  onRowClick,
 }: DataTableProps) {
   const [search, setSearch] = useState("");
   const [sort, setSort] = useState<SortState>(defaultSort);
@@ -127,11 +125,11 @@ export function DataTable({
   }
 
   return (
-    <div className="border-separator bg-panel flex max-h-full flex-1 flex-col self-start overflow-hidden border">
+    <div className="border-separator bg-panel rounded-4 flex max-h-full flex-1 flex-col self-start overflow-hidden border">
       <div className="border-separator flex shrink-0 items-center gap-8 border-b px-12 py-8">
         <span className="text-gray-2 whitespace-nowrap">{countLabel}</span>
 
-        <div className="bg-ghost-hover relative flex-1">
+        <div className="rounded-6 bg-ghost-hover relative flex-1">
           <Search
             size={13}
             strokeWidth={1}
@@ -141,7 +139,7 @@ export function DataTable({
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder={`Search ${noun}s...`}
-            className="border-separator bg-gray h-32 w-full border py-4 pr-12 pl-28 placeholder:text-(--text-secondary) focus:border-(--accent) focus:outline-none"
+            className="rounded-6 border-separator bg-gray h-32 w-full border py-4 pr-12 pl-28 placeholder:text-(--text-secondary) focus:border-(--accent) focus:outline-none"
           />
         </div>
 
@@ -280,7 +278,8 @@ export function DataTable({
             {processed.map((row, i) => (
               <tr
                 key={row[rowKey] ?? i}
-                className="border-separator hover:bg-ghost-hover border-b"
+                className={`border-separator hover:bg-ghost-hover border-b${onRowClick ? "cursor-pointer" : ""}`}
+                onClick={onRowClick ? () => onRowClick(row) : undefined}
               >
                 {columns.map((col) => (
                   <td key={col.key} className="px-12 py-7">

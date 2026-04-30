@@ -278,7 +278,7 @@ export function DataTable({
             {processed.map((row, i) => (
               <tr
                 key={row[rowKey] ?? i}
-                className={`border-separator hover:bg-ghost-hover border-b${onRowClick ? "cursor-pointer" : ""}`}
+                className={`border-separator hover:bg-ghost-hover border-b ${onRowClick ? "cursor-pointer" : ""}`}
                 onClick={onRowClick ? () => onRowClick(row) : undefined}
               >
                 {columns.map((col) => (

@@ -4,6 +4,7 @@ import { auth } from "@/lib/authn";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { Badge, BadgeColor } from "@/components/ui/Badge";
 import { DataCard } from "@/components/ui/DataCard";
+import { ArrowLeft } from "lucide-react";
 
 const statusColors: Record<string, BadgeColor> = {
   Active: "green",
@@ -21,7 +22,6 @@ type DetailField = {
 };
 
 const detailFields: DetailField[] = [
-  { label: "Founded", key: "Founded", type: "text" },
   { label: "Email", key: "Email", type: "email" },
   { label: "Website", key: "Website", type: "link" },
   { label: "LinkedIn", key: "LinkedIn", type: "link" },
@@ -48,15 +48,26 @@ export default async function ChapterPage({
     (f) => chapter[f.key] && chapter[f.key].trim() !== ""
   );
 
+  const subtitle = [
+    chapter.Place,
+    chapter.Founded ? `Founded ${chapter.Founded}` : "",
+  ]
+    .filter(Boolean)
+    .join(" • ");
+
   return (
     <div className="pt-32">
       <div className="mb-8 px-32">
-        <a href="/chapters" className="text-gray-2 hover:text-gray-1">
-          ← Chapters
+        <a
+          href="/chapters"
+          className="text-gray-2 hover:text-gray-1 flex flex-row items-center gap-4"
+        >
+          <ArrowLeft width={15} />
+          Chapters
         </a>
       </div>
 
-      <PageHeader title={chapter.Name} subtitle={chapter.Place}>
+      <PageHeader title={chapter.Name} subtitle={subtitle}>
         <Badge
           label={chapter.Status}
           color={statusColors[chapter.Status] ?? "grey"}

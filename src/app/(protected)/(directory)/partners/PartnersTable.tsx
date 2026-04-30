@@ -2,6 +2,7 @@
 
 import { DataTable } from "@/components/ui/DataTable";
 import { Badge, BadgeColor } from "@/components/ui/Badge";
+import { useRouter } from "next/navigation";
 
 type Props = { data: Record<string, string>[] };
 
@@ -12,6 +13,8 @@ const statusColors: Record<string, BadgeColor> = {
 };
 
 export function PartnersTable({ data }: Props) {
+  const router = useRouter();
+
   return (
     <DataTable
       data={data}
@@ -24,7 +27,7 @@ export function PartnersTable({ data }: Props) {
         "Email",
       ]}
       rowKey="id"
-      noun="partner"
+      noun="chapter"
       defaultSort={{ key: "Name", dir: "asc" }}
       filterFields={[
         { key: "Status", label: "Status" },
@@ -38,6 +41,7 @@ export function PartnersTable({ data }: Props) {
           ),
         },
       ]}
+      onRowClick={(row) => router.push(`/partners/${row.id}`)}
     />
   );
 }

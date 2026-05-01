@@ -304,7 +304,12 @@ export function DataTable({
         <div
           ref={scrollRef}
           onScroll={checkScroll}
-          className="flex-1 overflow-auto overscroll-none"
+          className={cn(
+            "flex-1 overflow-auto overscroll-none transition-shadow duration-200",
+            scrollState.left
+              ? "inset-shadow-[6px_0_20px_-2px_var(--color-popup-outline)]"
+              : ""
+          )}
         >
           <table className="w-full min-w-max">
             <thead

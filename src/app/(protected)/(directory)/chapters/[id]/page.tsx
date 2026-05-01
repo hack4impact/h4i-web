@@ -1,10 +1,11 @@
 import { notFound } from "next/navigation";
-import { chapters } from "@/lib/data";
+import { chapters, projects } from "@/lib/data";
 import { auth } from "@/lib/authn";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { Badge, BadgeColor } from "@/components/ui/Badge";
 import { DataCard } from "@/components/ui/DataCard";
 import { ArrowLeft } from "lucide-react";
+import { ProjectsTable } from "../../projects/ProjectsTable";
 
 const statusColors: Record<string, BadgeColor> = {
   Active: "green",
@@ -40,6 +41,10 @@ export default async function ChapterPage({
   const chapter = chapters.find((c) => c.id === id);
   if (!chapter) notFound();
 
+  const chapterProjects = projects.filter((p) =>
+    p.Chapters.includes(chapter.id)
+  );
+
   const session = await auth();
   const role = session?.user?.role;
   const canEdit = role === "ADMIN" || role === "CHAPTER_LEADER";
@@ -56,7 +61,7 @@ export default async function ChapterPage({
     .join(" • ");
 
   return (
-    <div className="pt-32">
+    <div className="flex h-full flex-col overflow-y-auto pt-32">
       <div className="mb-8 px-32">
         <a
           href="/chapters"
@@ -117,6 +122,10 @@ export default async function ChapterPage({
           </dl>
         </div>
       )}
+
+      <div className="flex h-400 flex-1 px-32 pb-32">
+        <ProjectsTable data={chapterProjects} />
+      </div>
     </div>
   );
 }

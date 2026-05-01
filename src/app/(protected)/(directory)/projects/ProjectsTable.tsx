@@ -2,6 +2,7 @@
 
 import { DataTable } from "@/components/ui/DataTable";
 import { Badge, BadgeColor } from "@/components/ui/Badge";
+import { useRouter } from "next/navigation";
 
 type Props = { data: Record<string, string>[] };
 
@@ -15,6 +16,8 @@ const statusColors: Record<string, BadgeColor> = {
 };
 
 export function ProjectsTable({ data }: Props) {
+  const router = useRouter();
+
   return (
     <DataTable
       data={data}
@@ -34,6 +37,7 @@ export function ProjectsTable({ data }: Props) {
           ),
         },
       ]}
+      onRowClick={(row) => router.push(`/projects/${row.id}`)}
     />
   );
 }

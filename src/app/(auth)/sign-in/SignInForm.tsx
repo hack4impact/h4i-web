@@ -11,11 +11,14 @@ import {
   FormError,
 } from "@/components/ui/Form";
 import { credentialsSignIn } from "@/actions/authn";
+import { cn } from "@/lib/utils";
 
 export default function SignInForm() {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
+
+  const inputCls = "bg-root rounded-6";
 
   function handleSubmit(e: React.SubmitEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -45,7 +48,7 @@ export default function SignInForm() {
           <FormInput
             type="email"
             name="email"
-            className="bg-root"
+            className={inputCls}
             placeholder="you@email.com"
             autoComplete="email"
             disabled={isPending}
@@ -67,7 +70,7 @@ export default function SignInForm() {
             <FormInput
               type={showPassword ? "text" : "password"}
               name="password"
-              className="bg-root pr-44"
+              className={cn(inputCls, "pr-44")}
               autoComplete="current-password"
               disabled={isPending}
             />

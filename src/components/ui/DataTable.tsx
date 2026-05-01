@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useRef, useCallback, useEffect } from "react";
 import { Menu } from "@base-ui/react/menu";
 import { Input } from "@base-ui/react/input";
 import { Search, ArrowUpDown, ListFilter, Check } from "lucide-react";
@@ -47,6 +47,34 @@ export function DataTable({
   const [search, setSearch] = useState("");
   const [sort, setSort] = useState<SortState>(defaultSort);
   const [filters, setFilters] = useState<Record<string, Set<string>>>({});
+
+  // Tracking scroll direction
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const [scrollState, setScrollState] = useState({
+    top: false,
+    bottom: false,
+    left: false,
+    right: false,
+  });
+
+  const checkScroll = useCallback(() => {
+    if (!scrollRef.current) return;
+    const {
+      scrollTop,
+      scrollHeight,
+      clientHeight,
+      scrollLeft,
+      scrollWidth,
+      clientWidth,
+    } = scrollRef.current;
+
+    setScrollState({
+      top: scrollTop > 0,
+      bottom: Math.ceil(scrollTop + clientHeight) < scrollHeight,
+      left: scrollLeft > 0,
+      right: Math.ceil(scrollLeft + clientWidth) < scrollWidth,
+    });
+  }, []);
 
   const columns = useMemo(() => {
     const keys = columnsProp?.length
@@ -96,6 +124,18 @@ export function DataTable({
       return sort.dir === "asc" ? cmp : -cmp;
     });
   }, [afterFilter, sort]);
+
+  // Attach ResizeObserver on mount & data change
+  useEffect(() => {
+    checkScroll();
+    const currentRef = scrollRef.current;
+
+    if (currentRef) {
+      const observer = new ResizeObserver(checkScroll);
+      observer.observe(currentRef);
+      return () => observer.disconnect();
+    }
+  }, [checkScroll, processed]);
 
   const activeFilterCount = Object.values(filters).filter(
     (s) => s.size > 0
@@ -260,42 +300,54 @@ export function DataTable({
         )}
       </div>
 
-      <div className="flex-1 overflow-auto overscroll-none">
-        <table className="w-full min-w-max">
-          <thead className="border-separator bg-panel sticky top-0 z-10 border-b">
-            <tr>
-              {columns.map((col) => (
-                <th
-                  key={col.key}
-                  className="section-label px-12 py-7 text-left whitespace-nowrap"
-                >
-                  {col.label}
-                </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {processed.map((row, i) => (
-              <tr
-                key={row[rowKey] ?? i}
-                className={`border-separator hover:bg-ghost-hover border-b ${onRowClick ? "cursor-pointer" : ""}`}
-                onClick={onRowClick ? () => onRowClick(row) : undefined}
-              >
+      <div className="relative flex flex-1 overflow-hidden">
+        <div
+          ref={scrollRef}
+          onScroll={checkScroll}
+          className="flex-1 overflow-auto overscroll-none"
+        >
+          <table className="w-full min-w-max">
+            <thead
+              className={cn(
+                "border-separator bg-panel sticky top-0 z-10 border-b transition-shadow duration-200",
+                scrollState.top &&
+                  "shadow-[-4px_0_20px_-2px_var(--color-popup-outline)]"
+              )}
+            >
+              <tr>
                 {columns.map((col) => (
-                  <td key={col.key} className="px-12 py-7">
-                    {(() => {
-                      const val = row[col.key] ?? "";
-                      const config = columnConfig?.find(
-                        (c) => c.key === col.key
-                      );
-                      return config?.render ? config.render(val) : val;
-                    })()}
-                  </td>
+                  <th
+                    key={col.key}
+                    className="section-label px-12 py-7 text-left whitespace-nowrap"
+                  >
+                    {col.label}
+                  </th>
                 ))}
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {processed.map((row, i) => (
+                <tr
+                  key={row[rowKey] ?? i}
+                  className={`border-separator hover:bg-ghost-hover border-b ${onRowClick ? "cursor-pointer" : ""}`}
+                  onClick={onRowClick ? () => onRowClick(row) : undefined}
+                >
+                  {columns.map((col) => (
+                    <td key={col.key} className="px-12 py-7">
+                      {(() => {
+                        const val = row[col.key] ?? "";
+                        const config = columnConfig?.find(
+                          (c) => c.key === col.key
+                        );
+                        return config?.render ? config.render(val) : val;
+                      })()}
+                    </td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );

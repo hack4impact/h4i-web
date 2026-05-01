@@ -11,11 +11,14 @@ import {
   FormError,
 } from "@/components/ui/Form";
 import { credentialsSignUp } from "@/actions/authn";
+import { cn } from "@/lib/utils";
 
 export default function SignUpForm() {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
+
+  const inputCls = "bg-root rounded-6";
 
   function handleSubmit(e: React.SubmitEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -41,7 +44,7 @@ export default function SignUpForm() {
             <FormLabel>First Name</FormLabel>
             <FormInput
               name="firstName"
-              className="bg-root"
+              className={inputCls}
               placeholder="Jane"
               autoComplete="given-name"
               disabled={isPending}
@@ -57,7 +60,7 @@ export default function SignUpForm() {
             <FormLabel>Last Name</FormLabel>
             <FormInput
               name="lastName"
-              className="bg-root"
+              className={inputCls}
               placeholder="Doe"
               autoComplete="family-name"
               disabled={isPending}
@@ -79,7 +82,7 @@ export default function SignUpForm() {
           <FormInput
             type="email"
             name="email"
-            className="bg-root"
+            className={inputCls}
             placeholder="you@email.com"
             autoComplete="email"
             disabled={isPending}
@@ -101,7 +104,7 @@ export default function SignUpForm() {
             <FormInput
               type={showPassword ? "text" : "password"}
               name="password"
-              className="bg-root pr-44"
+              className={cn(inputCls, "pr-44")}
               autoComplete="new-password"
               disabled={isPending}
             />

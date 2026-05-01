@@ -56,7 +56,7 @@ export default async function VolunteerPage({
     .join(" • ");
 
   return (
-    <div className="flex h-full flex-col overflow-y-auto pt-32">
+    <div className="h-full overflow-y-auto pt-32">
       <div className="mb-8 px-32">
         <a
           href="/volunteers"
@@ -114,7 +114,7 @@ export default async function VolunteerPage({
           </dl>
         </div>
       )}
-      <div className="flex min-h-0 flex-1 flex-col gap-12 px-32">
+      <div className="flex min-h-0 flex-1 flex-col gap-12 px-32 py-12">
         <div className="">
           <ChaptersTable data={volunteerChapters} />
         </div>

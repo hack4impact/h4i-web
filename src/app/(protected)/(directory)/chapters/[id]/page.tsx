@@ -6,6 +6,7 @@ import { Badge, BadgeColor } from "@/components/ui/Badge";
 import { DataCard } from "@/components/ui/DataCard";
 import { ArrowLeft } from "lucide-react";
 import { ProjectsTable } from "../../projects/ProjectsTable";
+import { Card } from "@/components/ui/Card";
 
 const statusColors: Record<string, BadgeColor> = {
   Active: "green",
@@ -61,7 +62,7 @@ export default async function ChapterPage({
     .join(" • ");
 
   return (
-    <div className="flex h-full flex-col overflow-y-auto pt-32">
+    <div className="h-full overflow-y-auto pt-32">
       <div className="mb-8 px-32">
         <a
           href="/chapters"
@@ -83,6 +84,11 @@ export default async function ChapterPage({
           </a>
         )}
       </PageHeader>
+
+      <div className="flex h-150 gap-12 px-32">
+        <Card className="flex h-full flex-2"></Card>
+        <Card className="flex h-full flex-1"></Card>
+      </div>
 
       <div className="flex gap-12 px-32 py-12">
         <DataCard label="Active Volunteers" value={24} className="flex-1" />
@@ -123,7 +129,7 @@ export default async function ChapterPage({
         </div>
       )}
 
-      <div className="flex h-400 flex-1 px-32 pb-32">
+      <div className="flex h-400 flex-1 px-32 py-12">
         <ProjectsTable data={chapterProjects} />
       </div>
     </div>

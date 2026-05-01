@@ -51,7 +51,7 @@ export default async function PartnerPage({
     .join(" • ");
 
   return (
-    <div className="flex h-full flex-col overflow-y-auto pt-32">
+    <div className="h-full overflow-y-auto pt-32">
       <div className="mb-8 px-32">
         <a
           href="/partners"
@@ -109,7 +109,7 @@ export default async function PartnerPage({
           </dl>
         </div>
       )}
-      <div className="flex h-400 flex-1 px-32 pb-32">
+      <div className="flex h-400 flex-1 px-32 py-12">
         <ProjectsTable data={partnerProjects} />
       </div>
     </div>

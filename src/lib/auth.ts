@@ -1,7 +1,7 @@
 import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
-import { z } from "zod";
 import type { AppRole } from "@/types";
+import { loginRequestSchema } from "@/lib/validators/auth";
 
 // TODO: replace with real database auth
 const DEV_EMAIL = "admin@hack4impact.org";
@@ -16,9 +16,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         password: { label: "Password", type: "password" },
       },
       async authorize(credentials) {
-        const parsed = z
-          .object({ email: z.email(), password: z.string().min(1) })
-          .safeParse(credentials);
+        const parsed = loginRequestSchema.safeParse(credentials);
 
         if (!parsed.success) return null;
 

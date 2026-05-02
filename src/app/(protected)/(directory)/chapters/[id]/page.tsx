@@ -28,6 +28,9 @@ const detailFields: DetailField[] = [
   { label: "Website", key: "Website", type: "link" },
   { label: "LinkedIn", key: "LinkedIn", type: "link" },
   { label: "Instagram", key: "Instagram", type: "link" },
+];
+
+const resourceLinks: DetailField[] = [
   { label: "Google Drive", key: "Google Drive", type: "link" },
   { label: "GitHub", key: "GitHub", type: "link" },
 ];
@@ -85,49 +88,47 @@ export default async function ChapterPage({
         )}
       </PageHeader>
 
-      <div className="flex h-150 gap-12 px-32">
-        <Card className="flex h-full flex-2"></Card>
-        <Card className="flex h-full flex-1"></Card>
-      </div>
-
       <div className="flex gap-12 px-32 py-12">
         <DataCard label="Active Volunteers" value={24} className="flex-1" />
         <DataCard label="Active Projects" value={3} className="flex-1" />
         <DataCard label="Active Partners" value={7} className="flex-1" />
       </div>
 
-      {presentFields.length > 0 && (
-        <div className="px-32 py-12">
-          <dl className="flex flex-col gap-16">
-            {presentFields.map((field) => {
-              const value = chapter[field.key];
-              return (
-                <div key={field.key}>
-                  <dt className="text-gray-2 mb-4">{field.label}</dt>
-                  <dd>
-                    {field.type === "email" ? (
-                      <a href={`mailto:${value}`} className="hover:underline">
-                        {value}
-                      </a>
-                    ) : field.type === "link" ? (
-                      <a
-                        href={value}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="hover:underline"
-                      >
-                        {value}
-                      </a>
-                    ) : (
-                      value
-                    )}
-                  </dd>
-                </div>
-              );
-            })}
-          </dl>
-        </div>
-      )}
+      <div className="flex flex-row gap-12 px-32">
+        <Card className="flex grow"></Card>
+        <Card>
+          {presentFields.length > 0 && (
+            <dl className="flex flex-col gap-16">
+              {presentFields.map((field) => {
+                const value = chapter[field.key];
+                return (
+                  <div key={field.key}>
+                    <dt className="text-gray-2 mb-4">{field.label}</dt>
+                    <dd>
+                      {field.type === "email" ? (
+                        <a href={`mailto:${value}`} className="hover:underline">
+                          {value}
+                        </a>
+                      ) : field.type === "link" ? (
+                        <a
+                          href={"https://" + value}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="hover:underline"
+                        >
+                          {value}
+                        </a>
+                      ) : (
+                        value
+                      )}
+                    </dd>
+                  </div>
+                );
+              })}
+            </dl>
+          )}
+        </Card>
+      </div>
 
       <div className="flex h-400 flex-1 px-32 py-12">
         <ProjectsTable data={chapterProjects} />

@@ -1,12 +1,12 @@
 import { notFound } from "next/navigation";
-import { chapters, projects } from "@/lib/data";
+import { chapters, partners, projects, volunteers } from "@/lib/data";
 import { auth } from "@/lib/authn";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { Badge, BadgeColor } from "@/components/ui/Badge";
 import { DataCard } from "@/components/ui/DataCard";
 import { ArrowLeft } from "lucide-react";
 import { ProjectsTable } from "../../projects/ProjectsTable";
-import { Card } from "@/components/ui/Card";
+import { Card, CardDivider } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 
 const statusColors: Record<string, BadgeColor> = {
@@ -47,7 +47,15 @@ export default async function ChapterPage({
   if (!chapter) notFound();
 
   const chapterProjects = projects.filter((p) =>
-    p.Chapters.includes(chapter.id)
+    p.Chapters ? p.Chapters.includes(chapter.id) : false
+  );
+
+  const chapterVolunteers = volunteers.filter((v) =>
+    v.Chapters ? v.Chapters.includes(chapter.id) : false
+  );
+
+  const chapterPartners = partners.filter((partner) =>
+    partner.Chapters ? partner.Chapters.includes(chapter.id) : false
   );
 
   const session = await auth();
@@ -70,7 +78,7 @@ export default async function ChapterPage({
     .join(" • ");
 
   return (
-    <div className="h-full overflow-y-auto pt-32">
+    <div className="flex h-full flex-col gap-12 overflow-y-auto py-32">
       <div className="mb-8 px-32">
         <a
           href="/chapters"
@@ -93,16 +101,15 @@ export default async function ChapterPage({
         )}
       </PageHeader>
 
-      <div className="flex gap-12 px-32 py-12">
-        <DataCard label="Active Volunteers" value={24} className="flex-1" />
-        <DataCard label="Active Projects" value={3} className="flex-1" />
-        <DataCard label="Active Partners" value={7} className="flex-1" />
-      </div>
-
       {presentFields.length > 0 && (
-        <div className="flex flex-row gap-12 px-32 py-12">
-          <Card className="flex grow">
-            <dl className="flex flex-col gap-16">
+        <div className="px-32">
+          <Card className="flex grow gap-16 py-0">
+            <div className="flex-1"></div>
+            <CardDivider
+              className="border-separator flex border"
+              orientation="vertical"
+            ></CardDivider>
+            <dl className="flex flex-col gap-16 py-24">
               {presentFields.map((field) => {
                 const value = chapter[field.key];
                 return (
@@ -134,8 +141,26 @@ export default async function ChapterPage({
         </div>
       )}
 
-      {presentResources && (
-        <div className="flex px-32 py-12">
+      <div className="flex gap-12 px-32">
+        <DataCard
+          label="All Volunteers"
+          value={chapterVolunteers.length}
+          className="flex-1"
+        />
+        <DataCard
+          label="All Projects"
+          value={chapterProjects.length}
+          className="flex-1"
+        />
+        <DataCard
+          label="All Partners"
+          value={chapterPartners.length}
+          className="flex-1"
+        />
+      </div>
+
+      {presentResources.length > 0 && (
+        <div className="flex px-32">
           <Card className="flex grow flex-row gap-16 py-16">
             {presentResources.map((field) => {
               const value = chapter[field.key];
@@ -155,7 +180,7 @@ export default async function ChapterPage({
         </div>
       )}
 
-      <div className="flex h-400 flex-1 px-32 py-12">
+      <div className="flex h-400 flex-1 px-32">
         <ProjectsTable data={chapterProjects} />
       </div>
     </div>

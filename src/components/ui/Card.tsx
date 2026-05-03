@@ -18,5 +18,5 @@ export function CardDivider({
   className,
   ...props
 }: ComponentPropsWithoutRef<typeof Separator>) {
-  return <Separator className={className} {...props} />;
+  return <Separator className={cn(className)} {...props} />;
 }

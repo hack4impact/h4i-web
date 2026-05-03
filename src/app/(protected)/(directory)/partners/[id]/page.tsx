@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import { chapters, partners, projects } from "@/lib/data";
+import { partners, projects } from "@/lib/data";
 import { auth } from "@/lib/authn";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { Badge, BadgeColor } from "@/components/ui/Badge";
@@ -39,10 +39,6 @@ export default async function PartnerPage({
     p.Partners ? p.Partners.includes(partner.id) : false
   );
 
-  const partnerChapter = chapters.find((c) =>
-    partner.Chapters ? partner.Chapters.includes(c.id) : false
-  );
-
   const session = await auth();
   const role = session?.user?.role;
   const canEdit = role === "ADMIN" || role === "CHAPTER_LEADER";
@@ -51,11 +47,7 @@ export default async function PartnerPage({
     (f) => partner[f.key] && partner[f.key].trim() !== ""
   );
 
-  const subtitle = [
-    partnerChapter?.Name,
-    partner["Organization Type"],
-    partner.Population,
-  ]
+  const subtitle = [partner["Organization Type"], partner.Population]
     .filter(Boolean)
     .join(" • ");
 
@@ -66,7 +58,7 @@ export default async function PartnerPage({
           href="/partners"
           className="text-gray-2 hover:text-gray-1 flex flex-row items-center gap-4"
         >
-          <ArrowLeft width={15} />
+          <ArrowLeft width={15} strokeWidth={1.5} />
           Partners
         </a>
       </div>
@@ -139,7 +131,7 @@ export default async function PartnerPage({
         </Card>
       </div>
 
-      <div className="flex h-400 flex-1 px-32 py-12">
+      <div className="px-32 py-12">
         <ProjectsTable data={partnerProjects} />
       </div>
     </div>

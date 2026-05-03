@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { chapters, projects, volunteers } from "@/lib/data";
+import { ensureUrl } from "@/lib/utils";
 import { auth } from "@/lib/authn";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { Badge, BadgeColor } from "@/components/ui/Badge";
@@ -71,7 +72,7 @@ export default async function VolunteerPage({
           href="/volunteers"
           className="text-gray-2 hover:text-gray-1 flex flex-row items-center gap-4"
         >
-          <ArrowLeft width={15} />
+          <ArrowLeft width={15} strokeWidth={1.5} />
           Volunteers
         </a>
       </div>
@@ -129,7 +130,7 @@ export default async function VolunteerPage({
                           </a>
                         ) : field.type === "link" ? (
                           <a
-                            href={"https://" + value}
+                            href={ensureUrl(value)}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="hover:underline"
@@ -149,10 +150,8 @@ export default async function VolunteerPage({
         </Card>
       </div>
 
-      <div className="flex min-h-0 flex-1 flex-col gap-12 px-32 py-12">
-        <div>
-          <ProjectsTable data={volunteerProjects} />
-        </div>
+      <div className="px-32 py-12">
+        <ProjectsTable data={volunteerProjects} />
       </div>
     </div>
   );

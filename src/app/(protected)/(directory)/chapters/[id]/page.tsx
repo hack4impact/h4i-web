@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { chapters, partners, projects, volunteers } from "@/lib/data";
+import { ensureUrl } from "@/lib/utils";
 import { auth } from "@/lib/authn";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { Badge, BadgeColor } from "@/components/ui/Badge";
@@ -121,7 +122,7 @@ export default async function ChapterPage({
                         </a>
                       ) : field.type === "link" ? (
                         <a
-                          href={"https://" + value}
+                          href={ensureUrl(value)}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="hover:underline"
@@ -180,7 +181,7 @@ export default async function ChapterPage({
         </div>
       )}
 
-      <div className="flex h-400 flex-1 px-32">
+      <div className="px-32">
         <ProjectsTable data={chapterProjects} />
       </div>
     </div>

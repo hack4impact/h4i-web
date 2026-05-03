@@ -1,6 +1,6 @@
 "use client";
 
-import { Button as ButtonPrimitive } from "@base-ui/react/button";
+import { Button as BaseButton } from "@base-ui/react/button";
 import { cn } from "@/lib/utils";
 
 type ButtonVariant = "default" | "ghost" | "high-contrast";
@@ -19,7 +19,7 @@ const sizeClass: Record<ButtonSize, string> = {
   xl: "btn-xl",
 };
 
-interface ButtonProps extends ButtonPrimitive.Props {
+interface ButtonProps extends BaseButton.Props {
   variant?: ButtonVariant;
   size?: ButtonSize;
 }
@@ -31,7 +31,7 @@ function Button({
   ...props
 }: ButtonProps) {
   return (
-    <ButtonPrimitive
+    <BaseButton
       data-slot="button"
       className={cn("btn", variantClass[variant], sizeClass[size], className)}
       {...props}

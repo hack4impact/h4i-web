@@ -4,7 +4,6 @@ import { auth } from "@/lib/authn";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { Badge, BadgeColor } from "@/components/ui/Badge";
 import { ArrowLeft } from "lucide-react";
-import { ChaptersTable } from "../../chapters/ChaptersTable";
 import { ProjectsTable } from "../../projects/ProjectsTable";
 import { Card, CardDivider } from "@/components/ui/Card";
 
@@ -33,7 +32,6 @@ const detailFields: DetailField[] = [
   { label: "Organization Email", key: "Organization Email", type: "email" },
   { label: "Personal Email", key: "Personal Email", type: "email" },
   { label: "School Email", key: "School Email", type: "email" },
-  { label: "Roles", key: "Roles", type: "text" },
 ];
 
 export default async function VolunteerPage({
@@ -62,7 +60,7 @@ export default async function VolunteerPage({
     (f) => volunteer[f.key] && volunteer[f.key].trim() !== ""
   );
 
-  const subtitle = [volunteer["Organization Type"], volunteer.Population]
+  const subtitle = [, volunteerChapters[0].Name, volunteer["Roles"]]
     .filter(Boolean)
     .join(" • ");
 
@@ -152,10 +150,7 @@ export default async function VolunteerPage({
       </div>
 
       <div className="flex min-h-0 flex-1 flex-col gap-12 px-32 py-12">
-        <div className="">
-          <ChaptersTable data={volunteerChapters} />
-        </div>
-        <div className="">
+        <div>
           <ProjectsTable data={volunteerProjects} />
         </div>
       </div>

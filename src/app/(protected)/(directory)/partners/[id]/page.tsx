@@ -1,9 +1,10 @@
 import { notFound } from "next/navigation";
-import { partners, projects } from "@/lib/data";
+import { chapters, partners, projects } from "@/lib/data";
 import { auth } from "@/lib/authn";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { Badge, BadgeColor } from "@/components/ui/Badge";
-import { DataCard } from "@/components/ui/DataCard";
+import { Avatar } from "@/components/ui/Avatar";
+import { Card, CardDivider } from "@/components/ui/Card";
 import { ArrowLeft } from "lucide-react";
 import { ProjectsTable } from "../../projects/ProjectsTable";
 
@@ -38,6 +39,10 @@ export default async function PartnerPage({
     p.Partners ? p.Partners.includes(partner.id) : false
   );
 
+  const partnerChapter = chapters.find((c) =>
+    partner.Chapters ? partner.Chapters.includes(c.id) : false
+  );
+
   const session = await auth();
   const role = session?.user?.role;
   const canEdit = role === "ADMIN" || role === "CHAPTER_LEADER";
@@ -46,7 +51,11 @@ export default async function PartnerPage({
     (f) => partner[f.key] && partner[f.key].trim() !== ""
   );
 
-  const subtitle = [partner["Organization Type"], partner.Population]
+  const subtitle = [
+    partnerChapter?.Name,
+    partner["Organization Type"],
+    partner.Population,
+  ]
     .filter(Boolean)
     .join(" • ");
 
@@ -72,43 +81,64 @@ export default async function PartnerPage({
           </a>
         )}
       </PageHeader>
-      <div className="flex gap-12 px-32 py-12">
-        <DataCard label="Active Volunteers" value={24} className="flex-1" />
-        <DataCard label="Active Projects" value={3} className="flex-1" />
-        <DataCard label="Active Partners" value={7} className="flex-1" />
+
+      <div className="px-32">
+        <Card className="flex grow gap-16 py-0">
+          <div className="flex flex-1 flex-row gap-20 py-24">
+            <Avatar name={partner.Name} size="lg" />
+            <div className="flex flex-col gap-8">
+              <span className="text-gray-2">About</span>
+              <p className="text-gray-1 leading-relaxed">
+                A valued community partner working alongside our chapters to
+                deliver impact. Collaborates on projects that support local
+                communities and advance the organization's civic technology
+                mission.
+              </p>
+            </div>
+          </div>
+
+          {presentFields.length > 0 && (
+            <>
+              <CardDivider
+                className="border-separator border-r"
+                orientation="vertical"
+              />
+              <dl className="flex flex-col gap-16 py-24">
+                {presentFields.map((field) => {
+                  const value = partner[field.key];
+                  return (
+                    <div key={field.key}>
+                      <dt className="text-gray-2 mb-4">{field.label}</dt>
+                      <dd>
+                        {field.type === "email" ? (
+                          <a
+                            href={`mailto:${value}`}
+                            className="hover:underline"
+                          >
+                            {value}
+                          </a>
+                        ) : field.type === "link" ? (
+                          <a
+                            href={value}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="hover:underline"
+                          >
+                            {value}
+                          </a>
+                        ) : (
+                          value
+                        )}
+                      </dd>
+                    </div>
+                  );
+                })}
+              </dl>
+            </>
+          )}
+        </Card>
       </div>
-      {presentFields.length > 0 && (
-        <div className="px-32 py-12">
-          <dl className="flex flex-col gap-16">
-            {presentFields.map((field) => {
-              const value = partner[field.key];
-              return (
-                <div key={field.key}>
-                  <dt className="text-gray-2 mb-4">{field.label}</dt>
-                  <dd>
-                    {field.type === "email" ? (
-                      <a href={`mailto:${value}`} className="hover:underline">
-                        {value}
-                      </a>
-                    ) : field.type === "link" ? (
-                      <a
-                        href={value}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="hover:underline"
-                      >
-                        {value}
-                      </a>
-                    ) : (
-                      value
-                    )}
-                  </dd>
-                </div>
-              );
-            })}
-          </dl>
-        </div>
-      )}
+
       <div className="flex h-400 flex-1 px-32 py-12">
         <ProjectsTable data={partnerProjects} />
       </div>

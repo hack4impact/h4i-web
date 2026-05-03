@@ -27,7 +27,7 @@ export function PartnersTable({ data }: Props) {
         "Email",
       ]}
       rowKey="id"
-      noun="chapter"
+      noun="partner"
       defaultSort={{ key: "Name", dir: "asc" }}
       filterFields={[
         { key: "Status", label: "Status" },

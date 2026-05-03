@@ -3,7 +3,8 @@ import { chapters, partners, projects } from "@/lib/data";
 import { auth } from "@/lib/authn";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { Badge, BadgeColor } from "@/components/ui/Badge";
-import { ArrowLeft } from "lucide-react";
+import { Card } from "@/components/ui/Card";
+import { ArrowLeft, SquareArrowOutUpRight } from "lucide-react";
 import { PartnersTable } from "../../partners/PartnersTable";
 import { ChaptersTable } from "../../chapters/ChaptersTable";
 
@@ -11,6 +12,7 @@ const statusColors: Record<string, BadgeColor> = {
   Active: "green",
   Inactive: "grey",
   Hiatus: "orange",
+  Done: "grey",
 };
 
 type DetailField = {
@@ -22,6 +24,10 @@ type DetailField = {
 const detailFields: DetailField[] = [
   { label: "Email", key: "Email", type: "email" },
   { label: "Contact Name", key: "Contact Name", type: "text" },
+];
+
+const resourceLinks: DetailField[] = [
+  { label: "GitHub", key: "Github", type: "link" },
 ];
 
 export default async function ProjectPage({
@@ -50,6 +56,10 @@ export default async function ProjectPage({
     (f) => project[f.key] && project[f.key].trim() !== ""
   );
 
+  const presentResources = resourceLinks.filter(
+    (f) => project[f.key] && project[f.key].trim() !== ""
+  );
+
   const subtitle = [project["Organization Type"], project.Population]
     .filter(Boolean)
     .join(" • ");
@@ -71,7 +81,7 @@ export default async function ProjectPage({
           color={statusColors[project.Status] ?? "grey"}
         />
         {canEdit && (
-          <a href={`/project/${id}/edit`} className="btn btn-ghost">
+          <a href={`/projects/${id}/edit`} className="btn btn-ghost">
             Edit
           </a>
         )}
@@ -109,11 +119,34 @@ export default async function ProjectPage({
           </dl>
         </div>
       )}
+
+      {presentResources.length > 0 && (
+        <div className="flex px-32 py-12">
+          <Card className="flex grow flex-row gap-16 py-16">
+            {presentResources.map((field) => {
+              const value = project[field.key];
+              return (
+                <a
+                  key={field.key}
+                  className="btn"
+                  href={value}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <SquareArrowOutUpRight size={15} strokeWidth={1.5} />
+                  {field.label}
+                </a>
+              );
+            })}
+          </Card>
+        </div>
+      )}
+
       <div className="flex min-h-0 flex-1 flex-col gap-12 px-32 py-12">
-        <div className="">
+        <div>
           <PartnersTable data={projectPartners} />
         </div>
-        <div className="">
+        <div>
           <ChaptersTable data={projectChapters} />
         </div>
       </div>

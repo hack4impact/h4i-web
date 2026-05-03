@@ -40,11 +40,11 @@ function UserMenu({ user }: { user: User }) {
           <img
             src={user.image}
             alt={user.name ?? ""}
-            className="h-24 w-24 shrink-0 rounded-full"
+            className="rounded-6 h-24 w-24 shrink-0"
           />
         ) : (
           <div
-            className="bg-blue-3 flex shrink-0 items-center justify-center rounded-full text-[11px] font-medium text-white"
+            className="bg-blue-3 rounded-6 flex shrink-0 items-center justify-center text-[11px] font-medium text-white"
             style={{ width: 24, height: 24 }}
           >
             {initials(user.name)}

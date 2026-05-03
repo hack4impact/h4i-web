@@ -1,5 +1,6 @@
 import { auth } from "@/lib/authn";
 import { PageHeader } from "@/components/ui/PageHeader";
+import { Avatar } from "@base-ui/react";
 import { Card } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
 import type { BadgeColor } from "@/components/ui/Badge";
@@ -26,15 +27,15 @@ export default async function SettingsPage() {
       <PageHeader title="Settings" />
       <div className="p-32">
         <Card className="max-w-480 space-y-20">
-          <div className="flex items-center gap-16">
+          <Avatar.Root className="flex items-center gap-16">
             {image ? (
-              <img
+              <Avatar.Image
                 src={image}
                 alt={name ?? ""}
-                className="h-48 w-48 rounded-full"
+                className="rounded-6 h-48 w-48"
               />
             ) : (
-              <div className="bg-blue-3 flex h-48 w-48 shrink-0 items-center justify-center rounded-full text-lg font-medium text-white">
+              <Avatar.Fallback className="bg-blue-3 rounded-6 flex h-48 w-48 shrink-0 items-center justify-center text-lg font-medium text-white">
                 {name
                   ? name
                       .split(" ")
@@ -43,13 +44,13 @@ export default async function SettingsPage() {
                       .slice(0, 2)
                       .toUpperCase()
                   : "?"}
-              </div>
+              </Avatar.Fallback>
             )}
             <div className="min-w-0">
               <p className="text-gray-1 font-medium">{name ?? "—"}</p>
               <p className="text-gray-3 truncate text-sm">{email}</p>
             </div>
-          </div>
+          </Avatar.Root>
 
           <div className="border-separator space-y-16 border-t pt-20">
             <Field label="Email" value={email ?? "—"} />
@@ -69,8 +70,8 @@ export default async function SettingsPage() {
 function Field({ label, value }: { label: string; value: React.ReactNode }) {
   return (
     <div className="flex items-center justify-between gap-16">
-      <span className="text-gray-3 shrink-0 text-sm">{label}</span>
-      <span className="text-gray-1 text-sm">{value}</span>
+      <span className="text-gray-3 shrink-0">{label}</span>
+      <span className="text-gray-1">{value}</span>
     </div>
   );
 }

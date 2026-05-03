@@ -1,4 +1,4 @@
-import rawData from "../../notion-export/export.json";
+import rawData from "../../notion-data/export.json";
 
 export type DirectoryRow = Record<string, string>;
 

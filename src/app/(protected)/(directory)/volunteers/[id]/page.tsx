@@ -60,7 +60,7 @@ export default async function VolunteerPage({
     (f) => volunteer[f.key] && volunteer[f.key].trim() !== ""
   );
 
-  const subtitle = [, volunteerChapters[0].Name, volunteer["Roles"]]
+  const subtitle = [volunteerChapters[0].Name, volunteer["Roles"]]
     .filter(Boolean)
     .join(" • ");
 

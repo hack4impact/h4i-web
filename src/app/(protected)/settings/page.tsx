@@ -1,6 +1,6 @@
 import { auth } from "@/lib/authn";
 import { PageHeader } from "@/components/ui/PageHeader";
-import { Avatar } from "@base-ui/react";
+import { Avatar } from "@/components/ui/Avatar";
 import { Card } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
 import type { BadgeColor } from "@/components/ui/Badge";
@@ -27,30 +27,13 @@ export default async function SettingsPage() {
       <PageHeader title="Settings" />
       <div className="p-32">
         <Card className="max-w-480 space-y-20">
-          <Avatar.Root className="flex items-center gap-16">
-            {image ? (
-              <Avatar.Image
-                src={image}
-                alt={name ?? ""}
-                className="rounded-6 h-48 w-48"
-              />
-            ) : (
-              <Avatar.Fallback className="bg-blue-3 rounded-6 flex h-48 w-48 shrink-0 items-center justify-center text-lg font-medium text-white">
-                {name
-                  ? name
-                      .split(" ")
-                      .map((w) => w[0])
-                      .join("")
-                      .slice(0, 2)
-                      .toUpperCase()
-                  : "?"}
-              </Avatar.Fallback>
-            )}
+          <div className="flex items-center gap-16">
+            <Avatar name={name} image={image} size="md" />
             <div className="min-w-0">
               <p className="text-gray-1 font-medium">{name ?? "—"}</p>
               <p className="text-gray-3 truncate">{email}</p>
             </div>
-          </Avatar.Root>
+          </div>
 
           <div className="border-separator space-y-16 border-t pt-20">
             <Field label="Email" value={email ?? "—"} />

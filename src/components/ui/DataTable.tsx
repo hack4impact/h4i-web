@@ -3,7 +3,15 @@
 import { useState, useMemo, useRef, useCallback, useEffect } from "react";
 import { Menu } from "@base-ui/react/menu";
 import { Input } from "@base-ui/react/input";
-import { Search, ArrowUpDown, ListFilter, Check } from "lucide-react";
+import {
+  Search,
+  ArrowUpDown,
+  ListFilter,
+  Check,
+  DotIcon,
+  ArrowDownZA,
+  ArrowUpAZ,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export type FilterField = {
@@ -171,8 +179,8 @@ export function DataTable({
 
         <div className="rounded-6 bg-ghost-hover relative flex-1">
           <Search
-            size={13}
-            strokeWidth={1}
+            size={15}
+            strokeWidth={1.5}
             className="pointer-events-none absolute top-1/2 left-8 -translate-y-1/2"
           />
           <Input
@@ -185,13 +193,23 @@ export function DataTable({
 
         <Menu.Root modal={false}>
           <Menu.Trigger className={toolbarBtn}>
-            <ArrowUpDown size={13} strokeWidth={1} />
-            Sort
-            {sort && (
-              <span className="text-gray-2">
-                · {sort.key} {sort.dir === "asc" ? "↑" : "↓"}
+            <span className="flex flex-row items-center">
+              <span className="flex flex-row items-center gap-8">
+                <ArrowUpDown size={15} strokeWidth={1.5} />
+                Sort
               </span>
-            )}
+              <DotIcon size={15} strokeWidth={1.5} />
+              {sort && (
+                <span className="text-gray-2 flex flex-row items-center gap-8">
+                  {sort.key}{" "}
+                  {sort.dir === "asc" ? (
+                    <ArrowUpAZ size={15} strokeWidth={1.5} />
+                  ) : (
+                    <ArrowDownZA size={15} strokeWidth={1.5} />
+                  )}
+                </span>
+              )}
+            </span>
           </Menu.Trigger>
           <Menu.Portal>
             <Menu.Positioner
@@ -219,7 +237,11 @@ export function DataTable({
                             active ? "text-gray-2" : "text-transparent"
                           }
                         >
-                          {active && sort!.dir === "desc" ? "↓ Z→A" : "↑ A→Z"}
+                          {active && sort!.dir === "desc" ? (
+                            <ArrowDownZA size={15} strokeWidth={1.5} />
+                          ) : (
+                            <ArrowUpAZ size={15} strokeWidth={1.5} />
+                          )}
                         </span>
                       </Menu.RadioItem>
                     );
@@ -244,7 +266,7 @@ export function DataTable({
         {filterFields && filterFields.length > 0 && (
           <Menu.Root modal={false}>
             <Menu.Trigger className={toolbarBtn}>
-              <ListFilter size={13} strokeWidth={1} />
+              <ListFilter size={15} strokeWidth={1.5} />
               Filter
               {activeFilterCount > 0 && (
                 <span className="text-gray-2">· {activeFilterCount}</span>

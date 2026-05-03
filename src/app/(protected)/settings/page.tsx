@@ -48,7 +48,7 @@ export default async function SettingsPage() {
             )}
             <div className="min-w-0">
               <p className="text-gray-1 font-medium">{name ?? "—"}</p>
-              <p className="text-gray-3 truncate text-sm">{email}</p>
+              <p className="text-gray-3 truncate">{email}</p>
             </div>
           </Avatar.Root>
 

@@ -4,10 +4,9 @@ import { auth } from "@/lib/authn";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { Badge, BadgeColor } from "@/components/ui/Badge";
 import { DataCard } from "@/components/ui/DataCard";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, SquareArrowOutUpRight } from "lucide-react";
 import { ProjectsTable } from "../../projects/ProjectsTable";
 import { Card, CardDivider } from "@/components/ui/Card";
-import { Button } from "@/components/ui/Button";
 
 const statusColors: Record<string, BadgeColor> = {
   Active: "green",
@@ -84,7 +83,7 @@ export default async function ChapterPage({
           href="/chapters"
           className="text-gray-2 hover:text-gray-1 flex flex-row items-center gap-4"
         >
-          <ArrowLeft width={15} />
+          <ArrowLeft width={15} strokeWidth={1.5} />
           Chapters
         </a>
       </div>
@@ -106,7 +105,7 @@ export default async function ChapterPage({
           <Card className="flex grow gap-16 py-0">
             <div className="flex-1"></div>
             <CardDivider
-              className="border-separator flex border"
+              className="border-separator flex border-r"
               orientation="vertical"
             ></CardDivider>
             <dl className="flex flex-col gap-16 py-24">
@@ -172,6 +171,7 @@ export default async function ChapterPage({
                   target="_blank"
                   rel="noopener noreferrer"
                 >
+                  <SquareArrowOutUpRight size={15} strokeWidth={1.5} />
                   {field.label}
                 </a>
               );

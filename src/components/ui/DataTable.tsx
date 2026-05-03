@@ -198,7 +198,9 @@ export function DataTable({
                 <ArrowUpDown size={15} strokeWidth={1.5} />
                 Sort
               </span>
-              <DotIcon size={15} strokeWidth={1.5} />
+              {sort && (
+                <DotIcon size={15} strokeWidth={1.5} className="text-gray-2" />
+              )}
               {sort && (
                 <span className="text-gray-2 flex flex-row items-center gap-8">
                   {sort.key}{" "}

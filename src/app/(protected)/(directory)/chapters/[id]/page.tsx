@@ -7,6 +7,7 @@ import { DataCard } from "@/components/ui/DataCard";
 import { ArrowLeft } from "lucide-react";
 import { ProjectsTable } from "../../projects/ProjectsTable";
 import { Card } from "@/components/ui/Card";
+import { Button } from "@/components/ui/Button";
 
 const statusColors: Record<string, BadgeColor> = {
   Active: "green",
@@ -57,6 +58,10 @@ export default async function ChapterPage({
     (f) => chapter[f.key] && chapter[f.key].trim() !== ""
   );
 
+  const presentResources = resourceLinks.filter(
+    (f) => chapter[f.key] && chapter[f.key].trim() !== ""
+  );
+
   const subtitle = [
     chapter.Place,
     chapter.Founded ? `Founded ${chapter.Founded}` : "",
@@ -94,10 +99,9 @@ export default async function ChapterPage({
         <DataCard label="Active Partners" value={7} className="flex-1" />
       </div>
 
-      <div className="flex flex-row gap-12 px-32">
-        <Card className="flex grow"></Card>
-        <Card>
-          {presentFields.length > 0 && (
+      {presentFields.length > 0 && (
+        <div className="flex flex-row gap-12 px-32 py-12">
+          <Card className="flex grow">
             <dl className="flex flex-col gap-16">
               {presentFields.map((field) => {
                 const value = chapter[field.key];
@@ -126,9 +130,30 @@ export default async function ChapterPage({
                 );
               })}
             </dl>
-          )}
-        </Card>
-      </div>
+          </Card>
+        </div>
+      )}
+
+      {presentResources && (
+        <div className="flex px-32 py-12">
+          <Card className="flex grow flex-row gap-16 py-16">
+            {presentResources.map((field) => {
+              const value = chapter[field.key];
+              return (
+                <a
+                  key={field.key}
+                  className="btn btn-md"
+                  href={value}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  {field.label}
+                </a>
+              );
+            })}
+          </Card>
+        </div>
+      )}
 
       <div className="flex h-400 flex-1 px-32 py-12">
         <ProjectsTable data={chapterProjects} />

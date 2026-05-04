@@ -199,6 +199,64 @@ export function ContactField({
   );
 }
 
+// LinksField: a single cell containing multiple button-style links.
+// No dividers between the buttons — just a tight gap.
+// layout="horizontal" (default): buttons wrap in a row.
+// layout="vertical": buttons stack in a column.
+type LinkItem = {
+  label: string;
+  href: string;
+  icon?: ReactNode;
+};
+
+type LinksFieldProps = {
+  label?: ReactNode;
+  links: LinkItem[];
+  layout?: "horizontal" | "vertical";
+  target?: string;
+  rel?: string;
+  className?: string;
+};
+
+export function LinksField({
+  label,
+  links,
+  layout = "horizontal",
+  target,
+  rel,
+  className,
+}: LinksFieldProps) {
+  return (
+    <div
+      className={cn(
+        "border-separator flex flex-col gap-4 px-12 py-16 not-first:border-l",
+        className
+      )}
+    >
+      {label && <div className="text-gray-2">{label}</div>}
+      <div
+        className={cn(
+          "flex gap-8",
+          layout === "horizontal" ? "flex-wrap" : "flex-col items-start"
+        )}
+      >
+        {links.map((link) => (
+          <a
+            key={link.href + link.label}
+            href={link.href}
+            target={target}
+            rel={rel}
+            className="btn"
+          >
+            {link.icon}
+            {link.label}
+          </a>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 type InfoCardSectionHeaderProps = {
   children: ReactNode;
   variant?: "section" | "subsection";

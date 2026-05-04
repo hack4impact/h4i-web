@@ -6,7 +6,7 @@ import { PageHeader } from "@/components/ui/PageHeader";
 import { Badge, BadgeColor } from "@/components/ui/Badge";
 import { ArrowLeft } from "lucide-react";
 import { SquareArrowOutUpRight } from "lucide-react";
-import { InfoCard, InfoCardRow, InfoCardField } from "@/components/ui/InfoCard";
+import { InfoCard, InfoCardRow, LinksField } from "@/components/ui/InfoCard";
 import { PartnersTable } from "../../partners/PartnersTable";
 import { ChaptersTable } from "../../chapters/ChaptersTable";
 
@@ -125,19 +125,16 @@ export default async function ProjectPage({
       {presentResources.length > 0 && (
         <div className="px-32 py-12">
           <InfoCard>
-            <InfoCardRow layout="auto">
-              {presentResources.map((field) => (
-                <InfoCardField
-                  key={field.key}
-                  href={ensureUrl(project[field.key])}
-                  icon={<SquareArrowOutUpRight size={14} strokeWidth={1.5} />}
-                  variant="button"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  {field.label}
-                </InfoCardField>
-              ))}
+            <InfoCardRow>
+              <LinksField
+                links={presentResources.map((field) => ({
+                  label: field.label,
+                  href: ensureUrl(project[field.key]),
+                  icon: <SquareArrowOutUpRight size={14} strokeWidth={1.5} />,
+                }))}
+                target="_blank"
+                rel="noopener noreferrer"
+              />
             </InfoCardRow>
           </InfoCard>
         </div>

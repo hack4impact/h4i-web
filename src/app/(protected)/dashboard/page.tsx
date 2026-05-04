@@ -17,7 +17,7 @@ export default function DashboardPage() {
 
       <div className="flex flex-col gap-16 px-32 py-16">
         {/* Vertical: one field per row */}
-        <InfoCard heading="Volunteer Details" className="max-w-lg">
+        <InfoCard heading="Volunteer Details" className="max-w-2xl">
           <InfoCardRow>
             <InfoCardField label="Status">
               <Badge label="Active" color="green" />
@@ -62,7 +62,7 @@ export default function DashboardPage() {
         </InfoCard>
 
         {/* No heading */}
-        <InfoCard className="max-w-lg">
+        <InfoCard className="max-w-2xl">
           <InfoCardRow>
             <InfoCardField label="Location">San Francisco, CA</InfoCardField>
             <InfoCardField label="Tags">

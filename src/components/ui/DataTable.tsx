@@ -5,6 +5,8 @@ import { Toolbar } from "@base-ui/react/toolbar";
 import {
   Search,
   ArrowUpDown,
+  ArrowUp,
+  ArrowDown,
   ListFilter,
   ArrowDownZA,
   ArrowUpAZ,
@@ -178,7 +180,7 @@ export function DataTable({
   return (
     <div className="border-separator bg-panel rounded-4 flex max-h-full flex-1 flex-col self-start overflow-hidden border">
       {/* Toolbar */}
-      <Toolbar.Root className="border-separator flex shrink-0 items-center gap-8 border-b px-12 py-8">
+      <Toolbar.Root className="bg-panel-header border-separator flex shrink-0 items-center gap-8 border-b px-12 py-8">
         <span className="text-gray-2 whitespace-nowrap">{countLabel}</span>
 
         <div className="rounded-6 bg-ghost-hover relative flex-1">
@@ -307,20 +309,39 @@ export function DataTable({
           <table className="w-full min-w-max">
             <thead
               className={cn(
-                "border-separator bg-panel sticky top-0 z-10 border-b transition-shadow duration-200",
+                "bg-panel-header border-separator sticky top-0 z-10 border-b transition-shadow duration-200",
                 scrollState.top &&
                   "shadow-[-4px_0_20px_-2px_var(--color-popup-outline)]"
               )}
             >
               <tr>
-                {columns.map((col) => (
-                  <th
-                    key={col.key}
-                    className="section-label px-12 py-7 text-left whitespace-nowrap"
-                  >
-                    {col.label}
-                  </th>
-                ))}
+                {columns.map((col) => {
+                  const active = sort?.key === col.key;
+                  return (
+                    <th
+                      key={col.key}
+                      onClick={() => cycleSort(col.key)}
+                      className="section-label hover:text-gray-1 cursor-pointer px-12 py-7 text-left whitespace-nowrap select-none"
+                    >
+                      <span className="flex items-center gap-6">
+                        {col.label}
+                        {active ? (
+                          sort!.dir === "asc" ? (
+                            <ArrowUp size={12} strokeWidth={1.5} />
+                          ) : (
+                            <ArrowDown size={12} strokeWidth={1.5} />
+                          )
+                        ) : (
+                          <ArrowUpDown
+                            size={12}
+                            strokeWidth={1.5}
+                            className="text-gray-4"
+                          />
+                        )}
+                      </span>
+                    </th>
+                  );
+                })}
               </tr>
             </thead>
             <tbody>

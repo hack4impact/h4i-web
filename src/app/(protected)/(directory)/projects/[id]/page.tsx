@@ -5,11 +5,8 @@ import { auth } from "@/lib/authn";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { Badge, BadgeColor } from "@/components/ui/Badge";
 import { ArrowLeft } from "lucide-react";
-import {
-  InfoCard,
-  InfoCardRow,
-  ResourceLinkField,
-} from "@/components/ui/InfoCard";
+import { SquareArrowOutUpRight } from "lucide-react";
+import { InfoCard, InfoCardRow, InfoCardField } from "@/components/ui/InfoCard";
 import { PartnersTable } from "../../partners/PartnersTable";
 import { ChaptersTable } from "../../chapters/ChaptersTable";
 
@@ -130,11 +127,16 @@ export default async function ProjectPage({
           <InfoCard>
             <InfoCardRow layout="auto">
               {presentResources.map((field) => (
-                <ResourceLinkField
+                <InfoCardField
                   key={field.key}
-                  label={field.label}
-                  href={project[field.key]}
-                />
+                  href={ensureUrl(project[field.key])}
+                  icon={<SquareArrowOutUpRight size={14} strokeWidth={1.5} />}
+                  variant="button"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  {field.label}
+                </InfoCardField>
               ))}
             </InfoCardRow>
           </InfoCard>

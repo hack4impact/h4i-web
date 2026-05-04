@@ -5,14 +5,10 @@ import { auth } from "@/lib/authn";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { Badge, BadgeColor } from "@/components/ui/Badge";
 import { DataCard } from "@/components/ui/DataCard";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, SquareArrowOutUpRight } from "lucide-react";
 import { ProjectsTable } from "../../projects/ProjectsTable";
 import { Card, CardDivider } from "@/components/ui/Card";
-import {
-  InfoCard,
-  InfoCardRow,
-  ResourceLinkField,
-} from "@/components/ui/InfoCard";
+import { InfoCard, InfoCardRow, InfoCardField } from "@/components/ui/InfoCard";
 
 const statusColors: Record<string, BadgeColor> = {
   Active: "green",
@@ -170,11 +166,16 @@ export default async function ChapterPage({
           <InfoCard>
             <InfoCardRow layout="auto">
               {presentResources.map((field) => (
-                <ResourceLinkField
+                <InfoCardField
                   key={field.key}
-                  label={field.label}
-                  href={chapter[field.key]}
-                />
+                  href={ensureUrl(chapter[field.key])}
+                  icon={<SquareArrowOutUpRight size={14} strokeWidth={1.5} />}
+                  variant="button"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  {field.label}
+                </InfoCardField>
               ))}
             </InfoCardRow>
           </InfoCard>

@@ -1,5 +1,4 @@
-import { SquareArrowOutUpRight } from "lucide-react";
-import { cn, ensureUrl } from "@/lib/utils";
+import { cn } from "@/lib/utils";
 import type { ReactNode, HTMLAttributes } from "react";
 
 type InfoCardProps = {
@@ -53,43 +52,87 @@ export function InfoCardRow({
   );
 }
 
-// Field is a single cell within a row. Optional label sits above the content.
-// Pass href to make the entire field a clickable link.
+// Field is a single cell within a row.
+//
+// variant="link" (default): the whole cell becomes an <a> when href is provided,
+//   with a hover background. icon renders inline with children.
+//
+// variant="button": the cell is always a <div>; when href is provided a btn-styled
+//   <a> is rendered inside the cell. Use this when you want a compact action link
+//   rather than a full-cell highlight (e.g. resource links).
 type InfoCardFieldProps = {
   label?: ReactNode;
   children: ReactNode;
+  icon?: ReactNode;
   href?: string;
+  variant?: "link" | "button";
+  target?: string;
+  rel?: string;
   className?: string;
 };
 
 export function InfoCardField({
   label,
   children,
+  icon,
   href,
+  variant = "link",
+  target,
+  rel,
   className,
 }: InfoCardFieldProps) {
-  const base = cn(
+  const cellBase = cn(
     "border-separator flex flex-col gap-4 px-12 py-16 not-first:border-l",
-    href && "hover:bg-panel-highlight-1 cursor-pointer transition-colors",
     className
   );
 
+  if (variant === "button") {
+    return (
+      <div className={cellBase}>
+        {label && <div className="text-gray-2">{label}</div>}
+        {href ? (
+          <a href={href} target={target} rel={rel} className="btn self-start">
+            {icon}
+            {children}
+          </a>
+        ) : (
+          <span className="btn self-start">
+            {icon}
+            {children}
+          </span>
+        )}
+      </div>
+    );
+  }
+
+  // variant="link": whole cell is the link
   const content = (
     <>
       {label && <div className="text-gray-2">{label}</div>}
-      <div>{children}</div>
+      <div className={cn(icon && "flex items-center gap-8")}>
+        {icon}
+        {children}
+      </div>
     </>
   );
 
   if (href) {
     return (
-      <a href={href} className={base}>
+      <a
+        href={href}
+        target={target}
+        rel={rel}
+        className={cn(
+          cellBase,
+          "hover:bg-panel-highlight-1 cursor-pointer transition-colors"
+        )}
+      >
         {content}
       </a>
     );
   }
 
-  return <div className={base}>{content}</div>;
+  return <div className={cellBase}>{content}</div>;
 }
 
 // ContactField: a field cell for contact info.
@@ -153,39 +196,6 @@ export function ContactField({
         </>
       )}
     </div>
-  );
-}
-
-// ResourceLinkField: an external link rendered as a button-style cell in a row.
-// Uses ensureUrl so bare domains (e.g. "github.com/...") are handled safely.
-type ResourceLinkFieldProps = {
-  label: string;
-  href: string;
-  className?: string;
-};
-
-export function ResourceLinkField({
-  label,
-  href,
-  className,
-}: ResourceLinkFieldProps) {
-  return (
-    <a
-      href={ensureUrl(href)}
-      target="_blank"
-      rel="noopener noreferrer"
-      className={cn(
-        "border-separator flex items-center gap-8 px-12 py-12 transition-colors not-first:border-l hover:bg-(--color-panel-highlight-1)",
-        className
-      )}
-    >
-      <SquareArrowOutUpRight
-        size={14}
-        strokeWidth={1.5}
-        className="text-gray-2 shrink-0"
-      />
-      {label}
-    </a>
   );
 }
 

@@ -182,7 +182,7 @@ export default async function ChapterPage({
         </div>
       )}
 
-      <div className="px-32">
+      <div className="h-400 px-32">
         <ProjectsTable data={chapterProjects} />
       </div>
     </div>

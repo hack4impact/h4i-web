@@ -168,7 +168,7 @@ export default async function ChapterPage({
               return (
                 <a
                   key={field.key}
-                  className="btn btn-md"
+                  className="btn btn-md cursor-pointer"
                   href={value}
                   target="_blank"
                   rel="noopener noreferrer"

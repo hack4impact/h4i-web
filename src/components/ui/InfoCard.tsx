@@ -53,17 +53,75 @@ export function InfoCardRow({
 }
 
 // Field is a single cell within a row. Optional label sits above the content.
+// Pass href to make the entire field a clickable link.
 type InfoCardFieldProps = {
   label?: ReactNode;
   children: ReactNode;
+  href?: string;
   className?: string;
 };
 
 export function InfoCardField({
   label,
   children,
+  href,
   className,
 }: InfoCardFieldProps) {
+  const base = cn(
+    "border-separator flex flex-col gap-4 px-12 py-16 not-first:border-l",
+    href && "hover:bg-panel-highlight-1 cursor-pointer transition-colors",
+    className
+  );
+
+  const content = (
+    <>
+      {label && <div className="text-gray-2">{label}</div>}
+      <div>{children}</div>
+    </>
+  );
+
+  if (href) {
+    return (
+      <a href={href} className={base}>
+        {content}
+      </a>
+    );
+  }
+
+  return <div className={base}>{content}</div>;
+}
+
+// ContactField: a field cell for contact info.
+// Person mode (name provided): shows name + optional subtitle alongside the contact link.
+//   layout="stacked" (default): name/subtitle above contact.
+//   layout="inline": name/subtitle on the left, contact on the right.
+// Label mode (no name): label above contact, same as InfoCardField.
+type ContactFieldProps = {
+  name?: string;
+  subtitle?: string;
+  layout?: "stacked" | "inline";
+  label?: string;
+  contact: string;
+  type: "email" | "phone";
+  className?: string;
+};
+
+export function ContactField({
+  name,
+  subtitle,
+  layout = "stacked",
+  label,
+  contact,
+  type,
+  className,
+}: ContactFieldProps) {
+  const href = type === "email" ? `mailto:${contact}` : `tel:${contact}`;
+  const contactLink = (
+    <a href={href} className="hover:underline">
+      {contact}
+    </a>
+  );
+
   return (
     <div
       className={cn(
@@ -71,8 +129,28 @@ export function InfoCardField({
         className
       )}
     >
-      {label && <div className="text-gray-2">{label}</div>}
-      <div>{children}</div>
+      {name ? (
+        layout === "inline" ? (
+          <div className="flex items-center justify-between gap-16">
+            <div className="flex flex-col gap-2">
+              <div className="font-medium">{name}</div>
+              {subtitle && <div className="text-gray-2">{subtitle}</div>}
+            </div>
+            {contactLink}
+          </div>
+        ) : (
+          <>
+            <div className="font-medium">{name}</div>
+            {subtitle && <div className="text-gray-2">{subtitle}</div>}
+            {contactLink}
+          </>
+        )
+      ) : (
+        <>
+          {label && <div className="text-gray-2">{label}</div>}
+          {contactLink}
+        </>
+      )}
     </div>
   );
 }

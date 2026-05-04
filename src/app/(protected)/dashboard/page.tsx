@@ -4,6 +4,7 @@ import {
   InfoCardRow,
   InfoCardField,
   InfoCardSectionHeader,
+  ContactField,
 } from "@/components/ui/InfoCard";
 import { Badge } from "@/components/ui/Badge";
 
@@ -36,7 +37,9 @@ export default function DashboardPage() {
             <InfoCardField label="Status">
               <Badge label="In Progress" color="blue" />
             </InfoCardField>
-            <InfoCardField label="Organization">Code for America</InfoCardField>
+            <InfoCardField label="Organization" href="/partners">
+              Code for America
+            </InfoCardField>
             <InfoCardField label="Founded">2019</InfoCardField>
           </InfoCardRow>
           <InfoCardSectionHeader>Skills Needed</InfoCardSectionHeader>
@@ -85,6 +88,67 @@ export default function DashboardPage() {
                 <Badge label="Design" color="pink" />
               </div>
             </InfoCardField>
+          </InfoCardRow>
+        </InfoCard>
+
+        {/* ContactField: person stacked (default) */}
+        <InfoCard heading="Project Contacts — Stacked" className="max-w-2xl">
+          <InfoCardRow>
+            <ContactField
+              name="Jane Smith"
+              subtitle="Chapter Lead"
+              contact="jane@example.com"
+              type="email"
+            />
+            <ContactField
+              name="Marcus Lee"
+              subtitle="Project Manager"
+              contact="marcus@example.com"
+              type="email"
+            />
+          </InfoCardRow>
+        </InfoCard>
+
+        {/* ContactField: person inline — contact beside name/subtitle */}
+        <InfoCard heading="Project Contacts — Inline" className="max-w-2xl">
+          <InfoCardRow>
+            <ContactField
+              name="Jane Smith"
+              subtitle="Chapter Lead"
+              contact="jane@example.com"
+              type="email"
+              layout="inline"
+            />
+          </InfoCardRow>
+          <InfoCardRow>
+            <ContactField
+              name="Marcus Lee"
+              subtitle="Project Manager"
+              contact="marcus@example.com"
+              type="email"
+              layout="inline"
+            />
+          </InfoCardRow>
+        </InfoCard>
+
+        {/* ContactField: label mode — different contact types for one person */}
+        <InfoCard heading="Contact" className="max-w-2xl">
+          <InfoCardRow>
+            <ContactField
+              label="Work Email"
+              contact="info@codeforamerica.org"
+              type="email"
+            />
+            <ContactField
+              label="Personal"
+              contact="jane@gmail.com"
+              type="email"
+            />
+            <ContactField
+              label="Phone"
+              contact="+1 415-555-0192"
+              type="phone"
+            />
           </InfoCardRow>
         </InfoCard>
       </div>

@@ -1,18 +1,27 @@
 "use client";
 
 import { useState, useMemo, useRef, useCallback, useEffect } from "react";
-import { Menu } from "@base-ui/react/menu";
-import { Input } from "@base-ui/react/input";
+import { Toolbar } from "@base-ui/react/toolbar";
 import {
   Search,
   ArrowUpDown,
   ListFilter,
-  Check,
-  DotIcon,
   ArrowDownZA,
   ArrowUpAZ,
+  DotIcon,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import {
+  MenuRoot,
+  MenuTrigger,
+  MenuContent,
+  MenuItem,
+  MenuCheckboxItem,
+  MenuRadioGroup,
+  MenuRadioItem,
+  MenuSeparator,
+  MenuCaption,
+} from "@/components/ui/Menu";
 
 export type FilterField = {
   key: string;
@@ -38,9 +47,6 @@ type DataTableProps = {
 };
 
 const toolbarBtn = "btn btn-ghost btn-lg";
-const menuItemCls = "menu-item text-left select-none";
-const menuPopupCls = "menu-popup";
-const menuPositionerCls = "z-50";
 
 export function DataTable({
   data,
@@ -56,7 +62,6 @@ export function DataTable({
   const [sort, setSort] = useState<SortState>(defaultSort);
   const [filters, setFilters] = useState<Record<string, Set<string>>>({});
 
-  // Tracking scroll direction
   const scrollRef = useRef<HTMLDivElement>(null);
   const [scrollState, setScrollState] = useState({
     top: false,
@@ -133,11 +138,9 @@ export function DataTable({
     });
   }, [afterFilter, sort]);
 
-  // Attach ResizeObserver on mount & data change
   useEffect(() => {
     checkScroll();
     const currentRef = scrollRef.current;
-
     if (currentRef) {
       const observer = new ResizeObserver(checkScroll);
       observer.observe(currentRef);
@@ -174,25 +177,27 @@ export function DataTable({
 
   return (
     <div className="border-separator bg-panel rounded-4 flex max-h-full flex-1 flex-col self-start overflow-hidden border">
-      <div className="border-separator flex shrink-0 items-center gap-8 border-b px-12 py-8">
+      {/* Toolbar */}
+      <Toolbar.Root className="border-separator flex shrink-0 items-center gap-8 border-b px-12 py-8">
         <span className="text-gray-2 whitespace-nowrap">{countLabel}</span>
 
         <div className="rounded-6 bg-ghost-hover relative flex-1">
           <Search
             size={15}
             strokeWidth={1.5}
-            className="pointer-events-none absolute top-1/2 left-8 -translate-y-1/2"
+            className="text-gray-3 pointer-events-none absolute top-1/2 left-8 -translate-y-1/2"
           />
-          <Input
+          <Toolbar.Input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder={`Search ${noun}s...`}
-            className="rounded-6 border-separator bg-gray h-32 w-full border py-4 pr-12 pl-28 placeholder:text-(--text-secondary) focus:border-(--accent) focus:outline-none"
+            className="rounded-6 border-separator h-32 w-full border py-4 pr-12 pl-28 placeholder:text-(--color-gray-3) focus:outline-none"
           />
         </div>
 
-        <Menu.Root modal={false}>
-          <Menu.Trigger className={toolbarBtn}>
+        {/* Sort menu */}
+        <MenuRoot modal={false}>
+          <Toolbar.Button render={<MenuTrigger />} className={toolbarBtn}>
             <span className="flex flex-row items-center">
               <span className="flex flex-row items-center gap-8">
                 <ArrowUpDown size={15} strokeWidth={1.5} />
@@ -212,117 +217,81 @@ export function DataTable({
                 </span>
               )}
             </span>
-          </Menu.Trigger>
-          <Menu.Portal>
-            <Menu.Positioner
-              className={menuPositionerCls}
-              side="bottom"
-              align="end"
-              sideOffset={4}
-            >
-              <Menu.Popup className={menuPopupCls}>
-                <div className="menu-caption text-gray-3">Sort by</div>
-                <Menu.RadioGroup value={sort?.key ?? ""}>
-                  {columns.map((col) => {
-                    const active = sort?.key === col.key;
-                    return (
-                      <Menu.RadioItem
-                        key={col.key}
-                        value={col.key}
-                        closeOnClick={false}
-                        onClick={() => cycleSort(col.key)}
-                        className={cn(menuItemCls, "justify-between gap-16")}
-                      >
-                        {col.label}
-                        <span
-                          className={
-                            active ? "text-gray-2" : "text-transparent"
-                          }
-                        >
-                          {active && sort!.dir === "desc" ? (
-                            <ArrowDownZA size={15} strokeWidth={1.5} />
-                          ) : (
-                            <ArrowUpAZ size={15} strokeWidth={1.5} />
-                          )}
-                        </span>
-                      </Menu.RadioItem>
-                    );
-                  })}
-                </Menu.RadioGroup>
-                {sort && (
-                  <>
-                    <div className="menu-separator" />
-                    <Menu.Item
-                      onClick={() => setSort(null)}
-                      className={menuItemCls}
+          </Toolbar.Button>
+          <MenuContent>
+            <MenuCaption>Sort by</MenuCaption>
+            <MenuRadioGroup value={sort?.key ?? ""}>
+              {columns.map((col) => {
+                const active = sort?.key === col.key;
+                return (
+                  <MenuRadioItem
+                    key={col.key}
+                    value={col.key}
+                    closeOnClick={false}
+                    onClick={() => cycleSort(col.key)}
+                  >
+                    {col.label}
+                    <span
+                      className={active ? "text-gray-2" : "text-transparent"}
                     >
-                      Clear sort
-                    </Menu.Item>
-                  </>
-                )}
-              </Menu.Popup>
-            </Menu.Positioner>
-          </Menu.Portal>
-        </Menu.Root>
+                      {active && sort!.dir === "desc" ? (
+                        <ArrowDownZA size={15} strokeWidth={1.5} />
+                      ) : (
+                        <ArrowUpAZ size={15} strokeWidth={1.5} />
+                      )}
+                    </span>
+                  </MenuRadioItem>
+                );
+              })}
+            </MenuRadioGroup>
+            {sort && (
+              <>
+                <MenuSeparator />
+                <MenuItem onClick={() => setSort(null)}>Clear sort</MenuItem>
+              </>
+            )}
+          </MenuContent>
+        </MenuRoot>
 
+        {/* Filter menu */}
         {filterFields && filterFields.length > 0 && (
-          <Menu.Root modal={false}>
-            <Menu.Trigger className={toolbarBtn}>
+          <MenuRoot modal={false}>
+            <Toolbar.Button render={<MenuTrigger />} className={toolbarBtn}>
               <ListFilter size={15} strokeWidth={1.5} />
               Filter
               {activeFilterCount > 0 && (
                 <span className="text-gray-2">· {activeFilterCount}</span>
               )}
-            </Menu.Trigger>
-            <Menu.Portal>
-              <Menu.Positioner
-                className={menuPositionerCls}
-                side="bottom"
-                align="end"
-                sideOffset={4}
-              >
-                <Menu.Popup className={menuPopupCls}>
-                  {filterFields.map((field, i) => (
-                    <div key={field.key}>
-                      {i > 0 && <div className="menu-separator" />}
-                      <div className="menu-caption text-gray-3">
-                        {field.label}
-                      </div>
-                      {(filterOptions[field.key] ?? []).map((opt) => (
-                        <Menu.CheckboxItem
-                          key={opt}
-                          checked={filters[field.key]?.has(opt) ?? false}
-                          onCheckedChange={() => toggleFilter(field.key, opt)}
-                          closeOnClick={false}
-                          className={cn(menuItemCls, "gap-8")}
-                        >
-                          <span className="border-checkbox-outline flex h-14 w-14 shrink-0 items-center justify-center border">
-                            <Menu.CheckboxItemIndicator>
-                              <Check size={10} strokeWidth={2.5} />
-                            </Menu.CheckboxItemIndicator>
-                          </span>
-                          <span>{opt}</span>
-                        </Menu.CheckboxItem>
-                      ))}
-                    </div>
+            </Toolbar.Button>
+            <MenuContent>
+              {filterFields.map((field, i) => (
+                <div key={field.key}>
+                  {i > 0 && <MenuSeparator />}
+                  <MenuCaption>{field.label}</MenuCaption>
+                  {(filterOptions[field.key] ?? []).map((opt) => (
+                    <MenuCheckboxItem
+                      key={opt}
+                      checked={filters[field.key]?.has(opt) ?? false}
+                      onCheckedChange={() => toggleFilter(field.key, opt)}
+                      closeOnClick={false}
+                    >
+                      {opt}
+                    </MenuCheckboxItem>
                   ))}
-                  {activeFilterCount > 0 && (
-                    <>
-                      <div className="menu-separator" />
-                      <Menu.Item
-                        onClick={() => setFilters({})}
-                        className={menuItemCls}
-                      >
-                        Clear filters
-                      </Menu.Item>
-                    </>
-                  )}
-                </Menu.Popup>
-              </Menu.Positioner>
-            </Menu.Portal>
-          </Menu.Root>
+                </div>
+              ))}
+              {activeFilterCount > 0 && (
+                <>
+                  <MenuSeparator />
+                  <MenuItem onClick={() => setFilters({})}>
+                    Clear filters
+                  </MenuItem>
+                </>
+              )}
+            </MenuContent>
+          </MenuRoot>
         )}
-      </div>
+      </Toolbar.Root>
 
       <div className="relative flex flex-1 overflow-hidden">
         <div

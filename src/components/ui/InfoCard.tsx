@@ -16,7 +16,7 @@ export function InfoCard({ heading, children, className }: InfoCardProps) {
       )}
     >
       {heading && (
-        <div className="border-separator border-b bg-(--color-panel-header) px-24 py-12 font-medium">
+        <div className="border-separator bg-panel-header border-b px-12 py-6 font-medium">
           {heading}
         </div>
       )}
@@ -26,17 +26,24 @@ export function InfoCard({ heading, children, className }: InfoCardProps) {
 }
 
 // Row is a horizontal container. Put one or many InfoCardField inside.
-// Multiple fields sit side-by-side with vertical dividers between them.
+// layout="equal" (default): fields share width evenly.
+// layout="auto": fields shrink-wrap to their content width.
 type InfoCardRowProps = {
   children: ReactNode;
+  layout?: "equal" | "auto";
   className?: string;
 };
 
-export function InfoCardRow({ children, className }: InfoCardRowProps) {
+export function InfoCardRow({
+  children,
+  layout = "equal",
+  className,
+}: InfoCardRowProps) {
   return (
     <div
       className={cn(
         "bg-panel border-separator flex border-b last:border-0",
+        layout === "equal" && "*:flex-1",
         className
       )}
     >
@@ -60,7 +67,7 @@ export function InfoCardField({
   return (
     <div
       className={cn(
-        "border-separator flex flex-1 flex-col gap-4 px-24 py-16 [&:not(:first-child)]:border-l",
+        "border-separator flex flex-col gap-4 px-12 py-16 not-first:border-l",
         className
       )}
     >
@@ -85,9 +92,9 @@ export function InfoCardSectionHeader({
   return (
     <div
       className={cn(
-        "bg-panel-header border-separator border-b px-24",
-        variant === "section" && "py-12 font-medium",
-        variant === "subsection" && "text-gray-2 py-10",
+        "bg-panel-header border-separator border-b px-12 py-6",
+        variant === "section" && "font-medium",
+        variant === "subsection" && "text-gray-2",
         className
       )}
       {...props}

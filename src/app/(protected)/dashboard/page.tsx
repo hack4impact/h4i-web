@@ -9,7 +9,7 @@ import { Badge } from "@/components/ui/Badge";
 
 export default function DashboardPage() {
   return (
-    <div className="pt-32">
+    <div className="h-full overflow-y-auto pt-32">
       <PageHeader title="Dashboard">
         <div className="h-36" />
       </PageHeader>
@@ -66,6 +66,23 @@ export default function DashboardPage() {
               <div className="flex flex-wrap gap-8">
                 <Badge label="Civic Tech" color="orange" />
                 <Badge label="Education" color="green" />
+              </div>
+            </InfoCardField>
+          </InfoCardRow>
+        </InfoCard>
+
+        {/* layout="auto": fields size to content */}
+        <InfoCard heading="Auto-width Fields" className="max-w-2xl">
+          <InfoCardRow layout="auto">
+            <InfoCardField label="Status">
+              <Badge label="Active" color="green" />
+            </InfoCardField>
+            <InfoCardField label="Role">Chapter Lead</InfoCardField>
+            <InfoCardField label="Tags">
+              <div className="flex flex-wrap gap-8">
+                <Badge label="Civic Tech" color="orange" />
+                <Badge label="Education" color="green" />
+                <Badge label="Design" color="pink" />
               </div>
             </InfoCardField>
           </InfoCardRow>

@@ -4,18 +4,9 @@ import { ensureUrl } from "@/lib/utils";
 import { auth } from "@/lib/authn";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { Badge, BadgeColor } from "@/components/ui/Badge";
+import { AboutCard } from "@/components/ui/AboutCard";
 import { ArrowLeft } from "lucide-react";
 import { ProjectsTable } from "../../projects/ProjectsTable";
-import { Card, CardDivider } from "@/components/ui/Card";
-
-function initials(name: string) {
-  return name
-    .split(" ")
-    .map((w) => w[0])
-    .join("")
-    .slice(0, 2)
-    .toUpperCase();
-}
 
 const statusColors: Record<string, BadgeColor> = {
   Active: "green",
@@ -61,7 +52,7 @@ export default async function VolunteerPage({
     (f) => volunteer[f.key] && volunteer[f.key].trim() !== ""
   );
 
-  const subtitle = [volunteerChapters[0].Name, volunteer["Roles"]]
+  const subtitle = [volunteerChapters[0]?.Name, volunteer["Roles"]]
     .filter(Boolean)
     .join(" • ");
 
@@ -82,38 +73,18 @@ export default async function VolunteerPage({
           color={statusColors[volunteer.Status] ?? "grey"}
         />
         {canEdit && (
-          <a href={`/volunteer/${id}/edit`} className="btn btn-ghost">
+          <a href={`/volunteers/${id}/edit`} className="btn btn-ghost">
             Edit
           </a>
         )}
       </PageHeader>
 
       <div className="px-32">
-        <Card className="flex grow gap-16 py-0">
-          <div className="flex flex-1 flex-row gap-20 py-24">
-            <div
-              className="bg-blue-3 rounded-6 flex shrink-0 items-center justify-center font-medium text-white"
-              style={{ width: 72, height: 72, fontSize: 22 }}
-            >
-              {initials(volunteer.Name)}
-            </div>
-            <div className="flex flex-col gap-8">
-              <span className="text-gray-2">About</span>
-              <p className="text-gray-1 leading-relaxed">
-                Passionate about civic engagement and technology-driven
-                community service. Contributes to chapter initiatives and
-                projects that connect volunteers with local organizations,
-                helping build scalable tools for nonprofit teams.
-              </p>
-            </div>
-          </div>
-
-          {presentFields.length > 0 && (
-            <>
-              <CardDivider
-                className="border-separator border-r"
-                orientation="vertical"
-              />
+        <AboutCard
+          name={volunteer.Name}
+          bio="Passionate about civic engagement and technology-driven community service. Contributes to chapter initiatives and projects that connect volunteers with local organizations, helping build scalable tools for nonprofit teams."
+          detail={
+            presentFields.length > 0 ? (
               <dl className="flex flex-col gap-16 py-24">
                 {presentFields.map((field) => {
                   const value = volunteer[field.key];
@@ -145,9 +116,9 @@ export default async function VolunteerPage({
                   );
                 })}
               </dl>
-            </>
-          )}
-        </Card>
+            ) : undefined
+          }
+        />
       </div>
 
       <div className="px-32 py-12">

@@ -1,4 +1,5 @@
-import { cn } from "@/lib/utils";
+import { SquareArrowOutUpRight } from "lucide-react";
+import { cn, ensureUrl } from "@/lib/utils";
 import type { ReactNode, HTMLAttributes } from "react";
 
 type InfoCardProps = {
@@ -152,6 +153,39 @@ export function ContactField({
         </>
       )}
     </div>
+  );
+}
+
+// ResourceLinkField: an external link rendered as a button-style cell in a row.
+// Uses ensureUrl so bare domains (e.g. "github.com/...") are handled safely.
+type ResourceLinkFieldProps = {
+  label: string;
+  href: string;
+  className?: string;
+};
+
+export function ResourceLinkField({
+  label,
+  href,
+  className,
+}: ResourceLinkFieldProps) {
+  return (
+    <a
+      href={ensureUrl(href)}
+      target="_blank"
+      rel="noopener noreferrer"
+      className={cn(
+        "border-separator flex items-center gap-8 px-12 py-12 transition-colors not-first:border-l hover:bg-(--color-panel-highlight-1)",
+        className
+      )}
+    >
+      <SquareArrowOutUpRight
+        size={14}
+        strokeWidth={1.5}
+        className="text-gray-2 shrink-0"
+      />
+      {label}
+    </a>
   );
 }
 

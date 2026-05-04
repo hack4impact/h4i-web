@@ -4,8 +4,12 @@ import { ensureUrl } from "@/lib/utils";
 import { auth } from "@/lib/authn";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { Badge, BadgeColor } from "@/components/ui/Badge";
-import { Card } from "@/components/ui/Card";
-import { ArrowLeft, SquareArrowOutUpRight } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
+import {
+  InfoCard,
+  InfoCardRow,
+  ResourceLinkField,
+} from "@/components/ui/InfoCard";
 import { PartnersTable } from "../../partners/PartnersTable";
 import { ChaptersTable } from "../../chapters/ChaptersTable";
 
@@ -122,24 +126,18 @@ export default async function ProjectPage({
       )}
 
       {presentResources.length > 0 && (
-        <div className="flex px-32 py-12">
-          <Card className="flex grow flex-row gap-16 py-16">
-            {presentResources.map((field) => {
-              const value = project[field.key];
-              return (
-                <a
+        <div className="px-32 py-12">
+          <InfoCard>
+            <InfoCardRow layout="auto">
+              {presentResources.map((field) => (
+                <ResourceLinkField
                   key={field.key}
-                  className="btn"
-                  href={ensureUrl(value)}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <SquareArrowOutUpRight size={15} strokeWidth={1.5} />
-                  {field.label}
-                </a>
-              );
-            })}
-          </Card>
+                  label={field.label}
+                  href={project[field.key]}
+                />
+              ))}
+            </InfoCardRow>
+          </InfoCard>
         </div>
       )}
 

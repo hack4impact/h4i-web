@@ -3,8 +3,7 @@ import { partners, projects } from "@/lib/data";
 import { auth } from "@/lib/authn";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { Badge, BadgeColor } from "@/components/ui/Badge";
-import { Avatar } from "@/components/ui/Avatar";
-import { Card, CardDivider } from "@/components/ui/Card";
+import { AboutCard } from "@/components/ui/AboutCard";
 import { ArrowLeft } from "lucide-react";
 import { ProjectsTable } from "../../projects/ProjectsTable";
 
@@ -75,26 +74,11 @@ export default async function PartnerPage({
       </PageHeader>
 
       <div className="px-32">
-        <Card className="flex grow gap-16 py-0">
-          <div className="flex flex-1 flex-row gap-20 py-24">
-            <Avatar name={partner.Name} size="lg" />
-            <div className="flex flex-col gap-8">
-              <span className="text-gray-2">About</span>
-              <p className="text-gray-1 leading-relaxed">
-                A valued community partner working alongside our chapters to
-                deliver impact. Collaborates on projects that support local
-                communities and advance the organization's civic technology
-                mission.
-              </p>
-            </div>
-          </div>
-
-          {presentFields.length > 0 && (
-            <>
-              <CardDivider
-                className="border-separator border-r"
-                orientation="vertical"
-              />
+        <AboutCard
+          name={partner.Name}
+          bio="A valued community partner working alongside our chapters to deliver impact. Collaborates on projects that support local communities and advance the organization's civic technology mission."
+          detail={
+            presentFields.length > 0 ? (
               <dl className="flex flex-col gap-16 py-24">
                 {presentFields.map((field) => {
                   const value = partner[field.key];
@@ -109,15 +93,6 @@ export default async function PartnerPage({
                           >
                             {value}
                           </a>
-                        ) : field.type === "link" ? (
-                          <a
-                            href={value}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="hover:underline"
-                          >
-                            {value}
-                          </a>
                         ) : (
                           value
                         )}
@@ -126,9 +101,9 @@ export default async function PartnerPage({
                   );
                 })}
               </dl>
-            </>
-          )}
-        </Card>
+            ) : undefined
+          }
+        />
       </div>
 
       <div className="px-32 py-12">

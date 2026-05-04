@@ -34,6 +34,7 @@ const detailFields: DetailField[] = [
 const resourceLinks: DetailField[] = [
   { label: "Google Drive", key: "Google Drive", type: "link" },
   { label: "GitHub", key: "GitHub", type: "link" },
+  { label: "Notion", key: "Notion", type: "link" },
 ];
 
 export default async function ChapterPage({

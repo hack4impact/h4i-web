@@ -7,6 +7,20 @@ import {
   ContactField,
 } from "@/components/ui/InfoCard";
 import { Badge } from "@/components/ui/Badge";
+import { RosterCard } from "@/components/ui/RosterCard";
+import type { RosterEntry } from "@/components/ui/RosterCard";
+import { SelectDemo, ComboboxDemo } from "./DropdownsDemo";
+
+const rosterEntries: RosterEntry[] = [
+  { name: "Sarah Liu", role: "Tech Lead", term: "Sp '25" },
+  { name: "Jamie Chen", role: "Designer", term: "Sp '25" },
+  { name: "Alex Martinez", role: "Developer", term: "Sp '25" },
+  { name: "Priya Tran", role: "Developer", term: "Sp '25" },
+  { name: "Marcus Tran", role: "Project Manager", term: "Sp '25" },
+  { name: "Sarah Liu", role: "Tech Lead", term: "Fa '24" },
+  { name: "Jordan Park", role: "Designer", term: "Fa '24" },
+  { name: "Alex Martinez", role: "Developer", term: "Fa '24" },
+];
 
 export default function DashboardPage() {
   return (
@@ -16,6 +30,14 @@ export default function DashboardPage() {
       </PageHeader>
 
       <div className="flex flex-col gap-16 px-32 py-16">
+        <RosterCard
+          entries={rosterEntries}
+          heading="Project Team"
+          currentTerm="Sp '25"
+          className="max-w-2xl"
+        />
+        <SelectDemo />
+        <ComboboxDemo />
         {/* Vertical: one field per row */}
         <InfoCard heading="Volunteer Details" className="max-w-2xl">
           <InfoCardRow>

@@ -90,7 +90,9 @@
   --font-weight-bold: unset;
 
   /* Fonts */
-  --font-sans: "Inclusive Sans", system-ui, sans-serif;
+  --font-sans: var(--font-inclusive-sans), system-ui, sans-serif;
+  --font-serif: var(--font-newsreader), system-serif, serif;
+  --font-mono: var(--font-paper-mono), ui-monospace, monospace;
 
   /* Line heights */
   --leading-base: 16px;

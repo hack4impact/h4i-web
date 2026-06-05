@@ -34,7 +34,7 @@ export function ComboboxInput({
   return (
     <BaseCombobox.Input
       className={cn(
-        "h-full flex-1 bg-transparent py-4 pr-4 pl-10 placeholder:text-(--color-gray-3) focus:outline-none",
+        "h-full min-w-0 flex-1 bg-transparent py-4 pr-4 pl-10 placeholder:text-(--color-gray-3) focus:outline-none",
         className
       )}
       {...props}

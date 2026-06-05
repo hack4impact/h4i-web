@@ -93,7 +93,7 @@ export function ComboboxDemo() {
         onOpenChange={setOpen}
         modal={false}
       >
-        <ComboboxInputGroup className="w-64">
+        <ComboboxInputGroup className="w-[240px]">
           <ComboboxInput placeholder="Search chapters..." />
           <ComboboxTrigger>
             <Chevron size={13} strokeWidth={1.5} />

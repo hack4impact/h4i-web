@@ -4,16 +4,37 @@
   color-scheme: light dark;
 
   /* Badge colors */
-  --badge-blue-bg: light-dark(rgb(59 130 246 / 0.12), rgb(59 130 246 / 0.18));
-  --badge-blue-fg: light-dark(#1d4ed8, #93c5fd);
-  --badge-green-bg: light-dark(rgb(34 197 94 / 0.12), rgb(34 197 94 / 0.18));
-  --badge-green-fg: light-dark(#15803d, #86efac);
-  --badge-orange-bg: light-dark(rgb(249 115 22 / 0.12), rgb(249 115 22 / 0.18));
-  --badge-orange-fg: light-dark(#c2410c, #fdba74);
-  --badge-purple-bg: light-dark(rgb(168 85 247 / 0.12), rgb(168 85 247 / 0.18));
-  --badge-purple-fg: light-dark(#7e22ce, #d8b4fe);
-  --badge-pink-bg: light-dark(rgb(236 72 153 / 0.12), rgb(236 72 153 / 0.18));
-  --badge-pink-fg: light-dark(#be185d, #f9a8d4);
+  --badge-blue-bg: light-dark(
+    color-mix(in oklab, var(--color-blue-400), transparent 88%),
+    color-mix(in oklab, var(--color-blue-400), transparent 82%)
+  );
+  --badge-blue-fg: light-dark(var(--color-blue-700), var(--color-blue-200));
+  --badge-green-bg: light-dark(
+    color-mix(in oklab, var(--color-green-400), transparent 88%),
+    color-mix(in oklab, var(--color-green-400), transparent 82%)
+  );
+  --badge-green-fg: light-dark(var(--color-green-700), var(--color-green-200));
+  --badge-orange-bg: light-dark(
+    color-mix(in oklab, var(--color-orange-400), transparent 88%),
+    color-mix(in oklab, var(--color-orange-400), transparent 82%)
+  );
+  --badge-orange-fg: light-dark(
+    var(--color-orange-700),
+    var(--color-orange-200)
+  );
+  --badge-purple-bg: light-dark(
+    color-mix(in oklab, var(--color-purple-400), transparent 88%),
+    color-mix(in oklab, var(--color-purple-400), transparent 82%)
+  );
+  --badge-purple-fg: light-dark(
+    var(--color-purple-700),
+    var(--color-purple-200)
+  );
+  --badge-pink-bg: light-dark(
+    color-mix(in oklab, var(--color-pink-400), transparent 88%),
+    color-mix(in oklab, var(--color-pink-400), transparent 82%)
+  );
+  --badge-pink-fg: light-dark(var(--color-pink-700), var(--color-pink-200));
   --badge-grey-bg: light-dark(rgb(0 0 0 / 0.06), rgb(255 255 255 / 0.06));
   --badge-grey-fg: light-dark(rgb(0 0 0 / 0.5), rgb(255 255 255 / 0.5));
 }
@@ -58,20 +79,74 @@
   );
   --color-inverse: light-dark(black, white);
 
-  /* Blue palette */
-  --color-brand: oklch(74% 0.104 258);
-  --color-blue-1: oklch(50% 0.15 258);
-  --color-blue-2: oklch(55% 0.18 258);
-  --color-blue-3: oklch(63% 0.19 258);
-  --color-blue-4: oklch(65% 0.16 258);
-  --color-blue-5: color-mix(
-    in oklab,
-    oklch(65% 0.16 258),
-    oklch(74% 0.104 258)
-  );
+  /* Brand colors — Blue */
+  --color-brand: var(--color-blue-500);
+  --color-blue-50: oklch(96.4% 0.014 254.6);
+  --color-blue-100: oklch(92.7% 0.029 249.8);
+  --color-blue-200: oklch(88.8% 0.046 250.4);
+  --color-blue-300: oklch(84.3% 0.065 251.4);
+  --color-blue-400: oklch(70.4% 0.126 252.8);
+  --color-blue-500: oklch(59.6% 0.175 255);
+  --color-blue-600: oklch(49.6% 0.149 255);
+  --color-blue-700: oklch(39.2% 0.115 255);
+  --color-blue-800: oklch(27.2% 0.072 254.2);
+  --color-blue-900: oklch(21.6% 0.052 253.5);
+  --color-blue-950: oklch(17% 0.035 251.2);
+
+  /* Brand colors — Purple */
+  --color-purple-50: oklch(96.6% 0.015 294.5);
+  --color-purple-100: oklch(93.1% 0.031 291.8);
+  --color-purple-200: oklch(89.1% 0.049 291.7);
+  --color-purple-300: oklch(84.8% 0.069 290.3);
+  --color-purple-400: oklch(71.5% 0.135 288.4);
+  --color-purple-500: oklch(61% 0.189 285.3);
+  --color-purple-600: oklch(51.6% 0.235 280.3);
+  --color-purple-700: oklch(42% 0.25 273.1);
+  --color-purple-800: oklch(29% 0.164 274.8);
+  --color-purple-900: oklch(22.8% 0.122 276.9);
+  --color-purple-950: oklch(18% 0.086 279.3);
+
+  /* Brand colors — Pink */
+  --color-pink-50: oklch(96.7% 0.021 321);
+  --color-pink-100: oklch(93.4% 0.044 322.5);
+  --color-pink-200: oklch(89.6% 0.07 321.6);
+  --color-pink-300: oklch(85.5% 0.099 322.5);
+  --color-pink-400: oklch(72.9% 0.195 322.4);
+  --color-pink-500: oklch(63% 0.268 321.8);
+  --color-pink-600: oklch(52.5% 0.237 321.7);
+  --color-pink-700: oklch(41.7% 0.185 321.9);
+  --color-pink-800: oklch(28.8% 0.122 322.5);
+  --color-pink-900: oklch(22.8% 0.092 322.1);
+  --color-pink-950: oklch(18% 0.07 322.5);
+
+  /* Brand colors — Orange */
+  --color-orange-50: oklch(96.6% 0.015 48.6);
+  --color-orange-100: oklch(93.1% 0.031 51.5);
+  --color-orange-200: oklch(89.2% 0.049 52.1);
+  --color-orange-300: oklch(84.9% 0.071 51.1);
+  --color-orange-400: oklch(71.7% 0.141 48.7);
+  --color-orange-500: oklch(61% 0.164 44.6);
+  --color-orange-600: oklch(50.6% 0.132 45.6);
+  --color-orange-700: oklch(40.2% 0.102 46.3);
+  --color-orange-800: oklch(27.8% 0.064 48);
+  --color-orange-900: oklch(21.9% 0.046 50.1);
+  --color-orange-950: oklch(17.4% 0.033 55.7);
+
+  /* Brand colors — Green */
+  --color-green-50: oklch(96.1% 0.05 138.8);
+  --color-green-100: oklch(91.9% 0.106 139.7);
+  --color-green-200: oklch(87.1% 0.169 139.6);
+  --color-green-300: oklch(82.1% 0.236 140.2);
+  --color-green-400: oklch(68.6% 0.217 140.8);
+  --color-green-500: oklch(57.9% 0.181 140.7);
+  --color-green-600: oklch(47.9% 0.148 140.6);
+  --color-green-700: oklch(38% 0.114 140.4);
+  --color-green-800: oklch(26.3% 0.074 140.2);
+  --color-green-900: oklch(21% 0.055 139.2);
+  --color-green-950: oklch(16.8% 0.042 136.7);
 
   /* State colors */
-  --color-orange: oklch(81% 0.18 67);
+  --color-orange: var(--color-orange-400);
   --color-red: oklch(59% 0.25 20);
 
   /* Type scale */
@@ -147,7 +222,10 @@
     light-dark(#f2f2f2, #2a2a2a) 92%,
     transparent
   );
-  --color-menu-highlight: light-dark(var(--color-blue-4), var(--color-blue-1));
+  --color-menu-highlight: light-dark(
+    var(--color-blue-500),
+    var(--color-blue-700)
+  );
   --color-toast: color-mix(
     in oklab,
     light-dark(#f2f2f2, #2a2a2a) 92%,

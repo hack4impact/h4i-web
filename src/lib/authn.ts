@@ -10,7 +10,8 @@ import type { AppRole } from "@/types";
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   ...authConfig,
-  adapter: PrismaAdapter(db),
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  adapter: PrismaAdapter(db as any),
   providers: [
     Credentials({
       credentials: {

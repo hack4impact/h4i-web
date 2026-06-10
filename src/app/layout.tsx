@@ -56,9 +56,19 @@ export default function RootLayout({
   return (
     <html
       lang="en"
+      suppressHydrationWarning
       className={`${inclusiveSans.variable} ${newsreader.variable} ${paperMono.variable}`}
     >
-      <body>{children}</body>
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){try{if(localStorage.getItem('theme')==='dark')document.documentElement.classList.add('dark')}catch(e){}})()`,
+          }}
+        />
+      </head>
+      <body className="relative flex min-h-screen flex-col font-sans">
+        {children}
+      </body>
     </html>
   );
 }

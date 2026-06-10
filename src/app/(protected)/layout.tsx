@@ -1,5 +1,6 @@
 import { auth } from "@/lib/authn";
 import { redirect } from "next/navigation";
+import { Sidebar } from "@/components/layout/Sidebar";
 
 export default async function ProtectedLayout({
   children,
@@ -9,5 +10,10 @@ export default async function ProtectedLayout({
   const session = await auth();
   if (!session) redirect("/sign-in");
 
-  return <>{children}</>;
+  return (
+    <div className="bg-root flex min-h-screen">
+      <Sidebar userName={session.user.name} userRole={session.user.role} />
+      <div className="bg-root flex min-w-0 flex-1 flex-col">{children}</div>
+    </div>
+  );
 }

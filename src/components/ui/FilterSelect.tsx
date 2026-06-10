@@ -20,11 +20,11 @@ export function FilterSelect({
 }: FilterSelectProps) {
   return (
     <Select.Root value={value} onValueChange={(v) => onValueChange(v ?? "all")}>
-      <Select.Trigger className="select-trigger label-xs">
-        <span className="text-gray-400">{label}</span>
-        <span className="text-gray-300">|</span>
+      <Select.Trigger className="select-trigger label-xs bg-root">
+        <span className="text-gray-2">{label}</span>
+        <span className="text-gray-4">|</span>
         <Select.Value />
-        <Select.Icon className="text-gray-400">
+        <Select.Icon className="text-gray-2">
           <svg width="10" height="10" viewBox="0 0 12 12" fill="none">
             <path
               d="M3 4.5L6 7.5L9 4.5"

@@ -75,59 +75,60 @@ export function FilteredGrid<T extends { id: string }>({
   });
 
   if (scrollable) {
+    if (items.length === 0) {
+      return (
+        <p className="mt-16 text-center font-sans text-base text-gray-400">
+          {emptyMessage}
+        </p>
+      );
+    }
     return (
-      <div ref={scrollRef} className="mt-6 max-h-[72vh] overflow-y-auto pr-1">
-        {items.length === 0 ? (
-          <p className="mt-16 text-center font-sans text-base text-gray-400">
-            {emptyMessage}
-          </p>
-        ) : (
-          <div
-            style={{ height: virtualizer.getTotalSize(), position: "relative" }}
-          >
-            {virtualizer.getVirtualItems().map((virtualRow) => (
-              <motion.div
-                key={`${filterKey}-${virtualRow.key}`}
-                data-index={virtualRow.index}
-                ref={virtualizer.measureElement}
-                style={{
-                  position: "absolute",
-                  top: virtualRow.start,
-                  left: 0,
-                  right: 0,
-                }}
-                variants={{
-                  hidden: {},
-                  visible: {
-                    transition: {
-                      staggerChildren: staggerDelay,
-                      delayChildren: Math.min(
-                        virtualRow.index * cols * staggerDelay,
-                        0.3
-                      ),
-                    },
+      <div ref={scrollRef} className="mt-6 min-h-0 flex-1 overflow-y-auto pr-1">
+        <div
+          style={{ height: virtualizer.getTotalSize(), position: "relative" }}
+        >
+          {virtualizer.getVirtualItems().map((virtualRow) => (
+            <motion.div
+              key={`${filterKey}-${virtualRow.key}`}
+              data-index={virtualRow.index}
+              ref={virtualizer.measureElement}
+              style={{
+                position: "absolute",
+                top: virtualRow.start,
+                left: 0,
+                right: 0,
+              }}
+              variants={{
+                hidden: {},
+                visible: {
+                  transition: {
+                    staggerChildren: staggerDelay,
+                    delayChildren: Math.min(
+                      virtualRow.index * cols * staggerDelay,
+                      0.3
+                    ),
                   },
+                },
+              }}
+              initial="hidden"
+              animate="visible"
+              className="pb-3"
+            >
+              <div
+                style={{
+                  gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))`,
                 }}
-                initial="hidden"
-                animate="visible"
-                className="pb-3"
+                className="grid gap-3"
               >
-                <div
-                  style={{
-                    gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))`,
-                  }}
-                  className="grid gap-3"
-                >
-                  {rows[virtualRow.index].map((item) => (
-                    <motion.div key={item.id} variants={itemVariants}>
-                      {renderItem(item)}
-                    </motion.div>
-                  ))}
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        )}
+                {rows[virtualRow.index].map((item) => (
+                  <motion.div key={item.id} variants={itemVariants}>
+                    {renderItem(item)}
+                  </motion.div>
+                ))}
+              </div>
+            </motion.div>
+          ))}
+        </div>
       </div>
     );
   }

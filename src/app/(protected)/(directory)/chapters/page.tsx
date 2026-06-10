@@ -14,14 +14,14 @@ export default async function ChaptersPage() {
   });
 
   return (
-    <main className="flex flex-1 flex-col">
+    <main className="flex flex-1 flex-col overflow-hidden">
       <header className="border-separator border-b px-8 py-6">
         <h1 className="text-inverse font-serif text-[28px] leading-snug font-light tracking-tight">
           Chapters
         </h1>
         <p className="label text-gray-3 mt-1">{chapters.length} total</p>
       </header>
-      <div className="p-8">
+      <div className="flex flex-1 flex-col overflow-hidden p-8">
         <ChaptersTable chapters={chapters} images={images} />
       </div>
     </main>

@@ -122,7 +122,7 @@ export function ChaptersTable({ chapters, images }: ChaptersTableProps) {
   }, [chapters, status, region, est, sort]);
 
   return (
-    <div>
+    <div className="flex min-h-0 flex-1 flex-col">
       <FilterBar
         filters={[
           {
@@ -155,7 +155,7 @@ export function ChaptersTable({ chapters, images }: ChaptersTableProps) {
       <FilteredGrid
         items={filtered}
         filterKey={`${status}|${region}|${est}|${sort}`}
-        gridClassName="mt-10 grid grid-cols-1 gap-3 min-[480px]:grid-cols-2 sm:grid-cols-3 lg:grid-cols-4"
+        gridClassName="grid grid-cols-1 gap-3 min-[480px]:grid-cols-2 sm:grid-cols-3 lg:grid-cols-4"
         emptyMessage="No chapters match the selected filters."
         renderItem={(chapter) => (
           <ChapterCard
@@ -163,6 +163,7 @@ export function ChaptersTable({ chapters, images }: ChaptersTableProps) {
             imageUrl={images[chapter.slug] ?? null}
           />
         )}
+        scrollable
       />
     </div>
   );

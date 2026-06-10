@@ -1,14 +1,10 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { motion } from "framer-motion";
 import { FilterBar } from "../FilterBar";
+import { FilteredGrid } from "../FilteredGrid";
 import { PartnerCard } from "./PartnerCard";
-import { staggerContainer, fadeInUp } from "@/lib/animations";
 import type { Partner } from "@/lib/types/partner";
-
-const gridVariants = staggerContainer(0.03);
-const itemVariants = fadeInUp(0.4);
 
 type Sort = "name-asc" | "name-desc" | "projects-desc";
 
@@ -107,29 +103,15 @@ export function PartnersTable({ partners }: PartnersTableProps) {
         }}
       />
 
-      <motion.div
-        key={`${focusArea}|${orgType}|${sort}`}
-        variants={gridVariants}
-        initial="hidden"
-        whileInView="visible"
-        viewport={{ once: true, amount: 0.05 }}
-      >
-        <div className="mt-6 max-h-[72vh] overflow-y-auto pr-1">
-          <div className="grid grid-cols-1 gap-3 min-[480px]:grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
-            {filtered.map((partner) => (
-              <motion.div key={partner.id} variants={itemVariants}>
-                <PartnerCard partner={partner} />
-              </motion.div>
-            ))}
-          </div>
-
-          {filtered.length === 0 && (
-            <p className="mt-16 text-center font-sans text-base text-gray-400">
-              No partners match the selected filters.
-            </p>
-          )}
-        </div>
-      </motion.div>
+      <FilteredGrid
+        items={filtered}
+        filterKey={`${focusArea}|${orgType}|${sort}`}
+        gridClassName="grid grid-cols-1 gap-3 min-[480px]:grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6"
+        emptyMessage="No partners match the selected filters."
+        renderItem={(partner) => <PartnerCard partner={partner} />}
+        scrollable
+        staggerDelay={0.03}
+      />
     </div>
   );
 }

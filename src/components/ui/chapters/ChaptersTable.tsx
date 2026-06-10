@@ -1,14 +1,10 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { motion } from "framer-motion";
 import { FilterBar } from "../FilterBar";
+import { FilteredGrid } from "../FilteredGrid";
 import { ChapterCard } from "./ChapterCard";
-import { staggerContainer, fadeInUp } from "@/lib/animations";
 import type { Chapter } from "@/lib/types/chapter";
-
-const gridVariants = staggerContainer(0.04);
-const itemVariants = fadeInUp(0.4);
 
 type Sort = "status" | "name-asc" | "name-desc" | "year-asc" | "year-desc";
 
@@ -156,29 +152,18 @@ export function ChaptersTable({ chapters, images }: ChaptersTableProps) {
         }}
       />
 
-      <motion.div
-        key={`${status}|${region}|${est}|${sort}`}
-        className="mt-10 grid grid-cols-1 gap-3 min-[480px]:grid-cols-2 sm:grid-cols-3 lg:grid-cols-4"
-        variants={gridVariants}
-        initial="hidden"
-        whileInView="visible"
-        viewport={{ once: true, amount: 0.05 }}
-      >
-        {filtered.map((chapter) => (
-          <motion.div key={chapter.id} variants={itemVariants}>
-            <ChapterCard
-              chapter={chapter}
-              imageUrl={images[chapter.slug] ?? null}
-            />
-          </motion.div>
-        ))}
-      </motion.div>
-
-      {filtered.length === 0 && (
-        <p className="mt-16 text-center font-sans text-base text-gray-400">
-          No chapters match the selected filters.
-        </p>
-      )}
+      <FilteredGrid
+        items={filtered}
+        filterKey={`${status}|${region}|${est}|${sort}`}
+        gridClassName="mt-10 grid grid-cols-1 gap-3 min-[480px]:grid-cols-2 sm:grid-cols-3 lg:grid-cols-4"
+        emptyMessage="No chapters match the selected filters."
+        renderItem={(chapter) => (
+          <ChapterCard
+            chapter={chapter}
+            imageUrl={images[chapter.slug] ?? null}
+          />
+        )}
+      />
     </div>
   );
 }

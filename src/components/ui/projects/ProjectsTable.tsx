@@ -1,14 +1,10 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { motion } from "framer-motion";
 import { FilterBar } from "../FilterBar";
+import { FilteredGrid } from "../FilteredGrid";
 import { ProjectCard } from "./ProjectCard";
-import { staggerContainer, fadeInUp } from "@/lib/animations";
 import type { Project } from "@/lib/types/project";
-
-const gridVariants = staggerContainer(0.04);
-const itemVariants = fadeInUp(0.4);
 
 type Sort = "year-desc" | "year-asc" | "name-asc" | "name-desc";
 
@@ -151,29 +147,14 @@ export function ProjectsTable({
         }}
       />
 
-      <motion.div
-        key={`${focusArea}|${chapter}|${year}|${sort}`}
-        variants={gridVariants}
-        initial="hidden"
-        whileInView="visible"
-        viewport={{ once: true, amount: 0.05 }}
-      >
-        <div className="mt-6 max-h-[72vh] overflow-y-auto pr-1">
-          <div className="grid grid-cols-1 gap-3 min-[480px]:grid-cols-2 sm:grid-cols-3 lg:grid-cols-4">
-            {filtered.map((project) => (
-              <motion.div key={project.id} variants={itemVariants}>
-                <ProjectCard project={project} />
-              </motion.div>
-            ))}
-          </div>
-
-          {filtered.length === 0 && (
-            <p className="mt-16 text-center font-sans text-base text-gray-400">
-              No projects match the selected filters.
-            </p>
-          )}
-        </div>
-      </motion.div>
+      <FilteredGrid
+        items={filtered}
+        filterKey={`${focusArea}|${chapter}|${year}|${sort}`}
+        gridClassName="grid grid-cols-1 gap-3 min-[480px]:grid-cols-2 sm:grid-cols-3 lg:grid-cols-4"
+        emptyMessage="No projects match the selected filters."
+        renderItem={(project) => <ProjectCard project={project} />}
+        scrollable
+      />
     </div>
   );
 }

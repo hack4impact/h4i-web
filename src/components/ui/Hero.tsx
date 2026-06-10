@@ -16,11 +16,7 @@ interface HomeIntroProps extends ComponentPropsWithoutRef<"section"> {
 const containerVariants = staggerContainer(0.2, false);
 const itemVariants = fadeInForward();
 
-export function HomeIntro({
-  heroImageUrl,
-  className,
-  ...props
-}: HomeIntroProps) {
+export function Hero({ heroImageUrl, className, ...props }: HomeIntroProps) {
   return (
     <section {...props} className={cn("relative flex flex-col", className)}>
       <StaticRadialGradient

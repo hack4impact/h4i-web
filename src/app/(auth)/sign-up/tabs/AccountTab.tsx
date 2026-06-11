@@ -27,7 +27,6 @@ export function AccountTab() {
       <div className="grid grid-cols-2 gap-3">
         <TextField
           label="First name"
-          id="firstName"
           name="firstName"
           type="text"
           autoComplete="given-name"
@@ -36,7 +35,6 @@ export function AccountTab() {
         />
         <TextField
           label="Last name"
-          id="lastName"
           name="lastName"
           type="text"
           autoComplete="family-name"
@@ -47,7 +45,6 @@ export function AccountTab() {
 
       <TextField
         label="Email address"
-        id="email"
         name="email"
         type="email"
         autoComplete="email"
@@ -58,7 +55,6 @@ export function AccountTab() {
 
       <TextField
         label="Password"
-        id="password"
         name="password"
         type="password"
         autoComplete="new-password"

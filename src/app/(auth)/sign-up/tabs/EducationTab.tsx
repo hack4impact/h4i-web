@@ -31,7 +31,6 @@ export function EducationTab({
     <>
       <ComboboxField
         label="University"
-        id="university"
         name="university"
         options={universityOptions}
         placeholder="e.g. Carnegie Mellon University"
@@ -50,7 +49,6 @@ export function EducationTab({
       <div className="grid grid-cols-2 gap-3">
         <ComboboxField
           label="Graduation year"
-          id="graduationYear"
           name="graduationYear"
           options={GRAD_YEAR_STRINGS}
           placeholder="e.g. 2026"
@@ -58,7 +56,6 @@ export function EducationTab({
         />
         <ComboboxField
           label="Major"
-          id="major"
           name="major"
           options={majorOptions}
           placeholder="e.g. Computer Science"

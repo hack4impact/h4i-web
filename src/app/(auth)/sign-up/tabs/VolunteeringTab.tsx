@@ -1,17 +1,23 @@
 "use client";
 
 import { useState } from "react";
+import { ToggleGroup } from "@base-ui/react/toggle-group";
+import { Toggle } from "@base-ui/react/toggle";
 import {
   SelectField,
   ComboboxField,
   type SelectOption,
 } from "@/components/forms/FormFields";
-import { cn } from "@/lib/utils";
 
 const Y = new Date().getFullYear();
 const JOIN_YEAR_STRINGS = Array.from({ length: Y - 2014 + 1 }, (_, i) =>
   String(Y - i)
 );
+
+const TOGGLE_ITEM_CLASS =
+  "rounded-[var(--radius-6)] border px-3.5 py-2.5 font-sans text-sm transition-colors " +
+  "border-separator text-gray-3 hover:border-gray-3 cursor-pointer " +
+  "data-[pressed]:border-blue-400 data-[pressed]:bg-blue-500/10 data-[pressed]:text-blue-400";
 
 interface VolunteeringTabProps {
   chapters: SelectOption[];
@@ -30,23 +36,21 @@ export function VolunteeringTab({
     <>
       <input type="hidden" name="volunteerType" value={volunteerType} />
 
-      <div className="grid grid-cols-2 gap-2">
-        {(["STUDENT", "PROFESSIONAL"] as const).map((type) => (
-          <button
-            key={type}
-            type="button"
-            onClick={() => setVolunteerType(type)}
-            className={cn(
-              "rounded-[var(--radius-6)] border px-3.5 py-2.5 font-sans text-sm transition-colors",
-              volunteerType === type
-                ? "border-blue-400 bg-blue-500/10 text-blue-400"
-                : "border-separator text-gray-3 hover:border-gray-3"
-            )}
-          >
-            {type === "STUDENT" ? "Student" : "Professional"}
-          </button>
-        ))}
-      </div>
+      <ToggleGroup
+        value={[volunteerType]}
+        onValueChange={(values) => {
+          const t = values[0];
+          if (t === "STUDENT" || t === "PROFESSIONAL") setVolunteerType(t);
+        }}
+        className="grid grid-cols-2 gap-2"
+      >
+        <Toggle value="STUDENT" className={TOGGLE_ITEM_CLASS}>
+          Student
+        </Toggle>
+        <Toggle value="PROFESSIONAL" className={TOGGLE_ITEM_CLASS}>
+          Professional
+        </Toggle>
+      </ToggleGroup>
 
       {chapters.length > 0 && (
         <SelectField
@@ -61,7 +65,6 @@ export function VolunteeringTab({
 
       <ComboboxField
         label="Year you started volunteering"
-        id="startYear"
         name="startYear"
         options={JOIN_YEAR_STRINGS}
         placeholder="e.g. 2018"
@@ -71,7 +74,6 @@ export function VolunteeringTab({
       {volunteerType === "PROFESSIONAL" && (
         <ComboboxField
           label="Employer"
-          id="employer"
           name="employer"
           options={employerOptions}
           placeholder="Company or organization"

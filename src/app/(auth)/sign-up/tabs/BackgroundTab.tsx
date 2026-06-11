@@ -31,7 +31,6 @@ export function BackgroundTab({
       <div className="grid grid-cols-2 gap-3">
         <ComboboxField
           label="Birth year"
-          id="birthYear"
           name="birthYear"
           options={BIRTH_YEAR_STRINGS}
           placeholder="e.g. 1998"

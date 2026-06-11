@@ -15,7 +15,7 @@ export type { SelectOption };
 
 const errorClass = "label-xs text-orange-500 mt-1";
 
-export function FieldLabel({
+function FieldLabel({
   children,
   required,
   optional,
@@ -46,7 +46,7 @@ export function TextField({
   validate,
 }: {
   label: string;
-  id: string;
+  id?: string;
   name: string;
   type: string;
   placeholder?: string;
@@ -66,7 +66,7 @@ export function TextField({
       </FieldLabel>
       <div className="relative">
         <Input
-          id={id}
+          id={id ?? name}
           name={name}
           type={type}
           autoComplete={autoComplete}
@@ -140,7 +140,7 @@ export function ComboboxField({
   persistField,
 }: {
   label: string;
-  id: string;
+  id?: string;
   name: string;
   options: string[];
   placeholder?: string;
@@ -155,7 +155,7 @@ export function ComboboxField({
         {label}
       </FieldLabel>
       <AppCombobox
-        id={id}
+        id={id ?? name}
         name={name}
         options={options}
         placeholder={placeholder}
@@ -167,14 +167,5 @@ export function ComboboxField({
         Required
       </Field.Error>
     </Field.Root>
-  );
-}
-
-export function SectionDivider({ label }: { label: string }) {
-  return (
-    <div className="flex items-center gap-3 pt-2">
-      <span className="label-xs text-gray-4 whitespace-nowrap">{label}</span>
-      <div className="bg-separator h-px flex-1" />
-    </div>
   );
 }

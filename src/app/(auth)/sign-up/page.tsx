@@ -8,6 +8,7 @@ import {
   GENDER_SUGGESTIONS,
   RACE_SUGGESTIONS,
 } from "@/lib/field-options";
+import { AuthHeader } from "@/components/ui/AuthHeader";
 
 export default async function SignUpPage() {
   const session = await auth();
@@ -47,7 +48,8 @@ export default async function SignUpPage() {
     ]);
 
   return (
-    <main className="bg-root flex min-h-screen items-center justify-center py-12">
+    <main className="bg-root flex min-h-screen flex-col items-center justify-center py-12">
+      <AuthHeader title="Volunteer Registration" />
       <SignUpForm
         chapters={chapters}
         majorOptions={

@@ -5,7 +5,6 @@ import { Form } from "@base-ui/react/form";
 import { credentialsSignIn } from "@/actions/authn";
 import { TextField } from "@/components/forms/FormFields";
 import { Button } from "@/components/ui/Button";
-import { AuthHeader } from "@/components/ui/AuthHeader";
 import Link from "next/link";
 
 async function action(
@@ -20,8 +19,6 @@ export default function SignInForm() {
 
   return (
     <div className="w-full max-w-[360px] px-4">
-      <AuthHeader title="Sign in" subtitle="to your volunteer account" />
-
       <Form action={formAction} className="flex flex-col gap-5">
         <TextField
           label="Email"

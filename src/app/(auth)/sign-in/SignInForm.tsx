@@ -3,9 +3,9 @@
 import { useActionState } from "react";
 import { Form } from "@base-ui/react/form";
 import { credentialsSignIn } from "@/actions/authn";
-import { TextField } from "@/components/ui/FormFields";
+import { TextField } from "@/components/forms/FormFields";
 import { Button } from "@/components/ui/Button";
-import { AuthHeader } from "../AuthHeader";
+import { AuthHeader } from "@/components/ui/AuthHeader";
 import Link from "next/link";
 
 async function action(

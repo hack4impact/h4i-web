@@ -1,4 +1,4 @@
-import type { Variants } from "framer-motion";
+import type { Variants } from "motion/react";
 
 export function staggerContainer(staggerDelay = 0.1, fade = true): Variants {
   return {

@@ -305,7 +305,10 @@
     display: flex;
     cursor: pointer;
     align-items: center;
-    padding: 0.5rem 1rem;
+    /* mx + border-radius give the pill shape on highlight */
+    padding: 0.4375rem 0.625rem;
+    margin: 2px 6px;
+    border-radius: 5px;
     font-family: var(--font-mono);
     font-size: 11px;
     letter-spacing: 0.06em;
@@ -320,6 +323,26 @@
 
   .select-item[data-selected] {
     color: var(--color-blue-500);
+  }
+
+  .select-search {
+    display: block;
+    width: 100%;
+    border-radius: 5px;
+    border: 1px solid var(--color-separator);
+    background: transparent;
+    padding: 0.375rem 0.625rem;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    color: var(--color-inverse);
+    outline: none;
+  }
+  .select-search:focus {
+    border-color: var(--color-blue-400);
+  }
+  .select-search::placeholder {
+    color: var(--color-gray-4);
   }
 
   /*  Popup animations  */
@@ -446,6 +469,10 @@
   box-shadow: 0 8px 24px light-dark(rgb(0 0 0 / 0.12), rgb(0 0 0 / 0.5));
 }
 
+@utility shadow-soft {
+  box-shadow: 0 4px 18px light-dark(rgb(0 0 0 / 0.07), rgb(0 0 0 / 0.28));
+}
+
 @utility badge-active {
   background-color: var(--color-green-50);
   color: var(--color-green-600);
@@ -474,5 +501,16 @@
 @utility logo-invert-dark {
   .dark & {
     filter: brightness(0) invert(1);
+  }
+}
+
+@layer components {
+  .input-auth {
+    /* min-h locks the height so flex/button/input elements are all the same size */
+    @apply border-separator text-inverse placeholder:text-gray-4 hover:border-gray-3 min-h-[calc(2.5rem+2px)] w-full rounded-[var(--radius-6)] border bg-transparent px-3.5 py-2.5 font-sans text-sm transition-colors outline-none focus:border-blue-400;
+  }
+
+  .select-auth {
+    @apply border-separator text-inverse hover:border-gray-3 w-full cursor-pointer appearance-none rounded-[var(--radius-6)] border bg-transparent px-3.5 py-2.5 font-sans text-sm transition-colors outline-none focus:border-blue-400;
   }
 }

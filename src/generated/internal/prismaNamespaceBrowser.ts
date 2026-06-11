@@ -57,6 +57,7 @@ export const ModelName = {
   User: "User",
   Account: "Account",
   VerificationToken: "VerificationToken",
+  OptionList: "OptionList",
 } as const;
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName];
@@ -84,6 +85,14 @@ export const UserScalarFieldEnum = {
   password: "password",
   role: "role",
   chapterId: "chapterId",
+  volunteerType: "volunteerType",
+  startYear: "startYear",
+  employer: "employer",
+  birthYear: "birthYear",
+  gender: "gender",
+  raceEthnicity: "raceEthnicity",
+  graduationYear: "graduationYear",
+  major: "major",
   createdAt: "createdAt",
   updatedAt: "updatedAt",
 } as const;
@@ -117,6 +126,16 @@ export const VerificationTokenScalarFieldEnum = {
 
 export type VerificationTokenScalarFieldEnum =
   (typeof VerificationTokenScalarFieldEnum)[keyof typeof VerificationTokenScalarFieldEnum];
+
+export const OptionListScalarFieldEnum = {
+  id: "id",
+  field: "field",
+  value: "value",
+  order: "order",
+} as const;
+
+export type OptionListScalarFieldEnum =
+  (typeof OptionListScalarFieldEnum)[keyof typeof OptionListScalarFieldEnum];
 
 export const SortOrder = {
   asc: "asc",

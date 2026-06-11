@@ -2,7 +2,7 @@
 
 import { useState, useRef } from "react";
 import Link from "next/link";
-import { motion, LayoutGroup } from "framer-motion";
+import { motion, LayoutGroup } from "motion/react";
 import { Menu } from "@base-ui/react/menu";
 import { dropdowns, dropdownKeys, type DropdownKey } from "./nav-data";
 

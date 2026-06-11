@@ -163,6 +163,7 @@ export function ChaptersTable({ chapters, images }: ChaptersTableProps) {
             imageUrl={images[chapter.slug] ?? null}
           />
         )}
+        estimatedItemHeight={185}
         scrollable
       />
     </div>

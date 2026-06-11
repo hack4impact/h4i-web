@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useState, useEffect, useMemo } from "react";
-import { motion } from "framer-motion";
+import { motion } from "motion/react";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { staggerContainer, fadeInUp } from "@/lib/animations";
 

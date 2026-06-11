@@ -7,7 +7,7 @@ export default async function SignInPage() {
   if (session) redirect("/dashboard");
 
   return (
-    <main className="flex min-h-screen items-center justify-center">
+    <main className="bg-root flex min-h-screen items-center justify-center">
       <SignInForm />
     </main>
   );

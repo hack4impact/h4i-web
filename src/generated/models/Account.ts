@@ -680,14 +680,6 @@ export type AccountUncheckedUpdateManyWithoutUserNestedInput = {
     | Prisma.AccountScalarWhereInput[];
 };
 
-export type NullableIntFieldUpdateOperationsInput = {
-  set?: number | null;
-  increment?: number;
-  decrement?: number;
-  multiply?: number;
-  divide?: number;
-};
-
 export type AccountCreateWithoutUserInput = {
   id?: string;
   type: string;

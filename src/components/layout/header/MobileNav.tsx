@@ -2,7 +2,7 @@
 
 import { usePathname } from "next/navigation";
 import Link from "next/link";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence } from "motion/react";
 import { Collapsible } from "@base-ui/react/collapsible";
 import { dropdowns, mobileItems } from "./nav-data";
 

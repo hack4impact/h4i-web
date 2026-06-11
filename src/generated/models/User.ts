@@ -20,8 +20,22 @@ export type UserModel =
 
 export type AggregateUser = {
   _count: UserCountAggregateOutputType | null;
+  _avg: UserAvgAggregateOutputType | null;
+  _sum: UserSumAggregateOutputType | null;
   _min: UserMinAggregateOutputType | null;
   _max: UserMaxAggregateOutputType | null;
+};
+
+export type UserAvgAggregateOutputType = {
+  startYear: number | null;
+  birthYear: number | null;
+  graduationYear: number | null;
+};
+
+export type UserSumAggregateOutputType = {
+  startYear: number | null;
+  birthYear: number | null;
+  graduationYear: number | null;
 };
 
 export type UserMinAggregateOutputType = {
@@ -33,6 +47,14 @@ export type UserMinAggregateOutputType = {
   password: string | null;
   role: $Enums.Role | null;
   chapterId: string | null;
+  volunteerType: $Enums.VolunteerType | null;
+  startYear: number | null;
+  employer: string | null;
+  birthYear: number | null;
+  gender: string | null;
+  raceEthnicity: string | null;
+  graduationYear: number | null;
+  major: string | null;
   createdAt: Date | null;
   updatedAt: Date | null;
 };
@@ -46,6 +68,14 @@ export type UserMaxAggregateOutputType = {
   password: string | null;
   role: $Enums.Role | null;
   chapterId: string | null;
+  volunteerType: $Enums.VolunteerType | null;
+  startYear: number | null;
+  employer: string | null;
+  birthYear: number | null;
+  gender: string | null;
+  raceEthnicity: string | null;
+  graduationYear: number | null;
+  major: string | null;
   createdAt: Date | null;
   updatedAt: Date | null;
 };
@@ -59,9 +89,29 @@ export type UserCountAggregateOutputType = {
   password: number;
   role: number;
   chapterId: number;
+  volunteerType: number;
+  startYear: number;
+  employer: number;
+  birthYear: number;
+  gender: number;
+  raceEthnicity: number;
+  graduationYear: number;
+  major: number;
   createdAt: number;
   updatedAt: number;
   _all: number;
+};
+
+export type UserAvgAggregateInputType = {
+  startYear?: true;
+  birthYear?: true;
+  graduationYear?: true;
+};
+
+export type UserSumAggregateInputType = {
+  startYear?: true;
+  birthYear?: true;
+  graduationYear?: true;
 };
 
 export type UserMinAggregateInputType = {
@@ -73,6 +123,14 @@ export type UserMinAggregateInputType = {
   password?: true;
   role?: true;
   chapterId?: true;
+  volunteerType?: true;
+  startYear?: true;
+  employer?: true;
+  birthYear?: true;
+  gender?: true;
+  raceEthnicity?: true;
+  graduationYear?: true;
+  major?: true;
   createdAt?: true;
   updatedAt?: true;
 };
@@ -86,6 +144,14 @@ export type UserMaxAggregateInputType = {
   password?: true;
   role?: true;
   chapterId?: true;
+  volunteerType?: true;
+  startYear?: true;
+  employer?: true;
+  birthYear?: true;
+  gender?: true;
+  raceEthnicity?: true;
+  graduationYear?: true;
+  major?: true;
   createdAt?: true;
   updatedAt?: true;
 };
@@ -99,6 +165,14 @@ export type UserCountAggregateInputType = {
   password?: true;
   role?: true;
   chapterId?: true;
+  volunteerType?: true;
+  startYear?: true;
+  employer?: true;
+  birthYear?: true;
+  gender?: true;
+  raceEthnicity?: true;
+  graduationYear?: true;
+  major?: true;
   createdAt?: true;
   updatedAt?: true;
   _all?: true;
@@ -147,6 +221,18 @@ export type UserAggregateArgs<
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
    *
+   * Select which fields to average
+   **/
+  _avg?: UserAvgAggregateInputType;
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+   *
+   * Select which fields to sum
+   **/
+  _sum?: UserSumAggregateInputType;
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+   *
    * Select which fields to find the minimum value
    **/
   _min?: UserMinAggregateInputType;
@@ -179,6 +265,8 @@ export type UserGroupByArgs<
   take?: number;
   skip?: number;
   _count?: UserCountAggregateInputType | true;
+  _avg?: UserAvgAggregateInputType;
+  _sum?: UserSumAggregateInputType;
   _min?: UserMinAggregateInputType;
   _max?: UserMaxAggregateInputType;
 };
@@ -192,9 +280,19 @@ export type UserGroupByOutputType = {
   password: string | null;
   role: $Enums.Role;
   chapterId: string | null;
+  volunteerType: $Enums.VolunteerType | null;
+  startYear: number | null;
+  employer: string | null;
+  birthYear: number | null;
+  gender: string | null;
+  raceEthnicity: string | null;
+  graduationYear: number | null;
+  major: string | null;
   createdAt: Date;
   updatedAt: Date;
   _count: UserCountAggregateOutputType | null;
+  _avg: UserAvgAggregateOutputType | null;
+  _sum: UserSumAggregateOutputType | null;
   _min: UserMinAggregateOutputType | null;
   _max: UserMaxAggregateOutputType | null;
 };
@@ -224,6 +322,17 @@ export type UserWhereInput = {
   password?: Prisma.StringNullableFilter<"User"> | string | null;
   role?: Prisma.EnumRoleFilter<"User"> | $Enums.Role;
   chapterId?: Prisma.StringNullableFilter<"User"> | string | null;
+  volunteerType?:
+    | Prisma.EnumVolunteerTypeNullableFilter<"User">
+    | $Enums.VolunteerType
+    | null;
+  startYear?: Prisma.IntNullableFilter<"User"> | number | null;
+  employer?: Prisma.StringNullableFilter<"User"> | string | null;
+  birthYear?: Prisma.IntNullableFilter<"User"> | number | null;
+  gender?: Prisma.StringNullableFilter<"User"> | string | null;
+  raceEthnicity?: Prisma.StringNullableFilter<"User"> | string | null;
+  graduationYear?: Prisma.IntNullableFilter<"User"> | number | null;
+  major?: Prisma.StringNullableFilter<"User"> | string | null;
   createdAt?: Prisma.DateTimeFilter<"User"> | Date | string;
   updatedAt?: Prisma.DateTimeFilter<"User"> | Date | string;
   accounts?: Prisma.AccountListRelationFilter;
@@ -238,6 +347,14 @@ export type UserOrderByWithRelationInput = {
   password?: Prisma.SortOrderInput | Prisma.SortOrder;
   role?: Prisma.SortOrder;
   chapterId?: Prisma.SortOrderInput | Prisma.SortOrder;
+  volunteerType?: Prisma.SortOrderInput | Prisma.SortOrder;
+  startYear?: Prisma.SortOrderInput | Prisma.SortOrder;
+  employer?: Prisma.SortOrderInput | Prisma.SortOrder;
+  birthYear?: Prisma.SortOrderInput | Prisma.SortOrder;
+  gender?: Prisma.SortOrderInput | Prisma.SortOrder;
+  raceEthnicity?: Prisma.SortOrderInput | Prisma.SortOrder;
+  graduationYear?: Prisma.SortOrderInput | Prisma.SortOrder;
+  major?: Prisma.SortOrderInput | Prisma.SortOrder;
   createdAt?: Prisma.SortOrder;
   updatedAt?: Prisma.SortOrder;
   accounts?: Prisma.AccountOrderByRelationAggregateInput;
@@ -260,6 +377,17 @@ export type UserWhereUniqueInput = Prisma.AtLeast<
     password?: Prisma.StringNullableFilter<"User"> | string | null;
     role?: Prisma.EnumRoleFilter<"User"> | $Enums.Role;
     chapterId?: Prisma.StringNullableFilter<"User"> | string | null;
+    volunteerType?:
+      | Prisma.EnumVolunteerTypeNullableFilter<"User">
+      | $Enums.VolunteerType
+      | null;
+    startYear?: Prisma.IntNullableFilter<"User"> | number | null;
+    employer?: Prisma.StringNullableFilter<"User"> | string | null;
+    birthYear?: Prisma.IntNullableFilter<"User"> | number | null;
+    gender?: Prisma.StringNullableFilter<"User"> | string | null;
+    raceEthnicity?: Prisma.StringNullableFilter<"User"> | string | null;
+    graduationYear?: Prisma.IntNullableFilter<"User"> | number | null;
+    major?: Prisma.StringNullableFilter<"User"> | string | null;
     createdAt?: Prisma.DateTimeFilter<"User"> | Date | string;
     updatedAt?: Prisma.DateTimeFilter<"User"> | Date | string;
     accounts?: Prisma.AccountListRelationFilter;
@@ -276,11 +404,21 @@ export type UserOrderByWithAggregationInput = {
   password?: Prisma.SortOrderInput | Prisma.SortOrder;
   role?: Prisma.SortOrder;
   chapterId?: Prisma.SortOrderInput | Prisma.SortOrder;
+  volunteerType?: Prisma.SortOrderInput | Prisma.SortOrder;
+  startYear?: Prisma.SortOrderInput | Prisma.SortOrder;
+  employer?: Prisma.SortOrderInput | Prisma.SortOrder;
+  birthYear?: Prisma.SortOrderInput | Prisma.SortOrder;
+  gender?: Prisma.SortOrderInput | Prisma.SortOrder;
+  raceEthnicity?: Prisma.SortOrderInput | Prisma.SortOrder;
+  graduationYear?: Prisma.SortOrderInput | Prisma.SortOrder;
+  major?: Prisma.SortOrderInput | Prisma.SortOrder;
   createdAt?: Prisma.SortOrder;
   updatedAt?: Prisma.SortOrder;
   _count?: Prisma.UserCountOrderByAggregateInput;
+  _avg?: Prisma.UserAvgOrderByAggregateInput;
   _max?: Prisma.UserMaxOrderByAggregateInput;
   _min?: Prisma.UserMinOrderByAggregateInput;
+  _sum?: Prisma.UserSumOrderByAggregateInput;
 };
 
 export type UserScalarWhereWithAggregatesInput = {
@@ -303,6 +441,23 @@ export type UserScalarWhereWithAggregatesInput = {
   password?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null;
   role?: Prisma.EnumRoleWithAggregatesFilter<"User"> | $Enums.Role;
   chapterId?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null;
+  volunteerType?:
+    | Prisma.EnumVolunteerTypeNullableWithAggregatesFilter<"User">
+    | $Enums.VolunteerType
+    | null;
+  startYear?: Prisma.IntNullableWithAggregatesFilter<"User"> | number | null;
+  employer?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null;
+  birthYear?: Prisma.IntNullableWithAggregatesFilter<"User"> | number | null;
+  gender?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null;
+  raceEthnicity?:
+    | Prisma.StringNullableWithAggregatesFilter<"User">
+    | string
+    | null;
+  graduationYear?:
+    | Prisma.IntNullableWithAggregatesFilter<"User">
+    | number
+    | null;
+  major?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null;
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"User"> | Date | string;
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"User"> | Date | string;
 };
@@ -316,6 +471,14 @@ export type UserCreateInput = {
   password?: string | null;
   role?: $Enums.Role;
   chapterId?: string | null;
+  volunteerType?: $Enums.VolunteerType | null;
+  startYear?: number | null;
+  employer?: string | null;
+  birthYear?: number | null;
+  gender?: string | null;
+  raceEthnicity?: string | null;
+  graduationYear?: number | null;
+  major?: string | null;
   createdAt?: Date | string;
   updatedAt?: Date | string;
   accounts?: Prisma.AccountCreateNestedManyWithoutUserInput;
@@ -330,6 +493,14 @@ export type UserUncheckedCreateInput = {
   password?: string | null;
   role?: $Enums.Role;
   chapterId?: string | null;
+  volunteerType?: $Enums.VolunteerType | null;
+  startYear?: number | null;
+  employer?: string | null;
+  birthYear?: number | null;
+  gender?: string | null;
+  raceEthnicity?: string | null;
+  graduationYear?: number | null;
+  major?: string | null;
   createdAt?: Date | string;
   updatedAt?: Date | string;
   accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput;
@@ -348,6 +519,20 @@ export type UserUpdateInput = {
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role;
   chapterId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+  volunteerType?:
+    | Prisma.NullableEnumVolunteerTypeFieldUpdateOperationsInput
+    | $Enums.VolunteerType
+    | null;
+  startYear?: Prisma.NullableIntFieldUpdateOperationsInput | number | null;
+  employer?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+  birthYear?: Prisma.NullableIntFieldUpdateOperationsInput | number | null;
+  gender?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+  raceEthnicity?:
+    | Prisma.NullableStringFieldUpdateOperationsInput
+    | string
+    | null;
+  graduationYear?: Prisma.NullableIntFieldUpdateOperationsInput | number | null;
+  major?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
   accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput;
@@ -366,6 +551,20 @@ export type UserUncheckedUpdateInput = {
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role;
   chapterId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+  volunteerType?:
+    | Prisma.NullableEnumVolunteerTypeFieldUpdateOperationsInput
+    | $Enums.VolunteerType
+    | null;
+  startYear?: Prisma.NullableIntFieldUpdateOperationsInput | number | null;
+  employer?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+  birthYear?: Prisma.NullableIntFieldUpdateOperationsInput | number | null;
+  gender?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+  raceEthnicity?:
+    | Prisma.NullableStringFieldUpdateOperationsInput
+    | string
+    | null;
+  graduationYear?: Prisma.NullableIntFieldUpdateOperationsInput | number | null;
+  major?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
   accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput;
@@ -380,6 +579,14 @@ export type UserCreateManyInput = {
   password?: string | null;
   role?: $Enums.Role;
   chapterId?: string | null;
+  volunteerType?: $Enums.VolunteerType | null;
+  startYear?: number | null;
+  employer?: string | null;
+  birthYear?: number | null;
+  gender?: string | null;
+  raceEthnicity?: string | null;
+  graduationYear?: number | null;
+  major?: string | null;
   createdAt?: Date | string;
   updatedAt?: Date | string;
 };
@@ -397,6 +604,20 @@ export type UserUpdateManyMutationInput = {
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role;
   chapterId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+  volunteerType?:
+    | Prisma.NullableEnumVolunteerTypeFieldUpdateOperationsInput
+    | $Enums.VolunteerType
+    | null;
+  startYear?: Prisma.NullableIntFieldUpdateOperationsInput | number | null;
+  employer?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+  birthYear?: Prisma.NullableIntFieldUpdateOperationsInput | number | null;
+  gender?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+  raceEthnicity?:
+    | Prisma.NullableStringFieldUpdateOperationsInput
+    | string
+    | null;
+  graduationYear?: Prisma.NullableIntFieldUpdateOperationsInput | number | null;
+  major?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
 };
@@ -414,6 +635,20 @@ export type UserUncheckedUpdateManyInput = {
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role;
   chapterId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+  volunteerType?:
+    | Prisma.NullableEnumVolunteerTypeFieldUpdateOperationsInput
+    | $Enums.VolunteerType
+    | null;
+  startYear?: Prisma.NullableIntFieldUpdateOperationsInput | number | null;
+  employer?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+  birthYear?: Prisma.NullableIntFieldUpdateOperationsInput | number | null;
+  gender?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+  raceEthnicity?:
+    | Prisma.NullableStringFieldUpdateOperationsInput
+    | string
+    | null;
+  graduationYear?: Prisma.NullableIntFieldUpdateOperationsInput | number | null;
+  major?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
 };
@@ -427,8 +662,22 @@ export type UserCountOrderByAggregateInput = {
   password?: Prisma.SortOrder;
   role?: Prisma.SortOrder;
   chapterId?: Prisma.SortOrder;
+  volunteerType?: Prisma.SortOrder;
+  startYear?: Prisma.SortOrder;
+  employer?: Prisma.SortOrder;
+  birthYear?: Prisma.SortOrder;
+  gender?: Prisma.SortOrder;
+  raceEthnicity?: Prisma.SortOrder;
+  graduationYear?: Prisma.SortOrder;
+  major?: Prisma.SortOrder;
   createdAt?: Prisma.SortOrder;
   updatedAt?: Prisma.SortOrder;
+};
+
+export type UserAvgOrderByAggregateInput = {
+  startYear?: Prisma.SortOrder;
+  birthYear?: Prisma.SortOrder;
+  graduationYear?: Prisma.SortOrder;
 };
 
 export type UserMaxOrderByAggregateInput = {
@@ -440,6 +689,14 @@ export type UserMaxOrderByAggregateInput = {
   password?: Prisma.SortOrder;
   role?: Prisma.SortOrder;
   chapterId?: Prisma.SortOrder;
+  volunteerType?: Prisma.SortOrder;
+  startYear?: Prisma.SortOrder;
+  employer?: Prisma.SortOrder;
+  birthYear?: Prisma.SortOrder;
+  gender?: Prisma.SortOrder;
+  raceEthnicity?: Prisma.SortOrder;
+  graduationYear?: Prisma.SortOrder;
+  major?: Prisma.SortOrder;
   createdAt?: Prisma.SortOrder;
   updatedAt?: Prisma.SortOrder;
 };
@@ -453,8 +710,22 @@ export type UserMinOrderByAggregateInput = {
   password?: Prisma.SortOrder;
   role?: Prisma.SortOrder;
   chapterId?: Prisma.SortOrder;
+  volunteerType?: Prisma.SortOrder;
+  startYear?: Prisma.SortOrder;
+  employer?: Prisma.SortOrder;
+  birthYear?: Prisma.SortOrder;
+  gender?: Prisma.SortOrder;
+  raceEthnicity?: Prisma.SortOrder;
+  graduationYear?: Prisma.SortOrder;
+  major?: Prisma.SortOrder;
   createdAt?: Prisma.SortOrder;
   updatedAt?: Prisma.SortOrder;
+};
+
+export type UserSumOrderByAggregateInput = {
+  startYear?: Prisma.SortOrder;
+  birthYear?: Prisma.SortOrder;
+  graduationYear?: Prisma.SortOrder;
 };
 
 export type UserScalarRelationFilter = {
@@ -476,6 +747,18 @@ export type NullableDateTimeFieldUpdateOperationsInput = {
 
 export type EnumRoleFieldUpdateOperationsInput = {
   set?: $Enums.Role;
+};
+
+export type NullableEnumVolunteerTypeFieldUpdateOperationsInput = {
+  set?: $Enums.VolunteerType | null;
+};
+
+export type NullableIntFieldUpdateOperationsInput = {
+  set?: number | null;
+  increment?: number;
+  decrement?: number;
+  multiply?: number;
+  divide?: number;
 };
 
 export type DateTimeFieldUpdateOperationsInput = {
@@ -517,6 +800,14 @@ export type UserCreateWithoutAccountsInput = {
   password?: string | null;
   role?: $Enums.Role;
   chapterId?: string | null;
+  volunteerType?: $Enums.VolunteerType | null;
+  startYear?: number | null;
+  employer?: string | null;
+  birthYear?: number | null;
+  gender?: string | null;
+  raceEthnicity?: string | null;
+  graduationYear?: number | null;
+  major?: string | null;
   createdAt?: Date | string;
   updatedAt?: Date | string;
 };
@@ -530,6 +821,14 @@ export type UserUncheckedCreateWithoutAccountsInput = {
   password?: string | null;
   role?: $Enums.Role;
   chapterId?: string | null;
+  volunteerType?: $Enums.VolunteerType | null;
+  startYear?: number | null;
+  employer?: string | null;
+  birthYear?: number | null;
+  gender?: string | null;
+  raceEthnicity?: string | null;
+  graduationYear?: number | null;
+  major?: string | null;
   createdAt?: Date | string;
   updatedAt?: Date | string;
 };
@@ -575,6 +874,20 @@ export type UserUpdateWithoutAccountsInput = {
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role;
   chapterId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+  volunteerType?:
+    | Prisma.NullableEnumVolunteerTypeFieldUpdateOperationsInput
+    | $Enums.VolunteerType
+    | null;
+  startYear?: Prisma.NullableIntFieldUpdateOperationsInput | number | null;
+  employer?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+  birthYear?: Prisma.NullableIntFieldUpdateOperationsInput | number | null;
+  gender?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+  raceEthnicity?:
+    | Prisma.NullableStringFieldUpdateOperationsInput
+    | string
+    | null;
+  graduationYear?: Prisma.NullableIntFieldUpdateOperationsInput | number | null;
+  major?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
 };
@@ -592,6 +905,20 @@ export type UserUncheckedUpdateWithoutAccountsInput = {
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role;
   chapterId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+  volunteerType?:
+    | Prisma.NullableEnumVolunteerTypeFieldUpdateOperationsInput
+    | $Enums.VolunteerType
+    | null;
+  startYear?: Prisma.NullableIntFieldUpdateOperationsInput | number | null;
+  employer?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+  birthYear?: Prisma.NullableIntFieldUpdateOperationsInput | number | null;
+  gender?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+  raceEthnicity?:
+    | Prisma.NullableStringFieldUpdateOperationsInput
+    | string
+    | null;
+  graduationYear?: Prisma.NullableIntFieldUpdateOperationsInput | number | null;
+  major?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
 };
@@ -647,6 +974,14 @@ export type UserSelect<
     password?: boolean;
     role?: boolean;
     chapterId?: boolean;
+    volunteerType?: boolean;
+    startYear?: boolean;
+    employer?: boolean;
+    birthYear?: boolean;
+    gender?: boolean;
+    raceEthnicity?: boolean;
+    graduationYear?: boolean;
+    major?: boolean;
     createdAt?: boolean;
     updatedAt?: boolean;
     accounts?: boolean | Prisma.User$accountsArgs<ExtArgs>;
@@ -668,6 +1003,14 @@ export type UserSelectCreateManyAndReturn<
     password?: boolean;
     role?: boolean;
     chapterId?: boolean;
+    volunteerType?: boolean;
+    startYear?: boolean;
+    employer?: boolean;
+    birthYear?: boolean;
+    gender?: boolean;
+    raceEthnicity?: boolean;
+    graduationYear?: boolean;
+    major?: boolean;
     createdAt?: boolean;
     updatedAt?: boolean;
   },
@@ -687,6 +1030,14 @@ export type UserSelectUpdateManyAndReturn<
     password?: boolean;
     role?: boolean;
     chapterId?: boolean;
+    volunteerType?: boolean;
+    startYear?: boolean;
+    employer?: boolean;
+    birthYear?: boolean;
+    gender?: boolean;
+    raceEthnicity?: boolean;
+    graduationYear?: boolean;
+    major?: boolean;
     createdAt?: boolean;
     updatedAt?: boolean;
   },
@@ -702,6 +1053,14 @@ export type UserSelectScalar = {
   password?: boolean;
   role?: boolean;
   chapterId?: boolean;
+  volunteerType?: boolean;
+  startYear?: boolean;
+  employer?: boolean;
+  birthYear?: boolean;
+  gender?: boolean;
+  raceEthnicity?: boolean;
+  graduationYear?: boolean;
+  major?: boolean;
   createdAt?: boolean;
   updatedAt?: boolean;
 };
@@ -718,6 +1077,14 @@ export type UserOmit<
   | "password"
   | "role"
   | "chapterId"
+  | "volunteerType"
+  | "startYear"
+  | "employer"
+  | "birthYear"
+  | "gender"
+  | "raceEthnicity"
+  | "graduationYear"
+  | "major"
   | "createdAt"
   | "updatedAt",
   ExtArgs["result"]["user"]
@@ -756,6 +1123,14 @@ export type $UserPayload<
       password: string | null;
       role: $Enums.Role;
       chapterId: string | null;
+      volunteerType: $Enums.VolunteerType | null;
+      startYear: number | null;
+      employer: string | null;
+      birthYear: number | null;
+      gender: string | null;
+      raceEthnicity: string | null;
+      graduationYear: number | null;
+      major: string | null;
       createdAt: Date;
       updatedAt: Date;
     },
@@ -1369,6 +1744,14 @@ export interface UserFieldRefs {
   readonly password: Prisma.FieldRef<"User", "String">;
   readonly role: Prisma.FieldRef<"User", "Role">;
   readonly chapterId: Prisma.FieldRef<"User", "String">;
+  readonly volunteerType: Prisma.FieldRef<"User", "VolunteerType">;
+  readonly startYear: Prisma.FieldRef<"User", "Int">;
+  readonly employer: Prisma.FieldRef<"User", "String">;
+  readonly birthYear: Prisma.FieldRef<"User", "Int">;
+  readonly gender: Prisma.FieldRef<"User", "String">;
+  readonly raceEthnicity: Prisma.FieldRef<"User", "String">;
+  readonly graduationYear: Prisma.FieldRef<"User", "Int">;
+  readonly major: Prisma.FieldRef<"User", "String">;
   readonly createdAt: Prisma.FieldRef<"User", "DateTime">;
   readonly updatedAt: Prisma.FieldRef<"User", "DateTime">;
 }

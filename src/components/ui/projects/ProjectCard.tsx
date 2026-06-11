@@ -11,7 +11,7 @@ export function ProjectCard({ project }: ProjectCardProps) {
 
   return (
     <Link
-      href={`/work/projects/${project.slug}`}
+      href={`/projects/${project.slug}`}
       className="group border-separator bg-panel hover:border-gray-4 flex h-full flex-col overflow-hidden rounded-xl border p-3.5 transition-colors"
     >
       {meta && (

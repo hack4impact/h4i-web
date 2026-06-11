@@ -415,6 +415,7 @@ export const ModelName = {
   User: "User",
   Account: "Account",
   VerificationToken: "VerificationToken",
+  OptionList: "OptionList",
 } as const;
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName];
@@ -436,7 +437,7 @@ export type TypeMap<
     omit: GlobalOmitOptions;
   };
   meta: {
-    modelProps: "user" | "account" | "verificationToken";
+    modelProps: "user" | "account" | "verificationToken" | "optionList";
     txIsolationLevel: TransactionIsolationLevel;
   };
   model: {
@@ -668,6 +669,82 @@ export type TypeMap<
         };
       };
     };
+    OptionList: {
+      payload: Prisma.$OptionListPayload<ExtArgs>;
+      fields: Prisma.OptionListFieldRefs;
+      operations: {
+        findUnique: {
+          args: Prisma.OptionListFindUniqueArgs<ExtArgs>;
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$OptionListPayload> | null;
+        };
+        findUniqueOrThrow: {
+          args: Prisma.OptionListFindUniqueOrThrowArgs<ExtArgs>;
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$OptionListPayload>;
+        };
+        findFirst: {
+          args: Prisma.OptionListFindFirstArgs<ExtArgs>;
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$OptionListPayload> | null;
+        };
+        findFirstOrThrow: {
+          args: Prisma.OptionListFindFirstOrThrowArgs<ExtArgs>;
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$OptionListPayload>;
+        };
+        findMany: {
+          args: Prisma.OptionListFindManyArgs<ExtArgs>;
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$OptionListPayload>[];
+        };
+        create: {
+          args: Prisma.OptionListCreateArgs<ExtArgs>;
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$OptionListPayload>;
+        };
+        createMany: {
+          args: Prisma.OptionListCreateManyArgs<ExtArgs>;
+          result: BatchPayload;
+        };
+        createManyAndReturn: {
+          args: Prisma.OptionListCreateManyAndReturnArgs<ExtArgs>;
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$OptionListPayload>[];
+        };
+        delete: {
+          args: Prisma.OptionListDeleteArgs<ExtArgs>;
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$OptionListPayload>;
+        };
+        update: {
+          args: Prisma.OptionListUpdateArgs<ExtArgs>;
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$OptionListPayload>;
+        };
+        deleteMany: {
+          args: Prisma.OptionListDeleteManyArgs<ExtArgs>;
+          result: BatchPayload;
+        };
+        updateMany: {
+          args: Prisma.OptionListUpdateManyArgs<ExtArgs>;
+          result: BatchPayload;
+        };
+        updateManyAndReturn: {
+          args: Prisma.OptionListUpdateManyAndReturnArgs<ExtArgs>;
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$OptionListPayload>[];
+        };
+        upsert: {
+          args: Prisma.OptionListUpsertArgs<ExtArgs>;
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$OptionListPayload>;
+        };
+        aggregate: {
+          args: Prisma.OptionListAggregateArgs<ExtArgs>;
+          result: runtime.Types.Utils.Optional<Prisma.AggregateOptionList>;
+        };
+        groupBy: {
+          args: Prisma.OptionListGroupByArgs<ExtArgs>;
+          result: runtime.Types.Utils.Optional<Prisma.OptionListGroupByOutputType>[];
+        };
+        count: {
+          args: Prisma.OptionListCountArgs<ExtArgs>;
+          result:
+            | runtime.Types.Utils.Optional<Prisma.OptionListCountAggregateOutputType>
+            | number;
+        };
+      };
+    };
   };
 } & {
   other: {
@@ -716,6 +793,14 @@ export const UserScalarFieldEnum = {
   password: "password",
   role: "role",
   chapterId: "chapterId",
+  volunteerType: "volunteerType",
+  startYear: "startYear",
+  employer: "employer",
+  birthYear: "birthYear",
+  gender: "gender",
+  raceEthnicity: "raceEthnicity",
+  graduationYear: "graduationYear",
+  major: "major",
   createdAt: "createdAt",
   updatedAt: "updatedAt",
 } as const;
@@ -749,6 +834,16 @@ export const VerificationTokenScalarFieldEnum = {
 
 export type VerificationTokenScalarFieldEnum =
   (typeof VerificationTokenScalarFieldEnum)[keyof typeof VerificationTokenScalarFieldEnum];
+
+export const OptionListScalarFieldEnum = {
+  id: "id",
+  field: "field",
+  value: "value",
+  order: "order",
+} as const;
+
+export type OptionListScalarFieldEnum =
+  (typeof OptionListScalarFieldEnum)[keyof typeof OptionListScalarFieldEnum];
 
 export const SortOrder = {
   asc: "asc",
@@ -822,6 +917,20 @@ export type ListEnumRoleFieldRefInput<$PrismaModel> = FieldRefInputType<
   $PrismaModel,
   "Role[]"
 >;
+
+/**
+ * Reference to a field of type 'VolunteerType'
+ */
+export type EnumVolunteerTypeFieldRefInput<$PrismaModel> = FieldRefInputType<
+  $PrismaModel,
+  "VolunteerType"
+>;
+
+/**
+ * Reference to a field of type 'VolunteerType[]'
+ */
+export type ListEnumVolunteerTypeFieldRefInput<$PrismaModel> =
+  FieldRefInputType<$PrismaModel, "VolunteerType[]">;
 
 /**
  * Reference to a field of type 'Int'
@@ -976,6 +1085,7 @@ export type GlobalOmitConfig = {
   user?: Prisma.UserOmit;
   account?: Prisma.AccountOmit;
   verificationToken?: Prisma.VerificationTokenOmit;
+  optionList?: Prisma.OptionListOmit;
 };
 
 /* Types for Logging */

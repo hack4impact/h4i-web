@@ -6,11 +6,47 @@ import { db } from "@/lib/db";
 import bcrypt from "bcryptjs";
 import { z } from "zod";
 
+const optionalYear = z.preprocess(
+  (v) => (!v || v === "" ? undefined : Number(v)),
+  z.number().int().optional()
+);
+
 const signUpSchema = z.object({
   firstName: z.string().min(1, "First name is required."),
   lastName: z.string().min(1, "Last name is required."),
-  email: z.email("Enter a valid email address."),
+  email: z
+    .email("Enter a valid email address.")
+    .refine(
+      (e) => !e.toLowerCase().endsWith(".edu"),
+      "Please use a personal email address, not a .edu address."
+    ),
   password: z.string().min(8, "Password must be at least 8 characters."),
+  chapterId: z
+    .string()
+    .optional()
+    .transform((v) => (!v || v === "none" ? null : v)),
+  volunteerType: z.enum(["PROFESSIONAL", "STUDENT"]).default("STUDENT"),
+  startYear: optionalYear,
+  employer: z
+    .string()
+    .trim()
+    .optional()
+    .transform((v) => v || undefined),
+  birthYear: optionalYear,
+  gender: z
+    .string()
+    .optional()
+    .transform((v) => v || undefined),
+  raceEthnicity: z
+    .string()
+    .optional()
+    .transform((v) => v || undefined),
+  graduationYear: optionalYear,
+  major: z
+    .string()
+    .trim()
+    .optional()
+    .transform((v) => v || undefined),
 });
 
 export async function credentialsSignIn(formData: FormData) {
@@ -32,22 +68,58 @@ export async function credentialsSignUp(formData: FormData) {
   const parsed = signUpSchema.safeParse({
     firstName: (formData.get("firstName") as string)?.trim(),
     lastName: (formData.get("lastName") as string)?.trim(),
-    email: (formData.get("email") as string)?.trim(),
+    email: (formData.get("email") as string)?.trim().toLowerCase(),
     password: formData.get("password"),
+    chapterId: formData.get("chapterId") as string,
+    volunteerType: formData.get("volunteerType") as string,
+    startYear: formData.get("startYear") as string,
+    employer: formData.get("employer") as string,
+    birthYear: formData.get("birthYear") as string,
+    gender: formData.get("gender") as string,
+    raceEthnicity: formData.get("raceEthnicity") as string,
+    graduationYear: formData.get("graduationYear") as string,
+    major: formData.get("major") as string,
   });
 
   if (!parsed.success) {
     return { error: parsed.error.issues[0].message };
   }
 
-  const { firstName, lastName, email, password } = parsed.data;
+  const {
+    firstName,
+    lastName,
+    email,
+    password,
+    chapterId,
+    volunteerType,
+    startYear,
+    employer,
+    birthYear,
+    gender,
+    raceEthnicity,
+    graduationYear,
+    major,
+  } = parsed.data;
 
   const existing = await db.user.findUnique({ where: { email } });
   if (existing) return { error: "An account with that email already exists." };
 
   const hashed = await bcrypt.hash(password, 12);
   await db.user.create({
-    data: { name: `${firstName} ${lastName}`, email, password: hashed },
+    data: {
+      name: `${firstName} ${lastName}`,
+      email,
+      password: hashed,
+      chapterId: chapterId ?? null,
+      volunteerType,
+      startYear,
+      employer,
+      birthYear,
+      gender,
+      raceEthnicity,
+      graduationYear,
+      major,
+    },
   });
 
   try {

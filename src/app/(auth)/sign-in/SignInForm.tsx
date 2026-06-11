@@ -1,9 +1,11 @@
 "use client";
 
 import { useActionState } from "react";
+import { Form } from "@base-ui/react/form";
 import { credentialsSignIn } from "@/actions/authn";
+import { TextField } from "@/components/ui/FormFields";
 import { Button } from "@/components/ui/Button";
-import Image from "next/image";
+import { AuthHeader } from "../AuthHeader";
 import Link from "next/link";
 
 async function action(
@@ -13,73 +15,43 @@ async function action(
   return (await credentialsSignIn(fd)) ?? null;
 }
 
-const inputClass =
-  "w-full rounded-[var(--radius-6)] border border-separator bg-transparent px-3.5 py-2 font-sans text-sm text-inverse outline-none transition-colors placeholder:text-gray-4 hover:border-gray-3 focus:border-blue-400";
-
 export default function SignInForm() {
   const [state, formAction, isPending] = useActionState(action, null);
 
   return (
-    <div className="border-separator bg-panel shadow-popup w-full max-w-[360px] rounded-xl border p-8">
-      <Image
-        src="/logo.svg"
-        alt="Hack4Impact"
-        width={144}
-        height={22}
-        className="logo-adaptive mx-auto mb-7"
-      />
+    <div className="w-full max-w-[360px] px-4">
+      <AuthHeader title="Sign in" subtitle="to your volunteer account" />
 
-      <h1 className="text-inverse mb-1 text-center font-serif text-[26px] leading-[34px] font-light tracking-[-0.01em]">
-        Sign in
-      </h1>
-      <p className="label-xs text-gray-3 mb-8 text-center">
-        to your volunteer account
-      </p>
-
-      <form action={formAction} className="flex flex-col gap-4">
-        <div>
-          <label htmlFor="email" className="label-xs text-gray-2 mb-1.5 block">
-            Email
-          </label>
-          <input
-            id="email"
-            name="email"
-            type="email"
-            autoComplete="email"
-            required
-            placeholder="you@example.com"
-            className={inputClass}
-          />
-        </div>
-
-        <div>
-          <label
-            htmlFor="password"
-            className="label-xs text-gray-2 mb-1.5 block"
-          >
-            Password
-          </label>
-          <input
-            id="password"
-            name="password"
-            type="password"
-            autoComplete="current-password"
-            required
-            placeholder="••••••••"
-            className={inputClass}
-          />
-        </div>
+      <Form action={formAction} className="flex flex-col gap-5">
+        <TextField
+          label="Email"
+          id="email"
+          name="email"
+          type="email"
+          autoComplete="email"
+          placeholder="you@example.com"
+          required
+        />
+        <TextField
+          label="Password"
+          id="password"
+          name="password"
+          type="password"
+          autoComplete="current-password"
+          placeholder="••••••••"
+          required
+        />
 
         {state?.error && (
           <p className="label-xs -mt-1 text-orange-500">{state.error}</p>
         )}
 
-        <Button type="submit" disabled={isPending} className="mt-2 w-full">
+        <Button type="submit" disabled={isPending} className="mt-1 w-full">
           {isPending ? "Signing in…" : "Sign in"}
         </Button>
-      </form>
+      </Form>
 
-      <p className="label-xs text-gray-3 mt-6 text-center">
+      <p className="label-xs text-gray-3 mt-8 text-center">
         Don&apos;t have an account?{" "}
         <Link
           href="/sign-up"

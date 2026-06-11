@@ -36,6 +36,13 @@ function formatRole(role: string) {
     .join(" ");
 }
 
+function getInitials(name: string): string {
+  const parts = name.trim().split(/\s+/);
+  if (parts.length >= 2)
+    return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+  return name.slice(0, 2).toUpperCase();
+}
+
 const navItemClass = (active: boolean) =>
   cn(
     "label flex items-center gap-2.5 rounded-[var(--radius-6)] px-3 py-2 transition-colors",
@@ -48,7 +55,7 @@ export function Sidebar({ userName, userRole }: SidebarProps) {
   const pathname = usePathname();
 
   return (
-    <aside className="border-separator bg-root shadow-popup sticky top-3 m-3 flex h-[calc(100vh-1.5rem)] w-64 shrink-0 flex-col rounded-xl border">
+    <aside className="border-separator bg-root sticky top-3 m-3 flex h-[calc(100vh-1.5rem)] w-64 shrink-0 flex-col rounded-xl border">
       <div className="border-separator flex h-16 items-center border-b px-5">
         <Link href="/dashboard">
           <Image
@@ -78,13 +85,18 @@ export function Sidebar({ userName, userRole }: SidebarProps) {
 
       <div className="border-separator flex flex-col gap-0.5 border-t p-3">
         {userName && (
-          <div className="mb-1 px-3 py-2">
-            <p className="label-xs text-inverse truncate">{userName}</p>
-            {userRole && (
-              <p className="label-xs text-gray-3 mt-0.5">
-                {formatRole(userRole)}
-              </p>
-            )}
+          <div className="bg-panel mb-1 flex items-center gap-2.5 rounded-[var(--radius-6)] px-3 py-2.5">
+            <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-blue-500/10 font-mono text-[10px] font-semibold text-blue-500">
+              {getInitials(userName)}
+            </div>
+            <div className="min-w-0 flex-1">
+              <p className="label-xs text-inverse truncate">{userName}</p>
+              {userRole && (
+                <p className="label-xs text-gray-3 mt-0.5">
+                  {formatRole(userRole)}
+                </p>
+              )}
+            </div>
           </div>
         )}
 

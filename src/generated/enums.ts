@@ -15,3 +15,10 @@ export const Role = {
 } as const;
 
 export type Role = (typeof Role)[keyof typeof Role];
+
+export const VolunteerType = {
+  PROFESSIONAL: "PROFESSIONAL",
+  STUDENT: "STUDENT",
+} as const;
+
+export type VolunteerType = (typeof VolunteerType)[keyof typeof VolunteerType];

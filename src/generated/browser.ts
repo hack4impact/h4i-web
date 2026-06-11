@@ -31,3 +31,8 @@ export type Account = Prisma.AccountModel;
  *
  */
 export type VerificationToken = Prisma.VerificationTokenModel;
+/**
+ * Model OptionList
+ *
+ */
+export type OptionList = Prisma.OptionListModel;

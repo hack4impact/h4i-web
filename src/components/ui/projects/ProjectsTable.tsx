@@ -153,6 +153,7 @@ export function ProjectsTable({
         gridClassName="grid grid-cols-1 gap-3 min-[480px]:grid-cols-2 sm:grid-cols-3 lg:grid-cols-4"
         emptyMessage="No projects match the selected filters."
         renderItem={(project) => <ProjectCard project={project} />}
+        estimatedItemHeight={110}
         scrollable
       />
     </div>

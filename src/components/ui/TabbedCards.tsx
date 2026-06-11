@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence } from "motion/react";
 import { Tabs } from "@base-ui/react";
 import { type InfoCard } from "@/lib/types/contentful";
 import { cn } from "@/lib/utils";

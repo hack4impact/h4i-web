@@ -5,6 +5,7 @@ import { FilterBar } from "../FilterBar";
 import { FilteredGrid } from "../FilteredGrid";
 import { VolunteerCard } from "./VolunteerCard";
 import type { Volunteer } from "@/lib/types/volunteer";
+import { buildFilterOptions } from "@/lib/utils";
 
 type Sort =
   | "status-first"
@@ -36,21 +37,15 @@ export function VolunteersTable({ volunteers }: VolunteersTableProps) {
   const [chapter, setChapter] = useState("all");
   const [sort, setSort] = useState<Sort>("status-first");
 
-  const statusOptions = useMemo(() => {
-    const statuses = new Set<string>();
-    let hasNone = false;
-    for (const v of volunteers) {
-      if (v.status) statuses.add(v.status);
-      else hasNone = true;
-    }
-    return [
-      { value: "all", label: "All" },
-      ...Array.from(statuses)
-        .sort((a, b) => (STATUS_ORDER[a] ?? 99) - (STATUS_ORDER[b] ?? 99))
-        .map((s) => ({ value: s, label: s })),
-      ...(hasNone ? [{ value: "__none__", label: "None" }] : []),
-    ];
-  }, [volunteers]);
+  const statusOptions = useMemo(
+    () =>
+      buildFilterOptions(
+        volunteers,
+        (v) => v.status,
+        (a, b) => (STATUS_ORDER[a] ?? 99) - (STATUS_ORDER[b] ?? 99)
+      ),
+    [volunteers]
+  );
 
   const roleOptions = useMemo(() => {
     const roles = new Set<string>();
@@ -65,21 +60,10 @@ export function VolunteersTable({ volunteers }: VolunteersTableProps) {
     ];
   }, [volunteers]);
 
-  const chapterOptions = useMemo(() => {
-    const chapters = new Set<string>();
-    let hasNone = false;
-    for (const v of volunteers) {
-      if (v.chapter) chapters.add(v.chapter);
-      else hasNone = true;
-    }
-    return [
-      { value: "all", label: "All" },
-      ...Array.from(chapters)
-        .sort()
-        .map((c) => ({ value: c, label: c })),
-      ...(hasNone ? [{ value: "__none__", label: "None" }] : []),
-    ];
-  }, [volunteers]);
+  const chapterOptions = useMemo(
+    () => buildFilterOptions(volunteers, (v) => v.chapter),
+    [volunteers]
+  );
 
   const filtered = useMemo(() => {
     let list = [...volunteers];

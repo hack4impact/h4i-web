@@ -5,6 +5,7 @@ import { FilterBar } from "../FilterBar";
 import { FilteredGrid } from "../FilteredGrid";
 import { PartnerCard } from "./PartnerCard";
 import type { Partner } from "@/lib/types/partner";
+import { buildFilterOptions } from "@/lib/utils";
 
 type Sort = "name-asc" | "name-desc" | "projects-desc";
 
@@ -23,38 +24,15 @@ export function PartnersTable({ partners }: PartnersTableProps) {
   const [orgType, setOrgType] = useState("all");
   const [sort, setSort] = useState<Sort>("name-asc");
 
-  const focusAreaOptions = useMemo(() => {
-    const subjects = new Set<string>();
-    let hasNone = false;
-    for (const p of partners) {
-      if (p.subjects?.length) for (const s of p.subjects) subjects.add(s);
-      else hasNone = true;
-    }
-    return [
-      { value: "all", label: "All" },
-      ...Array.from(subjects)
-        .sort()
-        .map((s) => ({ value: s, label: s })),
-      ...(hasNone ? [{ value: "__none__", label: "None" }] : []),
-    ];
-  }, [partners]);
+  const focusAreaOptions = useMemo(
+    () => buildFilterOptions(partners, (p) => p.subjects ?? null),
+    [partners]
+  );
 
-  const orgTypeOptions = useMemo(() => {
-    const types = new Set<string>();
-    let hasNone = false;
-    for (const p of partners) {
-      if (p.organizationTypes?.length)
-        for (const t of p.organizationTypes) types.add(t);
-      else hasNone = true;
-    }
-    return [
-      { value: "all", label: "All" },
-      ...Array.from(types)
-        .sort()
-        .map((t) => ({ value: t, label: t })),
-      ...(hasNone ? [{ value: "__none__", label: "None" }] : []),
-    ];
-  }, [partners]);
+  const orgTypeOptions = useMemo(
+    () => buildFilterOptions(partners, (p) => p.organizationTypes ?? null),
+    [partners]
+  );
 
   const filtered = useMemo(() => {
     let list = [...partners];

@@ -13,13 +13,13 @@ import { EducationTab } from "./tabs/EducationTab";
 import { BackgroundTab } from "./tabs/BackgroundTab";
 import { ReviewTab } from "./tabs/ReviewTab";
 
-interface Chapter {
+interface ChapterOption {
   id: string;
   university: string;
 }
 
 interface SignUpFormProps {
-  chapters: Chapter[];
+  chapters: ChapterOption[];
   majorOptions: string[];
   employerOptions: string[];
   genderOptions: SelectOption[];
@@ -130,6 +130,7 @@ export default function SignUpForm({
         "input[required], select[required], textarea[required]"
       )
     );
+    console.log(required);
     const hasInvalid = required.some((el) => !el.checkValidity());
     if (!hasInvalid) {
       if (currentStep === STEPS.length - 2 && formRef.current) {
@@ -139,6 +140,7 @@ export default function SignUpForm({
           obj[k] = String(v);
         });
         setReviewData(obj);
+        console.log(obj);
       }
       setCurrentStep((s) => s + 1);
     }

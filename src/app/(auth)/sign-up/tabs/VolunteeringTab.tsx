@@ -19,6 +19,11 @@ const TOGGLE_ITEM_CLASS =
   "border-separator text-gray-3 hover:border-gray-3 cursor-pointer " +
   "data-[pressed]:border-blue-400 data-[pressed]:bg-blue-500/10 data-[pressed]:text-blue-400";
 
+const UNAFFILIATED: SelectOption = {
+  value: "unaffiliated",
+  label: "Unaffiliated",
+};
+
 interface VolunteeringTabProps {
   chapters: SelectOption[];
   employerOptions: string[];
@@ -31,6 +36,9 @@ export function VolunteeringTab({
   const [volunteerType, setVolunteerType] = useState<
     "STUDENT" | "PROFESSIONAL"
   >("STUDENT");
+
+  const chapterOptions =
+    volunteerType === "PROFESSIONAL" ? [UNAFFILIATED, ...chapters] : chapters;
 
   return (
     <>
@@ -52,11 +60,11 @@ export function VolunteeringTab({
         </Toggle>
       </ToggleGroup>
 
-      {chapters.length > 0 && (
+      {chapterOptions.length > 0 && (
         <SelectField
           label="Chapter"
           name="chapterId"
-          options={chapters}
+          options={chapterOptions}
           placeholder="Select your chapter…"
           searchable
           required

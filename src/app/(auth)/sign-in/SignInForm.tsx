@@ -22,7 +22,6 @@ export default function SignInForm() {
       <Form action={formAction} className="flex flex-col gap-5">
         <TextField
           label="Email"
-          id="email"
           name="email"
           type="email"
           autoComplete="email"
@@ -31,7 +30,6 @@ export default function SignInForm() {
         />
         <TextField
           label="Password"
-          id="password"
           name="password"
           type="password"
           autoComplete="current-password"

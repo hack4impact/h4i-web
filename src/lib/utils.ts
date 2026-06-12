@@ -1,8 +1,31 @@
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
+import { type SelectOption } from "@/components/forms/AppInputs";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
+}
+
+export function buildFilterOptions<T>(
+  items: T[],
+  getKey: (item: T) => string | string[] | null | undefined,
+  compare?: (a: string, b: string) => number
+): SelectOption[] {
+  const seen = new Set<string>();
+  let hasNone = false;
+  for (const item of items) {
+    const key = getKey(item);
+    if (!key || (Array.isArray(key) && key.length === 0)) hasNone = true;
+    else if (Array.isArray(key)) for (const k of key) seen.add(k);
+    else seen.add(key);
+  }
+  return [
+    { value: "all", label: "All" },
+    ...Array.from(seen)
+      .sort(compare)
+      .map((s) => ({ value: s, label: s })),
+    ...(hasNone ? [{ value: "__none__", label: "None" }] : []),
+  ];
 }
 
 export function buildContentfulImageUrl(

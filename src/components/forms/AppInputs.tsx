@@ -5,32 +5,12 @@ import { Select } from "@base-ui/react/select";
 import { Combobox } from "@base-ui/react/combobox";
 import { addFieldOption } from "@/actions/field-options";
 import { cn } from "@/lib/utils";
-import { type SelectOption } from "@/components/ui/FilterSelect";
+import { X, ChevronDown } from "lucide-react";
 
-export type { SelectOption };
-
-const XIcon = () => (
-  <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
-    <path
-      d="M1.5 1.5L8.5 8.5M8.5 1.5L1.5 8.5"
-      stroke="currentColor"
-      strokeWidth="1.5"
-      strokeLinecap="round"
-    />
-  </svg>
-);
-
-const Chevron = () => (
-  <svg width="10" height="10" viewBox="0 0 12 12" fill="none">
-    <path
-      d="M3 4.5L6 7.5L9 4.5"
-      stroke="currentColor"
-      strokeWidth="1.5"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    />
-  </svg>
-);
+export interface SelectOption {
+  value: string;
+  label: string;
+}
 
 export function ClearButton({
   onClick,
@@ -49,7 +29,7 @@ export function ClearButton({
         className ?? "right-2.5"
       )}
     >
-      <XIcon />
+      <X size={10} />
     </button>
   );
 }
@@ -167,7 +147,7 @@ export function AppCombobox({
       )
     : localItems;
 
-  const showPortal = filtered.length > 0 || (allowNew && Boolean(query.trim()));
+  const showPortal = filtered.length > 0 || Boolean(query.trim());
 
   function handleValueChange(v: string | null) {
     setValue(v);
@@ -181,11 +161,6 @@ export function AppCombobox({
         addFieldOption(persistField, v).catch(console.error);
       }
     }
-  }
-
-  function handleClear() {
-    setValue(null);
-    setQuery("");
   }
 
   return (
@@ -203,7 +178,12 @@ export function AppCombobox({
           className={cn("input-auth", value && "pr-9")}
           autoComplete="off"
         />
-        {value && <ClearButton onClick={handleClear} />}
+        <Combobox.Clear
+          aria-label="Clear"
+          className="text-gray-4 hover:text-gray-2 absolute top-1/2 right-2.5 flex h-5 w-5 -translate-y-1/2 cursor-pointer items-center justify-center rounded transition-colors"
+        >
+          <X size={10} />
+        </Combobox.Clear>
       </div>
       {showPortal && (
         <Combobox.Portal>
@@ -295,9 +275,8 @@ export function AppSelect({
           }
         </Select.Value>
         {value && (
-          <div
-            role="button"
-            tabIndex={-1}
+          <button
+            type="button"
             aria-label="Clear"
             onPointerDown={(e) => {
               e.preventDefault();
@@ -309,11 +288,11 @@ export function AppSelect({
             }}
             className="text-gray-4 hover:text-gray-2 flex h-5 w-5 shrink-0 cursor-pointer items-center justify-center rounded transition-colors"
           >
-            <XIcon />
-          </div>
+            <X size={10} />
+          </button>
         )}
         <Select.Icon className="text-gray-3 shrink-0">
-          <Chevron />
+          <ChevronDown size={10} />
         </Select.Icon>
       </Select.Trigger>
       <SelectPopup

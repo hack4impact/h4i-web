@@ -2,23 +2,10 @@
 
 import { useState } from "react";
 import { Select } from "@base-ui/react/select";
+import { ChevronDown } from "lucide-react";
+import { type SelectOption } from "@/components/forms/AppInputs";
 
-export interface SelectOption {
-  value: string;
-  label: string;
-}
-
-const Chevron = () => (
-  <svg width="10" height="10" viewBox="0 0 12 12" fill="none">
-    <path
-      d="M3 4.5L6 7.5L9 4.5"
-      stroke="currentColor"
-      strokeWidth="1.5"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    />
-  </svg>
-);
+export type { SelectOption };
 
 function SelectPopup({
   options,
@@ -119,7 +106,7 @@ export function FilterSelect({
         <span className="text-gray-4">|</span>
         <Select.Value />
         <Select.Icon className="text-gray-2">
-          <Chevron />
+          <ChevronDown size={10} />
         </Select.Icon>
       </Select.Trigger>
       <SelectPopup options={options} align={align} searchable={searchable} />

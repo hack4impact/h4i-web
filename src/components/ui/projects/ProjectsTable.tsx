@@ -5,6 +5,7 @@ import { FilterBar } from "../FilterBar";
 import { FilteredGrid } from "../FilteredGrid";
 import { ProjectCard } from "./ProjectCard";
 import type { Project } from "@/lib/types/project";
+import { buildFilterOptions } from "@/lib/utils";
 
 type Sort = "year-desc" | "year-asc" | "name-asc" | "name-desc";
 
@@ -29,53 +30,25 @@ export function ProjectsTable({
   const [year, setYear] = useState("all");
   const [sort, setSort] = useState<Sort>("year-desc");
 
-  const focusAreaOptions = useMemo(() => {
-    const tags = new Set<string>();
-    let hasNone = false;
-    for (const p of projects) {
-      if (p.tag) tags.add(p.tag);
-      else hasNone = true;
-    }
-    return [
-      { value: "all", label: "All" },
-      ...Array.from(tags)
-        .sort()
-        .map((t) => ({ value: t, label: t })),
-      ...(hasNone ? [{ value: "__none__", label: "None" }] : []),
-    ];
-  }, [projects]);
+  const focusAreaOptions = useMemo(
+    () => buildFilterOptions(projects, (p) => p.tag),
+    [projects]
+  );
 
-  const chapterOptions = useMemo(() => {
-    const chapters = new Set<string>();
-    let hasNone = false;
-    for (const p of projects) {
-      if (p.chapter) chapters.add(p.chapter);
-      else hasNone = true;
-    }
-    return [
-      { value: "all", label: "All" },
-      ...Array.from(chapters)
-        .sort()
-        .map((c) => ({ value: c, label: c })),
-      ...(hasNone ? [{ value: "__none__", label: "None" }] : []),
-    ];
-  }, [projects]);
+  const chapterOptions = useMemo(
+    () => buildFilterOptions(projects, (p) => p.chapter),
+    [projects]
+  );
 
-  const yearOptions = useMemo(() => {
-    const years = new Set<string>();
-    let hasNone = false;
-    for (const p of projects) {
-      if (p.year) years.add(p.year);
-      else hasNone = true;
-    }
-    return [
-      { value: "all", label: "All" },
-      ...Array.from(years)
-        .sort((a, b) => b.localeCompare(a))
-        .map((y) => ({ value: y, label: y })),
-      ...(hasNone ? [{ value: "__none__", label: "None" }] : []),
-    ];
-  }, [projects]);
+  const yearOptions = useMemo(
+    () =>
+      buildFilterOptions(
+        projects,
+        (p) => p.year,
+        (a, b) => b.localeCompare(a)
+      ),
+    [projects]
+  );
 
   const filtered = useMemo(() => {
     let list = [...projects];

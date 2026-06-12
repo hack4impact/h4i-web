@@ -1,4 +1,4 @@
-import { type SelectOption } from "@/components/forms/AppInputs";
+import { type SelectOption } from "@/components/ui/Select";
 
 interface ReviewTabProps {
   data: Record<string, string>;

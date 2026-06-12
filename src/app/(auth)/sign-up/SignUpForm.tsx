@@ -3,7 +3,7 @@
 import { useActionState, useState } from "react";
 import { Form } from "@base-ui/react/form";
 import { credentialsSignUp } from "@/actions/authn";
-import { type SelectOption } from "@/components/forms/AppInputs";
+import { type SelectOption } from "@/components/ui/Select";
 import { Button } from "@/components/ui/Button";
 import Link from "next/link";
 import { cn } from "@/lib/utils";

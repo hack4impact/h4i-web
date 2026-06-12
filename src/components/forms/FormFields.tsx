@@ -5,7 +5,7 @@ import { Field } from "@base-ui/react/field";
 import { Input } from "@base-ui/react/input";
 import { Combobox } from "@/components/ui/Combobox";
 import { Select, type SelectOption } from "@/components/ui/Select";
-import { ClearButton } from "@/components/forms/AppInputs";
+import { X } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export type { SelectOption };
@@ -73,7 +73,16 @@ export function TextField({
           onChange={(e) => setValue(e.target.value)}
           className={cn("input-auth", showClear && "pr-9")}
         />
-        {showClear && <ClearButton onClick={() => setValue("")} />}
+        {showClear && (
+          <button
+            type="button"
+            aria-label="Clear"
+            onClick={() => setValue("")}
+            className="text-gray-4 hover:text-gray-2 absolute top-1/2 right-2.5 flex h-5 w-5 -translate-y-1/2 items-center justify-center rounded transition-colors"
+          >
+            <X size={10} />
+          </button>
+        )}
       </div>
       {hint && <p className="label-xs text-gray-4 mt-1">{hint}</p>}
       <Field.Error match="valueMissing" className={errorClass}>

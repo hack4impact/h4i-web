@@ -22,17 +22,12 @@ const primaryStyles: Record<ButtonColor, string> = {
   green: "bg-green-600 text-white hover:bg-green-700 active:bg-green-800",
 };
 
-function returnVariant(color: ButtonColor, variant: ButtonVariant) {
-  const variantStyles: Record<ButtonVariant, string> = {
-    primary: primaryStyles[color],
-    secondary:
-      "bg-purple-600 text-white hover:bg-purple-700 active:bg-purple-800",
-    outline:
-      "border border-inverse text-inverse hover:bg-inverse hover:text-root active:bg-inverse",
-  };
-
-  return variantStyles[variant];
-}
+const variantStyles: Record<Exclude<ButtonVariant, "primary">, string> = {
+  secondary:
+    "bg-purple-600 text-white hover:bg-purple-700 active:bg-purple-800",
+  outline:
+    "border border-inverse text-inverse hover:bg-inverse hover:text-root active:bg-inverse",
+};
 
 const sizeStyles: Record<ButtonSize, string> = {
   sm: "px-4 py-2 text-[11px]",
@@ -52,7 +47,7 @@ export function Button({
     <BaseButton
       className={cn(
         "inline-flex items-center justify-center rounded-md font-mono tracking-[0.02em] transition-colors disabled:pointer-events-none disabled:opacity-50",
-        returnVariant(color, variant),
+        variant === "primary" ? primaryStyles[color] : variantStyles[variant],
         sizeStyles[size],
         className
       )}

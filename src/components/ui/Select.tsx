@@ -1,20 +1,24 @@
 "use client";
 
 import { useState } from "react";
-import { Select } from "@base-ui/react/select";
+import { Select as BaseSelect } from "@base-ui/react/select";
 import { ChevronDown } from "lucide-react";
-import { type SelectOption } from "@/components/forms/AppInputs";
 
-export type { SelectOption };
+export interface SelectOption {
+  value: string;
+  label: string;
+}
 
-function SelectPopup({
+export function SelectPopup({
   options,
   searchable,
   align = "start",
+  allowNew,
 }: {
   options: SelectOption[];
   searchable?: boolean;
   align?: "start" | "end";
+  allowNew?: boolean;
 }) {
   const [query, setQuery] = useState("");
   const visible =
@@ -25,15 +29,15 @@ function SelectPopup({
       : options;
 
   return (
-    <Select.Portal>
-      <Select.Positioner
+    <BaseSelect.Portal>
+      <BaseSelect.Positioner
         sideOffset={6}
         align={align}
         alignItemWithTrigger={false}
         positionMethod="fixed"
         className="z-50"
       >
-        <Select.Popup className="select-popup select-popup-panel min-w-[var(--anchor-width)]">
+        <BaseSelect.Popup className="select-popup select-popup-panel min-w-[var(--anchor-width)]">
           {searchable && (
             <div className="px-2 pt-2">
               <input
@@ -62,54 +66,67 @@ function SelectPopup({
           <div className="max-h-[220px] overflow-y-auto py-1">
             {visible.length > 0 ? (
               visible.map((opt) => (
-                <Select.Item
+                <BaseSelect.Item
                   key={opt.value}
                   value={opt.value}
                   className="select-item"
                 >
-                  <Select.ItemText>{opt.label}</Select.ItemText>
-                </Select.Item>
+                  <BaseSelect.ItemText>{opt.label}</BaseSelect.ItemText>
+                </BaseSelect.Item>
               ))
+            ) : allowNew && query.trim() ? (
+              <BaseSelect.Item value={query.trim()} className="select-item">
+                <BaseSelect.ItemText>
+                  Add &ldquo;{query.trim()}&rdquo;
+                </BaseSelect.ItemText>
+              </BaseSelect.Item>
             ) : (
               <p className="select-item cursor-default opacity-50">
                 No results
               </p>
             )}
           </div>
-        </Select.Popup>
-      </Select.Positioner>
-    </Select.Portal>
+        </BaseSelect.Popup>
+      </BaseSelect.Positioner>
+    </BaseSelect.Portal>
   );
 }
 
-export interface FilterSelectProps {
-  label: string;
+export interface SelectProps {
   value: string;
   onValueChange: (v: string) => void;
   options: SelectOption[];
+  label?: string;
   align?: "start" | "end";
   searchable?: boolean;
 }
 
-export function FilterSelect({
+export function Select({
   label,
   value,
   onValueChange,
   options,
   align = "start",
   searchable,
-}: FilterSelectProps) {
+}: SelectProps) {
   return (
-    <Select.Root value={value} onValueChange={(v) => onValueChange(v ?? "all")}>
-      <Select.Trigger className="select-trigger label-xs bg-root">
-        <span className="text-gray-2">{label}</span>
-        <span className="text-gray-4">|</span>
-        <Select.Value />
-        <Select.Icon className="text-gray-2">
+    <BaseSelect.Root
+      value={value}
+      onValueChange={(v) => onValueChange(v ?? "all")}
+    >
+      <BaseSelect.Trigger className="select-trigger label-xs bg-root">
+        {label && (
+          <>
+            <span className="text-gray-2">{label}</span>
+            <span className="text-gray-4">|</span>
+          </>
+        )}
+        <BaseSelect.Value />
+        <BaseSelect.Icon className="text-gray-2">
           <ChevronDown size={10} />
-        </Select.Icon>
-      </Select.Trigger>
+        </BaseSelect.Icon>
+      </BaseSelect.Trigger>
       <SelectPopup options={options} align={align} searchable={searchable} />
-    </Select.Root>
+    </BaseSelect.Root>
   );
 }

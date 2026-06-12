@@ -1,16 +1,14 @@
 "use client";
 
 import { useState } from "react";
-import { Select } from "@base-ui/react/select";
+import { Select as BaseSelect } from "@base-ui/react/select";
 import { Combobox } from "@base-ui/react/combobox";
 import { addFieldOption } from "@/actions/field-options";
 import { cn } from "@/lib/utils";
 import { X, ChevronDown } from "lucide-react";
+import { SelectPopup, type SelectOption } from "@/components/ui/Select";
 
-export interface SelectOption {
-  value: string;
-  label: string;
-}
+export type { SelectOption };
 
 export function ClearButton({
   onClick,
@@ -31,89 +29,6 @@ export function ClearButton({
     >
       <X size={10} />
     </button>
-  );
-}
-
-function SelectPopup({
-  options,
-  searchable,
-  align = "start",
-  allowNew,
-}: {
-  options: SelectOption[];
-  searchable?: boolean;
-  align?: "start" | "end";
-  allowNew?: boolean;
-}) {
-  const [query, setQuery] = useState("");
-  const visible =
-    searchable && query.trim()
-      ? options.filter((o) =>
-          o.label.toLowerCase().includes(query.toLowerCase())
-        )
-      : options;
-
-  return (
-    <Select.Portal>
-      <Select.Positioner
-        sideOffset={6}
-        align={align}
-        alignItemWithTrigger={false}
-        positionMethod="fixed"
-        className="z-50"
-      >
-        <Select.Popup className="select-popup select-popup-panel min-w-[var(--anchor-width)]">
-          {searchable && (
-            <div className="px-2 pt-2">
-              <input
-                autoFocus
-                type="text"
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                onKeyDown={(e) => {
-                  if (
-                    ![
-                      "ArrowUp",
-                      "ArrowDown",
-                      "Enter",
-                      "Escape",
-                      "Tab",
-                    ].includes(e.key)
-                  ) {
-                    e.stopPropagation();
-                  }
-                }}
-                placeholder="Search…"
-                className="select-search"
-              />
-            </div>
-          )}
-          <div className="max-h-[220px] overflow-y-auto py-1">
-            {visible.length > 0 ? (
-              visible.map((opt) => (
-                <Select.Item
-                  key={opt.value}
-                  value={opt.value}
-                  className="select-item"
-                >
-                  <Select.ItemText>{opt.label}</Select.ItemText>
-                </Select.Item>
-              ))
-            ) : allowNew && query.trim() ? (
-              <Select.Item value={query.trim()} className="select-item">
-                <Select.ItemText>
-                  Add &ldquo;{query.trim()}&rdquo;
-                </Select.ItemText>
-              </Select.Item>
-            ) : (
-              <p className="select-item cursor-default opacity-50">
-                No results
-              </p>
-            )}
-          </div>
-        </Select.Popup>
-      </Select.Positioner>
-    </Select.Portal>
   );
 }
 
@@ -256,24 +171,24 @@ export function AppSelect({
   }
 
   return (
-    <Select.Root
+    <BaseSelect.Root
       name={name}
       value={value}
       required={required}
       disabled={disabled}
       onValueChange={handleValueChange}
     >
-      <Select.Trigger
+      <BaseSelect.Trigger
         className={cn(
           "input-auth flex w-full items-center gap-2 text-left",
           "[&_[data-placeholder]]:text-gray-4"
         )}
       >
-        <Select.Value placeholder={placeholder} className="flex-1 truncate">
+        <BaseSelect.Value placeholder={placeholder} className="flex-1 truncate">
           {(v: string | null) =>
             v ? (localOptions.find((o) => o.value === v)?.label ?? v) : null
           }
-        </Select.Value>
+        </BaseSelect.Value>
         {value && (
           <button
             type="button"
@@ -291,16 +206,16 @@ export function AppSelect({
             <X size={10} />
           </button>
         )}
-        <Select.Icon className="text-gray-3 shrink-0">
+        <BaseSelect.Icon className="text-gray-3 shrink-0">
           <ChevronDown size={10} />
-        </Select.Icon>
-      </Select.Trigger>
+        </BaseSelect.Icon>
+      </BaseSelect.Trigger>
       <SelectPopup
         options={localOptions}
         align={align}
         searchable={searchable}
         allowNew={allowNew}
       />
-    </Select.Root>
+    </BaseSelect.Root>
   );
 }

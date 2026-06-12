@@ -3,12 +3,9 @@
 import { useState } from "react";
 import { Field } from "@base-ui/react/field";
 import { Input } from "@base-ui/react/input";
-import {
-  AppCombobox,
-  AppSelect,
-  ClearButton,
-  type SelectOption,
-} from "@/components/forms/AppInputs";
+import { Combobox } from "@/components/ui/Combobox";
+import { Select, type SelectOption } from "@/components/ui/Select";
+import { ClearButton } from "@/components/forms/AppInputs";
 import { cn } from "@/lib/utils";
 
 export type { SelectOption };
@@ -114,7 +111,7 @@ export function SelectField({
       <FieldLabel required={required} optional={optional}>
         {label}
       </FieldLabel>
-      <AppSelect
+      <Select
         name={name}
         options={options}
         placeholder={placeholder}
@@ -154,7 +151,7 @@ export function ComboboxField({
       <FieldLabel required={required} optional={optional}>
         {label}
       </FieldLabel>
-      <AppCombobox
+      <Combobox
         id={id ?? name}
         name={name}
         options={options}

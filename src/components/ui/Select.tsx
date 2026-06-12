@@ -2,7 +2,8 @@
 
 import { useState } from "react";
 import { Select as BaseSelect } from "@base-ui/react/select";
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, X } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 export interface SelectOption {
   value: string;
@@ -93,40 +94,82 @@ export function SelectPopup({
 }
 
 export interface SelectProps {
-  value: string;
-  onValueChange: (v: string) => void;
+  name: string;
   options: SelectOption[];
-  label?: string;
+  placeholder?: string;
   align?: "start" | "end";
   searchable?: boolean;
+  required?: boolean;
+  disabled?: boolean;
+  allowNew?: boolean;
 }
 
 export function Select({
-  label,
-  value,
-  onValueChange,
+  name,
   options,
+  placeholder = "Select…",
   align = "start",
   searchable,
+  required,
+  disabled,
+  allowNew,
 }: SelectProps) {
+  const [localOptions, setLocalOptions] = useState(options);
+  const [value, setValue] = useState<string | null>(null);
+
+  function handleValueChange(v: string | null) {
+    setValue(v);
+    if (allowNew && v && !localOptions.some((o) => o.value === v)) {
+      setLocalOptions((prev) => [...prev, { value: v, label: v }]);
+    }
+  }
+
   return (
     <BaseSelect.Root
+      name={name}
       value={value}
-      onValueChange={(v) => onValueChange(v ?? "all")}
+      required={required}
+      disabled={disabled}
+      onValueChange={handleValueChange}
     >
-      <BaseSelect.Trigger className="select-trigger label-xs bg-root">
-        {label && (
-          <>
-            <span className="text-gray-2">{label}</span>
-            <span className="text-gray-4">|</span>
-          </>
+      <BaseSelect.Trigger
+        className={cn(
+          "input-auth flex w-full items-center gap-2 text-left",
+          "[&_[data-placeholder]]:text-gray-4"
         )}
-        <BaseSelect.Value />
-        <BaseSelect.Icon className="text-gray-2">
+      >
+        <BaseSelect.Value placeholder={placeholder} className="flex-1 truncate">
+          {(v: string | null) =>
+            v ? (localOptions.find((o) => o.value === v)?.label ?? v) : null
+          }
+        </BaseSelect.Value>
+        {value && (
+          <div
+            role="button"
+            aria-label="Clear"
+            onPointerDown={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+            }}
+            onClick={(e) => {
+              e.stopPropagation();
+              setValue(null);
+            }}
+            className="text-gray-4 hover:text-gray-2 flex h-5 w-5 shrink-0 cursor-pointer items-center justify-center rounded transition-colors"
+          >
+            <X size={10} />
+          </div>
+        )}
+        <BaseSelect.Icon className="text-gray-3 shrink-0">
           <ChevronDown size={10} />
         </BaseSelect.Icon>
       </BaseSelect.Trigger>
-      <SelectPopup options={options} align={align} searchable={searchable} />
+      <SelectPopup
+        options={localOptions}
+        align={align}
+        searchable={searchable}
+        allowNew={allowNew}
+      />
     </BaseSelect.Root>
   );
 }

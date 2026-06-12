@@ -1,7 +1,7 @@
 "use client";
 
 import { Collapsible } from "@base-ui/react/collapsible";
-import { Select } from "./Select";
+import { FilterSelect } from "./FilterSelect";
 
 export interface FilterConfig {
   label: string;
@@ -22,10 +22,10 @@ export function FilterBar({ filters, sort }: FilterBarProps) {
       {/* Desktop */}
       <div className="border-separator hidden items-center gap-2 border-b pb-5 md:flex">
         {filters.map((f) => (
-          <Select key={f.label} {...f} />
+          <FilterSelect key={f.label} {...f} />
         ))}
         <div className="ml-auto">
-          <Select {...sort} align={sort.align ?? "end"} />
+          <FilterSelect {...sort} align={sort.align ?? "end"} />
         </div>
       </div>
 
@@ -51,12 +51,12 @@ export function FilterBar({ filters, sort }: FilterBarProps) {
                 />
               </svg>
             </Collapsible.Trigger>
-            <Select {...sort} align={sort.align ?? "end"} />
+            <FilterSelect {...sort} align={sort.align ?? "end"} />
           </div>
           <Collapsible.Panel className="[height:var(--collapsible-panel-height,0px)] overflow-hidden [transition:height_0.24s_cubic-bezier(0.16,1,0.3,1)]">
             <div className="grid grid-cols-2 gap-2 pt-3">
               {filters.map((f) => (
-                <Select key={f.label} {...f} />
+                <FilterSelect key={f.label} {...f} />
               ))}
             </div>
           </Collapsible.Panel>

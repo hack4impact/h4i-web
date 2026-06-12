@@ -190,8 +190,8 @@ export function AppSelect({
           }
         </BaseSelect.Value>
         {value && (
-          <button
-            type="button"
+          <div
+            role="button"
             aria-label="Clear"
             onPointerDown={(e) => {
               e.preventDefault();
@@ -204,7 +204,7 @@ export function AppSelect({
             className="text-gray-4 hover:text-gray-2 flex h-5 w-5 shrink-0 cursor-pointer items-center justify-center rounded transition-colors"
           >
             <X size={10} />
-          </button>
+          </div>
         )}
         <BaseSelect.Icon className="text-gray-3 shrink-0">
           <ChevronDown size={10} />

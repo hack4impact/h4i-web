@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useRef, useState } from "react";
+import { useActionState, useState } from "react";
 import { Form } from "@base-ui/react/form";
 import { credentialsSignUp } from "@/actions/authn";
 import { type SelectOption } from "@/components/forms/AppInputs";
@@ -76,22 +76,13 @@ function WizardProgress({
 function StepPanel({
   step,
   current,
-  panelRef,
   children,
 }: {
   step: number;
   current: number;
-  panelRef?: (el: HTMLDivElement | null) => void;
   children: React.ReactNode;
 }) {
-  return (
-    <div
-      ref={panelRef}
-      className={cn("flex flex-col gap-4", step !== current && "hidden")}
-    >
-      {children}
-    </div>
-  );
+  return <div className={cn(step !== current && "hidden")}>{children}</div>;
 }
 
 export default function SignUpForm({
@@ -103,14 +94,7 @@ export default function SignUpForm({
 }: SignUpFormProps) {
   const [state, formAction, isPending] = useActionState(action, null);
   const [currentStep, setCurrentStep] = useState(0);
-  const [reviewData, setReviewData] = useState<Record<string, string>>({});
-
-  const actionsRef = useRef<Form.Actions | null>(null);
-  const formRef = useRef<HTMLFormElement>(null);
-  const panelRefs = useRef<(HTMLDivElement | null)[]>([]);
-  const setPanel = (i: number) => (el: HTMLDivElement | null) => {
-    panelRefs.current[i] = el;
-  };
+  const [accumulated, setAccumulated] = useState<Record<string, string>>({});
 
   const chapterOptions = chapters.map((c) => ({
     value: c.id,
@@ -118,32 +102,15 @@ export default function SignUpForm({
   }));
   const universityOptions = chapters.map((c) => c.university);
 
-  function handleNext() {
-    actionsRef.current?.validate();
-    const panel = panelRefs.current[currentStep];
-    if (!panel) {
-      setCurrentStep((s) => s + 1);
-      return;
-    }
-    const required = Array.from(
-      panel.querySelectorAll<HTMLInputElement>(
-        "input[required], select[required], textarea[required]"
-      )
-    );
-    console.log(required);
-    const hasInvalid = required.some((el) => !el.checkValidity());
-    if (!hasInvalid) {
-      if (currentStep === STEPS.length - 2 && formRef.current) {
-        const fd = new FormData(formRef.current);
-        const obj: Record<string, string> = {};
-        fd.forEach((v, k) => {
-          obj[k] = String(v);
-        });
-        setReviewData(obj);
-        console.log(obj);
-      }
-      setCurrentStep((s) => s + 1);
-    }
+  function handleStepSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    const fd = new FormData(e.currentTarget);
+    const data: Record<string, string> = {};
+    fd.forEach((v, k) => {
+      data[k] = String(v);
+    });
+    setAccumulated((prev) => ({ ...prev, ...data }));
+    setCurrentStep((s) => s + 1);
   }
 
   const isLastStep = currentStep === STEPS.length - 1;
@@ -152,70 +119,105 @@ export default function SignUpForm({
     <div className="w-full max-w-[460px] px-4">
       <WizardProgress steps={STEPS} current={currentStep} />
 
-      <Form
-        ref={formRef}
-        action={formAction}
-        validationMode="onBlur"
-        actionsRef={actionsRef}
-        className="flex flex-col gap-5"
-      >
-        <StepPanel step={0} current={currentStep} panelRef={setPanel(0)}>
+      <StepPanel step={0} current={currentStep}>
+        <Form
+          id="step-0"
+          onSubmit={handleStepSubmit}
+          validationMode="onSubmit"
+          className="flex flex-col gap-5"
+        >
           <AccountTab />
-        </StepPanel>
+        </Form>
+      </StepPanel>
 
-        <StepPanel step={1} current={currentStep} panelRef={setPanel(1)}>
+      <StepPanel step={1} current={currentStep}>
+        <Form
+          id="step-1"
+          onSubmit={handleStepSubmit}
+          validationMode="onSubmit"
+          className="flex flex-col gap-5"
+        >
           <VolunteeringTab
             chapters={chapterOptions}
             employerOptions={employerOptions}
           />
-        </StepPanel>
+        </Form>
+      </StepPanel>
 
-        <StepPanel step={2} current={currentStep} panelRef={setPanel(2)}>
+      <StepPanel step={2} current={currentStep}>
+        <Form
+          id="step-2"
+          onSubmit={handleStepSubmit}
+          validationMode="onSubmit"
+          className="flex flex-col gap-5"
+        >
           <EducationTab
             universityOptions={universityOptions}
             majorOptions={majorOptions}
           />
-        </StepPanel>
+        </Form>
+      </StepPanel>
 
-        <StepPanel step={3} current={currentStep} panelRef={setPanel(3)}>
+      <StepPanel step={3} current={currentStep}>
+        <Form
+          id="step-3"
+          onSubmit={handleStepSubmit}
+          validationMode="onSubmit"
+          className="flex flex-col gap-5"
+        >
           <BackgroundTab
             genderOptions={genderOptions}
             raceOptions={raceOptions}
           />
-        </StepPanel>
+        </Form>
+      </StepPanel>
 
-        <StepPanel step={4} current={currentStep}>
-          <ReviewTab data={reviewData} chapterOptions={chapterOptions} />
-        </StepPanel>
+      <StepPanel step={4} current={currentStep}>
+        <Form
+          id="step-review"
+          action={formAction}
+          validationMode="onSubmit"
+          className="flex flex-col gap-5"
+        >
+          {Object.entries(accumulated).map(([k, v]) => (
+            <input key={k} type="hidden" name={k} value={v} />
+          ))}
+          <ReviewTab data={accumulated} chapterOptions={chapterOptions} />
+        </Form>
+      </StepPanel>
 
-        {state?.error && (
-          <p className="label-xs -mt-1 text-orange-500">{state.error}</p>
+      {state?.error && (
+        <p className="label-xs -mt-1 text-orange-500">{state.error}</p>
+      )}
+
+      <div className="mt-1 flex items-center justify-between">
+        {currentStep > 0 ? (
+          <button
+            type="button"
+            onClick={() => setCurrentStep((s) => s - 1)}
+            className="label-xs text-gray-3 hover:bg-separator hover:text-inverse -ml-2 rounded px-2 py-1 transition-colors"
+          >
+            ← Back
+          </button>
+        ) : (
+          <span />
         )}
 
-        <div className="mt-1 flex items-center justify-between">
-          {currentStep > 0 ? (
-            <button
-              type="button"
-              onClick={() => setCurrentStep((s) => s - 1)}
-              className="label-xs text-gray-3 hover:bg-separator hover:text-inverse -ml-2 rounded px-2 py-1 transition-colors"
-            >
-              ← Back
-            </button>
-          ) : (
-            <span />
-          )}
-
-          {!isLastStep ? (
-            <Button key="continue" type="button" onClick={handleNext}>
-              Continue
-            </Button>
-          ) : (
-            <Button key="submit" type="submit" disabled={isPending}>
-              {isPending ? "Creating account…" : "Create account"}
-            </Button>
-          )}
-        </div>
-      </Form>
+        {!isLastStep ? (
+          <Button key="continue" type="submit" form={`step-${currentStep}`}>
+            Continue
+          </Button>
+        ) : (
+          <Button
+            key="submit"
+            type="submit"
+            form="step-review"
+            disabled={isPending}
+          >
+            {isPending ? "Creating account…" : "Create account"}
+          </Button>
+        )}
+      </div>
 
       <p className="label-xs text-gray-3 mt-6 mb-4 text-center">
         Already have an account?{" "}

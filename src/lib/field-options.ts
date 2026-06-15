@@ -20,7 +20,28 @@ export const MAJOR_SUGGESTIONS = [
   "Statistics",
 ];
 
-// Order is meaningful for these — seeded and fetched with explicit order index.
+export const COMPANY_SUGGESTIONS = [
+  "Adobe",
+  "Amazon",
+  "Apple",
+  "Cisco",
+  "Dell Technologies",
+  "Google",
+  "IBM",
+  "Intel",
+  "LinkedIn",
+  "Meta",
+  "Microsoft",
+  "Netflix",
+  "Oracle",
+  "Salesforce",
+  "SAP",
+  "Stripe",
+  "Uber",
+  "VMware",
+];
+
+// Order is meaningful — seeded and fetched with explicit order index.
 export const GENDER_SUGGESTIONS = [
   "Man",
   "Woman",

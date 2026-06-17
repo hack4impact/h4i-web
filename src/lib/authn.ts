@@ -72,6 +72,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           token.chapterId = dbUser?.chapterId ?? null
         }
       } else if (token.sub) {
+        // Invalidate tokens for deleted users on every refresh.
         const exists = await db.user.findUnique({
           where: { id: token.sub },
           select: { id: true },

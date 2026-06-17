@@ -13,6 +13,12 @@ const optionalYear = z.preprocess(
   z.number().int().optional(),
 )
 
+const optionalString = z
+  .string()
+  .trim()
+  .optional()
+  .transform((v) => v || undefined)
+
 const signUpSchema = z.object({
   firstName: z.string().min(1, 'First name is required.'),
   lastName: z.string().min(1, 'Last name is required.'),
@@ -29,26 +35,12 @@ const signUpSchema = z.object({
     .transform((v) => (!v || v === 'none' ? null : v)),
   volunteerType: z.enum(['PROFESSIONAL', 'STUDENT']).default('STUDENT'),
   startYear: optionalYear,
-  employer: z
-    .string()
-    .trim()
-    .optional()
-    .transform((v) => v || undefined),
+  employer: optionalString,
   birthYear: optionalYear,
-  gender: z
-    .string()
-    .optional()
-    .transform((v) => v || undefined),
-  raceEthnicity: z
-    .string()
-    .optional()
-    .transform((v) => v || undefined),
+  gender: optionalString,
+  raceEthnicity: optionalString,
   graduationYear: optionalYear,
-  major: z
-    .string()
-    .trim()
-    .optional()
-    .transform((v) => v || undefined),
+  major: optionalString,
 })
 
 export async function credentialsSignIn(formData: FormData) {

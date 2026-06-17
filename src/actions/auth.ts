@@ -112,7 +112,7 @@ export async function credentialsSignUp(formData: FormData) {
       name: `${firstName} ${lastName}`,
       email,
       password: hashed,
-      chapterId: chapterId ?? null,
+      chapterId,
       volunteerType,
       startYear,
       employer,

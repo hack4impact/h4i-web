@@ -102,7 +102,7 @@ export default function SignUpForm({
   }));
   const universityOptions = chapters.map((c) => c.university);
 
-  function handleStepSubmit(e: React.FormEvent<HTMLFormElement>) {
+  function handleStepSubmit(e: React.SubmitEvent<HTMLFormElement>) {
     e.preventDefault();
     const fd = new FormData(e.currentTarget);
     const data: Record<string, string> = {};

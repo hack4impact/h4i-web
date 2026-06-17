@@ -14,7 +14,7 @@ import {
   Users,
 } from 'lucide-react'
 
-import { credentialsSignOut } from '@/actions/authn'
+import { credentialsSignOut } from '@/actions/auth'
 import { cn } from '@/lib/utils'
 
 interface SidebarProps {

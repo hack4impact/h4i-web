@@ -6,7 +6,7 @@ import Link from 'next/link'
 
 import { Form } from '@base-ui/react/form'
 
-import { credentialsSignUp } from '@/actions/authn'
+import { credentialsSignUp } from '@/actions/auth'
 import { Button } from '@/components/ui/Button'
 import { type SelectOption } from '@/components/ui/Select'
 import { cn } from '@/lib/utils'

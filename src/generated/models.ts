@@ -7,8 +7,8 @@
  *
  * 🟢 You can import this file directly.
  */
-export type * from "./models/User";
-export type * from "./models/Account";
-export type * from "./models/VerificationToken";
-export type * from "./models/OptionList";
-export type * from "./commonInputTypes";
+export type * from './models/User'
+export type * from './models/Account'
+export type * from './models/VerificationToken'
+export type * from './models/OptionList'
+export type * from './commonInputTypes'

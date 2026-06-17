@@ -1,61 +1,62 @@
-import type { Metadata } from "next";
-import localFont from "next/font/local";
-import "./globals.css";
+import type { Metadata } from 'next'
+import localFont from 'next/font/local'
+
+import './globals.css'
 
 const inclusiveSans = localFont({
   src: [
-    { path: "./fonts/inclusive-sans-regular.woff2", style: "normal" },
-    { path: "./fonts/inclusive-sans-italic.woff2", style: "italic" },
+    { path: './fonts/inclusive-sans-regular.woff2', style: 'normal' },
+    { path: './fonts/inclusive-sans-italic.woff2', style: 'italic' },
   ],
-  display: "swap",
-  variable: "--font-inclusive-sans",
-});
+  display: 'swap',
+  variable: '--font-inclusive-sans',
+})
 
 const newsreader = localFont({
   src: [
-    { path: "./fonts/newsreader.woff2", weight: "200 800", style: "normal" },
+    { path: './fonts/newsreader.woff2', weight: '200 800', style: 'normal' },
     {
-      path: "./fonts/newsreader-italic.woff2",
-      weight: "200 800",
-      style: "italic",
+      path: './fonts/newsreader-italic.woff2',
+      weight: '200 800',
+      style: 'italic',
     },
   ],
-  display: "swap",
-  variable: "--font-newsreader",
-});
+  display: 'swap',
+  variable: '--font-newsreader',
+})
 
 const paperMono = localFont({
   src: [
     {
-      path: "./fonts/paper-mono-regular.woff2",
-      weight: "400",
-      style: "normal",
+      path: './fonts/paper-mono-regular.woff2',
+      weight: '400',
+      style: 'normal',
     },
   ],
-  display: "swap",
-  variable: "--font-paper-mono",
-});
+  display: 'swap',
+  variable: '--font-paper-mono',
+})
 
 export const metadata: Metadata = {
   title: {
-    default: "Hack4Impact",
-    template: "%s | Hack4Impact",
+    default: 'Hack4Impact',
+    template: '%s | Hack4Impact',
   },
-  description: "Volunteer Platform",
-  manifest: "/manifest.json",
+  description: 'Volunteer Platform',
+  manifest: '/manifest.json',
   appleWebApp: {
-    title: "Hack4Impact",
+    title: 'Hack4Impact',
   },
-};
+}
 
 export default function RootLayout({
   children,
 }: {
-  children: React.ReactNode;
+  children: React.ReactNode
 }) {
   return (
     <html
-      lang="en"
+      lang='en'
       suppressHydrationWarning
       className={`${inclusiveSans.variable} ${newsreader.variable} ${paperMono.variable}`}
     >
@@ -66,9 +67,9 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body className="relative flex min-h-screen flex-col font-sans">
+      <body className='relative flex min-h-screen flex-col font-sans'>
         {children}
       </body>
     </html>
-  );
+  )
 }

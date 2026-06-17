@@ -1,98 +1,100 @@
-"use client";
+'use client'
 
-import { cn } from "@/lib/utils";
-import { usePathname } from "next/navigation";
-import Link from "next/link";
-import Image from "next/image";
+import Image from 'next/image'
+import Link from 'next/link'
+import { usePathname } from 'next/navigation'
+
 import {
-  LayoutDashboard,
   Building2,
-  Handshake,
   FolderOpen,
-  Users,
-  Settings,
+  Handshake,
+  LayoutDashboard,
   LogOut,
-} from "lucide-react";
-import { credentialsSignOut } from "@/actions/authn";
+  Settings,
+  Users,
+} from 'lucide-react'
+
+import { credentialsSignOut } from '@/actions/authn'
+import { cn } from '@/lib/utils'
 
 interface SidebarProps {
-  userName?: string | null;
-  userRole?: string | null;
+  userName?: string | null
+  userRole?: string | null
 }
 
 const navItems = [
-  { href: "/dashboard", label: "Dashboard", Icon: LayoutDashboard },
-  { href: "/chapters", label: "Chapters", Icon: Building2 },
-  { href: "/partners", label: "Partners", Icon: Handshake },
-  { href: "/projects", label: "Projects", Icon: FolderOpen },
-  { href: "/volunteers", label: "Volunteers", Icon: Users },
-];
+  { href: '/dashboard', label: 'Dashboard', Icon: LayoutDashboard },
+  { href: '/chapters', label: 'Chapters', Icon: Building2 },
+  { href: '/partners', label: 'Partners', Icon: Handshake },
+  { href: '/projects', label: 'Projects', Icon: FolderOpen },
+  { href: '/volunteers', label: 'Volunteers', Icon: Users },
+]
 
 function formatRole(role: string) {
   return role
     .toLowerCase()
-    .split("_")
+    .split('_')
     .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
-    .join(" ");
+    .join(' ')
 }
 
 function getInitials(name: string): string {
-  const parts = name.trim().split(/\s+/);
+  const parts = name.trim().split(/\s+/)
   if (parts.length >= 2)
-    return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
-  return name.slice(0, 2).toUpperCase();
+    return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase()
+  return name.slice(0, 2).toUpperCase()
 }
 
 const navItemClass = (active: boolean) =>
   cn(
-    "label flex items-center gap-2.5 rounded-[var(--radius-6)] px-3 py-2 transition-colors",
+    'label flex items-center gap-2.5 rounded-[var(--radius-6)] px-3 py-2 transition-colors',
     active
-      ? "bg-panel-highlight-1 text-blue-500"
-      : "text-gray-2 hover:bg-gray-5 hover:text-inverse"
-  );
+      ? 'bg-panel-highlight-1 text-blue-500'
+      : 'text-gray-2 hover:bg-gray-5 hover:text-inverse',
+  )
 
 export function Sidebar({ userName, userRole }: SidebarProps) {
-  const pathname = usePathname();
+  const pathname = usePathname()
 
   return (
-    <aside className="border-separator bg-root sticky top-3 m-3 flex h-[calc(100vh-1.5rem)] w-64 shrink-0 flex-col rounded-xl border">
-      <div className="border-separator flex h-16 items-center border-b px-5">
-        <Link href="/dashboard">
+    <aside className='border-separator bg-root sticky top-3 m-3 flex h-[calc(100vh-1.5rem)] w-64 shrink-0 flex-col rounded-xl border'>
+      <div className='border-separator flex h-16 items-center border-b px-5'>
+        <Link href='/dashboard'>
           <Image
-            src="/logo.svg"
-            alt="Hack4Impact"
+            src='/logo.svg'
+            alt='Hack4Impact'
             width={120}
             height={18}
-            className="logo-adaptive"
+            className='logo-adaptive'
           />
         </Link>
       </div>
 
       <nav
-        aria-label="Main navigation"
-        className="flex flex-1 flex-col gap-0.5 p-3 pt-4"
+        aria-label='Main navigation'
+        className='flex flex-1 flex-col gap-0.5 p-3 pt-4'
       >
         {navItems.map(({ href, label, Icon }) => {
-          const active = pathname === href || pathname.startsWith(href + "/");
+          const active = pathname === href || pathname.startsWith(href + '/')
           return (
             <Link key={href} href={href} className={navItemClass(active)}>
               <Icon size={14} strokeWidth={1.5} />
               {label}
             </Link>
-          );
+          )
         })}
       </nav>
 
-      <div className="border-separator flex flex-col gap-0.5 border-t p-3">
+      <div className='border-separator flex flex-col gap-0.5 border-t p-3'>
         {userName && (
-          <div className="bg-panel mb-1 flex items-center gap-2.5 rounded-[var(--radius-6)] px-3 py-2.5">
-            <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-blue-500/10 font-mono text-[10px] font-semibold text-blue-500">
+          <div className='bg-panel mb-1 flex items-center gap-2.5 rounded-[var(--radius-6)] px-3 py-2.5'>
+            <div className='flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-blue-500/10 font-mono text-[10px] font-semibold text-blue-500'>
               {getInitials(userName)}
             </div>
-            <div className="min-w-0 flex-1">
-              <p className="label-xs text-inverse truncate">{userName}</p>
+            <div className='min-w-0 flex-1'>
+              <p className='label-xs text-inverse truncate'>{userName}</p>
               {userRole && (
-                <p className="label-xs text-gray-3 mt-0.5">
+                <p className='label-xs text-gray-3 mt-0.5'>
                   {formatRole(userRole)}
                 </p>
               )}
@@ -101,9 +103,9 @@ export function Sidebar({ userName, userRole }: SidebarProps) {
         )}
 
         <Link
-          href="/settings"
+          href='/settings'
           className={navItemClass(
-            pathname === "/settings" || pathname.startsWith("/settings/")
+            pathname === '/settings' || pathname.startsWith('/settings/'),
           )}
         >
           <Settings size={14} strokeWidth={1.5} />
@@ -112,8 +114,8 @@ export function Sidebar({ userName, userRole }: SidebarProps) {
 
         <form action={credentialsSignOut}>
           <button
-            type="submit"
-            className="label text-gray-2 hover:bg-gray-5 hover:text-inverse flex w-full cursor-pointer items-center gap-2.5 rounded-[var(--radius-6)] px-3 py-2 transition-colors"
+            type='submit'
+            className='label text-gray-2 hover:bg-gray-5 hover:text-inverse flex w-full cursor-pointer items-center gap-2.5 rounded-[var(--radius-6)] px-3 py-2 transition-colors'
           >
             <LogOut size={14} strokeWidth={1.5} />
             Sign out
@@ -121,5 +123,5 @@ export function Sidebar({ userName, userRole }: SidebarProps) {
         </form>
       </div>
     </aside>
-  );
+  )
 }

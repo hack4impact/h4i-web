@@ -1,4 +1,4 @@
-import type { Variants } from "motion/react";
+import type { Variants } from 'motion/react'
 
 export function staggerContainer(staggerDelay = 0.1, fade = true): Variants {
   return {
@@ -9,7 +9,7 @@ export function staggerContainer(staggerDelay = 0.1, fade = true): Variants {
         staggerChildren: staggerDelay,
       },
     },
-  };
+  }
 }
 
 export function fadeInUp(duration = 0.5): Variants {
@@ -22,7 +22,7 @@ export function fadeInUp(duration = 0.5): Variants {
         duration,
       },
     },
-  };
+  }
 }
 
 export function fadeInForward(duration = 0.6): Variants {
@@ -36,5 +36,5 @@ export function fadeInForward(duration = 0.6): Variants {
         ease: [0.25, 0.46, 0.45, 0.94],
       },
     },
-  };
+  }
 }

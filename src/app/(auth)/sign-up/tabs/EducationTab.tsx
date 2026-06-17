@@ -1,26 +1,27 @@
+import { addFieldOption } from '@/actions/field-options'
 import {
   ComboboxField,
   SelectField,
   type SelectOption,
-} from "@/components/forms/FormFields";
+} from '@/components/forms/FormFields'
 
-const Y = new Date().getFullYear();
+const Y = new Date().getFullYear()
 const GRAD_YEAR_STRINGS = Array.from({ length: Y + 8 - 1960 + 1 }, (_, i) =>
-  String(Y + 8 - i)
-);
+  String(Y + 8 - i),
+)
 
 const DEGREE_OPTIONS: SelectOption[] = [
   { value: "Associate's", label: "Associate's" },
   { value: "Bachelor's", label: "Bachelor's" },
   { value: "Master's", label: "Master's" },
-  { value: "PhD / Doctorate", label: "PhD / Doctorate" },
-  { value: "Certificate", label: "Certificate" },
-  { value: "Other", label: "Other" },
-];
+  { value: 'PhD / Doctorate', label: 'PhD / Doctorate' },
+  { value: 'Certificate', label: 'Certificate' },
+  { value: 'Other', label: 'Other' },
+]
 
 interface EducationTabProps {
-  universityOptions: string[];
-  majorOptions: string[];
+  universityOptions: string[]
+  majorOptions: string[]
 }
 
 export function EducationTab({
@@ -30,40 +31,40 @@ export function EducationTab({
   return (
     <>
       <ComboboxField
-        label="University"
-        name="university"
+        label='University'
+        name='university'
         options={universityOptions}
-        placeholder="e.g. Carnegie Mellon University"
+        placeholder='e.g. Carnegie Mellon University'
         optional
         allowNew
       />
 
       <SelectField
-        label="Degree type"
-        name="degreeType"
+        label='Degree type'
+        name='degreeType'
         options={DEGREE_OPTIONS}
-        placeholder="Select…"
+        placeholder='Select…'
         optional
       />
 
-      <div className="grid grid-cols-2 gap-3">
+      <div className='grid grid-cols-2 gap-3'>
         <ComboboxField
-          label="Graduation year"
-          name="graduationYear"
+          label='Graduation year'
+          name='graduationYear'
           options={GRAD_YEAR_STRINGS}
-          placeholder="e.g. 2026"
+          placeholder='e.g. 2026'
           optional
         />
         <ComboboxField
-          label="Major"
-          name="major"
+          label='Major'
+          name='major'
           options={majorOptions}
-          placeholder="e.g. Computer Science"
+          placeholder='e.g. Computer Science'
           optional
           allowNew
-          persistField="major"
+          onAddNew={(v) => addFieldOption('major', v)}
         />
       </div>
     </>
-  );
+  )
 }

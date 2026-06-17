@@ -14,146 +14,146 @@
  * model files in the `model` directory!
  */
 
-import * as runtime from "@prisma/client/runtime/index-browser";
+import * as runtime from '@prisma/client/runtime/index-browser'
 
-export type * from "../models";
-export type * from "./prismaNamespace";
+export type * from '../models'
+export type * from './prismaNamespace'
 
-export const Decimal = runtime.Decimal;
+export const Decimal = runtime.Decimal
 
 export const NullTypes = {
   DbNull: runtime.NullTypes.DbNull as new (
-    secret: never
+    secret: never,
   ) => typeof runtime.DbNull,
   JsonNull: runtime.NullTypes.JsonNull as new (
-    secret: never
+    secret: never,
   ) => typeof runtime.JsonNull,
   AnyNull: runtime.NullTypes.AnyNull as new (
-    secret: never
+    secret: never,
   ) => typeof runtime.AnyNull,
-};
+}
 /**
  * Helper for filtering JSON entries that have `null` on the database (empty on the db)
  *
  * @see https://www.prisma.io/docs/concepts/components/prisma-client/working-with-fields/working-with-json-fields#filtering-on-a-json-field
  */
-export const DbNull = runtime.DbNull;
+export const DbNull = runtime.DbNull
 
 /**
  * Helper for filtering JSON entries that have JSON `null` values (not empty on the db)
  *
  * @see https://www.prisma.io/docs/concepts/components/prisma-client/working-with-fields/working-with-json-fields#filtering-on-a-json-field
  */
-export const JsonNull = runtime.JsonNull;
+export const JsonNull = runtime.JsonNull
 
 /**
  * Helper for filtering JSON entries that are `Prisma.DbNull` or `Prisma.JsonNull`
  *
  * @see https://www.prisma.io/docs/concepts/components/prisma-client/working-with-fields/working-with-json-fields#filtering-on-a-json-field
  */
-export const AnyNull = runtime.AnyNull;
+export const AnyNull = runtime.AnyNull
 
 export const ModelName = {
-  User: "User",
-  Account: "Account",
-  VerificationToken: "VerificationToken",
-  OptionList: "OptionList",
-} as const;
+  User: 'User',
+  Account: 'Account',
+  VerificationToken: 'VerificationToken',
+  OptionList: 'OptionList',
+} as const
 
-export type ModelName = (typeof ModelName)[keyof typeof ModelName];
+export type ModelName = (typeof ModelName)[keyof typeof ModelName]
 
 /*
  * Enums
  */
 
 export const TransactionIsolationLevel = runtime.makeStrictEnum({
-  ReadUncommitted: "ReadUncommitted",
-  ReadCommitted: "ReadCommitted",
-  RepeatableRead: "RepeatableRead",
-  Serializable: "Serializable",
-} as const);
+  ReadUncommitted: 'ReadUncommitted',
+  ReadCommitted: 'ReadCommitted',
+  RepeatableRead: 'RepeatableRead',
+  Serializable: 'Serializable',
+} as const)
 
 export type TransactionIsolationLevel =
-  (typeof TransactionIsolationLevel)[keyof typeof TransactionIsolationLevel];
+  (typeof TransactionIsolationLevel)[keyof typeof TransactionIsolationLevel]
 
 export const UserScalarFieldEnum = {
-  id: "id",
-  name: "name",
-  email: "email",
-  emailVerified: "emailVerified",
-  image: "image",
-  password: "password",
-  role: "role",
-  chapterId: "chapterId",
-  volunteerType: "volunteerType",
-  startYear: "startYear",
-  employer: "employer",
-  birthYear: "birthYear",
-  gender: "gender",
-  raceEthnicity: "raceEthnicity",
-  graduationYear: "graduationYear",
-  major: "major",
-  createdAt: "createdAt",
-  updatedAt: "updatedAt",
-} as const;
+  id: 'id',
+  name: 'name',
+  email: 'email',
+  emailVerified: 'emailVerified',
+  image: 'image',
+  password: 'password',
+  role: 'role',
+  chapterId: 'chapterId',
+  volunteerType: 'volunteerType',
+  startYear: 'startYear',
+  employer: 'employer',
+  birthYear: 'birthYear',
+  gender: 'gender',
+  raceEthnicity: 'raceEthnicity',
+  graduationYear: 'graduationYear',
+  major: 'major',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+} as const
 
 export type UserScalarFieldEnum =
-  (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum];
+  (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
 
 export const AccountScalarFieldEnum = {
-  id: "id",
-  userId: "userId",
-  type: "type",
-  provider: "provider",
-  providerAccountId: "providerAccountId",
-  refresh_token: "refresh_token",
-  access_token: "access_token",
-  expires_at: "expires_at",
-  token_type: "token_type",
-  scope: "scope",
-  id_token: "id_token",
-  session_state: "session_state",
-} as const;
+  id: 'id',
+  userId: 'userId',
+  type: 'type',
+  provider: 'provider',
+  providerAccountId: 'providerAccountId',
+  refresh_token: 'refresh_token',
+  access_token: 'access_token',
+  expires_at: 'expires_at',
+  token_type: 'token_type',
+  scope: 'scope',
+  id_token: 'id_token',
+  session_state: 'session_state',
+} as const
 
 export type AccountScalarFieldEnum =
-  (typeof AccountScalarFieldEnum)[keyof typeof AccountScalarFieldEnum];
+  (typeof AccountScalarFieldEnum)[keyof typeof AccountScalarFieldEnum]
 
 export const VerificationTokenScalarFieldEnum = {
-  identifier: "identifier",
-  token: "token",
-  expires: "expires",
-} as const;
+  identifier: 'identifier',
+  token: 'token',
+  expires: 'expires',
+} as const
 
 export type VerificationTokenScalarFieldEnum =
-  (typeof VerificationTokenScalarFieldEnum)[keyof typeof VerificationTokenScalarFieldEnum];
+  (typeof VerificationTokenScalarFieldEnum)[keyof typeof VerificationTokenScalarFieldEnum]
 
 export const OptionListScalarFieldEnum = {
-  id: "id",
-  field: "field",
-  value: "value",
-  order: "order",
-} as const;
+  id: 'id',
+  field: 'field',
+  value: 'value',
+  order: 'order',
+} as const
 
 export type OptionListScalarFieldEnum =
-  (typeof OptionListScalarFieldEnum)[keyof typeof OptionListScalarFieldEnum];
+  (typeof OptionListScalarFieldEnum)[keyof typeof OptionListScalarFieldEnum]
 
 export const SortOrder = {
-  asc: "asc",
-  desc: "desc",
-} as const;
+  asc: 'asc',
+  desc: 'desc',
+} as const
 
-export type SortOrder = (typeof SortOrder)[keyof typeof SortOrder];
+export type SortOrder = (typeof SortOrder)[keyof typeof SortOrder]
 
 export const QueryMode = {
-  default: "default",
-  insensitive: "insensitive",
-} as const;
+  default: 'default',
+  insensitive: 'insensitive',
+} as const
 
-export type QueryMode = (typeof QueryMode)[keyof typeof QueryMode];
+export type QueryMode = (typeof QueryMode)[keyof typeof QueryMode]
 
 export const NullsOrder = {
-  first: "first",
-  last: "last",
-} as const;
+  first: 'first',
+  last: 'last',
+} as const
 
-export type NullsOrder = (typeof NullsOrder)[keyof typeof NullsOrder];
+export type NullsOrder = (typeof NullsOrder)[keyof typeof NullsOrder]

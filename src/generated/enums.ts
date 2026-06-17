@@ -9,16 +9,16 @@
  */
 
 export const Role = {
-  ADMIN: "ADMIN",
-  CHAPTER_LEADER: "CHAPTER_LEADER",
-  VOLUNTEER: "VOLUNTEER",
-} as const;
+  ADMIN: 'ADMIN',
+  CHAPTER_LEADER: 'CHAPTER_LEADER',
+  VOLUNTEER: 'VOLUNTEER',
+} as const
 
-export type Role = (typeof Role)[keyof typeof Role];
+export type Role = (typeof Role)[keyof typeof Role]
 
 export const VolunteerType = {
-  PROFESSIONAL: "PROFESSIONAL",
-  STUDENT: "STUDENT",
-} as const;
+  PROFESSIONAL: 'PROFESSIONAL',
+  STUDENT: 'STUDENT',
+} as const
 
-export type VolunteerType = (typeof VolunteerType)[keyof typeof VolunteerType];
+export type VolunteerType = (typeof VolunteerType)[keyof typeof VolunteerType]

@@ -1,25 +1,26 @@
 import type {
-  JournalEntry,
   BoardTeamMember,
+  ContentfulInfoCards,
+  ContentfulProcess,
+  FAQ,
+  JournalEntry,
   Sponsor,
   SponsorshipTier,
-  FAQ,
-  ContentfulProcess,
-  ContentfulInfoCards,
-} from "@/lib/types/contentful";
-import { buildContentfulImageUrl } from "../utils";
+} from '@/lib/types/contentful'
+
+import { buildContentfulImageUrl } from '../utils'
 
 function formatDate(iso: string): string {
-  return new Date(iso).toLocaleDateString("en-US", {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-  });
+  return new Date(iso).toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  })
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function mapEntry(item: any): JournalEntry {
-  const f = item.fields;
+  const f = item.fields
   return {
     id: item.sys.id,
     slug: f.slug,
@@ -37,12 +38,12 @@ export function mapEntry(item: any): JournalEntry {
     bannerUrl: f.banner?.fields?.file?.url
       ? buildContentfulImageUrl(`https:${f.banner.fields.file.url}`, {})
       : undefined,
-  };
+  }
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function mapBoardTeamMember(item: any): BoardTeamMember {
-  const f = item.fields;
+  const f = item.fields
   return {
     name: f.name,
     team: f.team,
@@ -56,26 +57,26 @@ export function mapBoardTeamMember(item: any): BoardTeamMember {
           q: 80,
         })
       : undefined,
-  };
+  }
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function mapSponsorshipTier(item: any): SponsorshipTier {
-  const f = item.fields;
+  const f = item.fields
   const benefits = (f.benefits ?? [])
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     .map((b: any) => b.fields?.name)
-    .filter(Boolean) as string[];
+    .filter(Boolean) as string[]
   return {
     name: f.name,
     cost: f.cost,
     benefits,
-  };
+  }
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function mapSponsor(item: any): Sponsor {
-  const f = item.fields;
+  const f = item.fields
   return {
     id: item.sys.id,
     name: f.name,
@@ -88,7 +89,7 @@ export function mapSponsor(item: any): Sponsor {
           q: 85,
         })
       : undefined,
-  };
+  }
 }
 
 // Maps a "Common Questions" entry (with linked question entries) to FAQ[]
@@ -103,13 +104,13 @@ export function mapQuestions(item: any): FAQ[] {
         question: f.name,
         answer: f.answer,
       }))
-  );
+  )
 }
 
 // Maps a "Process" entry (with linked step entries) to ContentfulProcess
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function mapProcess(item: any): ContentfulProcess {
-  const f = item.fields;
+  const f = item.fields
   return {
     title: f.title || undefined,
     numbered: f.numbered ?? false,
@@ -121,13 +122,13 @@ export function mapProcess(item: any): ContentfulProcess {
         name: s.name,
         description: s.description,
       })),
-  };
+  }
 }
 
 // Maps a "Info Cards" entry (with linked card entries) to ContentfulCard
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function mapInfoCards(item: any): ContentfulInfoCards {
-  const f = item.fields;
+  const f = item.fields
   return {
     name: f.name,
     cards: (f.cards ?? [])
@@ -136,16 +137,16 @@ export function mapInfoCards(item: any): ContentfulInfoCards {
       .filter(Boolean)
       .map(
         (s: {
-          name: string;
-          description: string;
-          icon?: string;
-          link?: string;
+          name: string
+          description: string
+          icon?: string
+          link?: string
         }) => ({
           name: s.name,
           description: s.description,
           icon: s.icon,
           link: s.link,
-        })
+        }),
       ),
-  };
+  }
 }

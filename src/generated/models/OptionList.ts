@@ -7,84 +7,85 @@
  *
  * 🟢 You can import this file directly.
  */
-import type * as runtime from "@prisma/client/runtime/client";
-import type * as $Enums from "../enums";
-import type * as Prisma from "../internal/prismaNamespace";
+import type * as runtime from '@prisma/client/runtime/client'
+
+import type * as $Enums from '../enums'
+import type * as Prisma from '../internal/prismaNamespace'
 
 /**
  * Model OptionList
  *
  */
 export type OptionListModel =
-  runtime.Types.Result.DefaultSelection<Prisma.$OptionListPayload>;
+  runtime.Types.Result.DefaultSelection<Prisma.$OptionListPayload>
 
 export type AggregateOptionList = {
-  _count: OptionListCountAggregateOutputType | null;
-  _avg: OptionListAvgAggregateOutputType | null;
-  _sum: OptionListSumAggregateOutputType | null;
-  _min: OptionListMinAggregateOutputType | null;
-  _max: OptionListMaxAggregateOutputType | null;
-};
+  _count: OptionListCountAggregateOutputType | null
+  _avg: OptionListAvgAggregateOutputType | null
+  _sum: OptionListSumAggregateOutputType | null
+  _min: OptionListMinAggregateOutputType | null
+  _max: OptionListMaxAggregateOutputType | null
+}
 
 export type OptionListAvgAggregateOutputType = {
-  order: number | null;
-};
+  order: number | null
+}
 
 export type OptionListSumAggregateOutputType = {
-  order: number | null;
-};
+  order: number | null
+}
 
 export type OptionListMinAggregateOutputType = {
-  id: string | null;
-  field: string | null;
-  value: string | null;
-  order: number | null;
-};
+  id: string | null
+  field: string | null
+  value: string | null
+  order: number | null
+}
 
 export type OptionListMaxAggregateOutputType = {
-  id: string | null;
-  field: string | null;
-  value: string | null;
-  order: number | null;
-};
+  id: string | null
+  field: string | null
+  value: string | null
+  order: number | null
+}
 
 export type OptionListCountAggregateOutputType = {
-  id: number;
-  field: number;
-  value: number;
-  order: number;
-  _all: number;
-};
+  id: number
+  field: number
+  value: number
+  order: number
+  _all: number
+}
 
 export type OptionListAvgAggregateInputType = {
-  order?: true;
-};
+  order?: true
+}
 
 export type OptionListSumAggregateInputType = {
-  order?: true;
-};
+  order?: true
+}
 
 export type OptionListMinAggregateInputType = {
-  id?: true;
-  field?: true;
-  value?: true;
-  order?: true;
-};
+  id?: true
+  field?: true
+  value?: true
+  order?: true
+}
 
 export type OptionListMaxAggregateInputType = {
-  id?: true;
-  field?: true;
-  value?: true;
-  order?: true;
-};
+  id?: true
+  field?: true
+  value?: true
+  order?: true
+}
 
 export type OptionListCountAggregateInputType = {
-  id?: true;
-  field?: true;
-  value?: true;
-  order?: true;
-  _all?: true;
-};
+  id?: true
+  field?: true
+  value?: true
+  order?: true
+  _all?: true
+}
 
 export type OptionListAggregateArgs<
   ExtArgs extends runtime.Types.Extensions.InternalArgs =
@@ -93,7 +94,7 @@ export type OptionListAggregateArgs<
   /**
    * Filter which OptionList to aggregate.
    */
-  where?: Prisma.OptionListWhereInput;
+  where?: Prisma.OptionListWhereInput
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
    *
@@ -101,339 +102,339 @@ export type OptionListAggregateArgs<
    */
   orderBy?:
     | Prisma.OptionListOrderByWithRelationInput
-    | Prisma.OptionListOrderByWithRelationInput[];
+    | Prisma.OptionListOrderByWithRelationInput[]
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
    *
    * Sets the start position
    */
-  cursor?: Prisma.OptionListWhereUniqueInput;
+  cursor?: Prisma.OptionListWhereUniqueInput
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
    *
    * Take `±n` OptionLists from the position of the cursor.
    */
-  take?: number;
+  take?: number
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
    *
    * Skip the first `n` OptionLists.
    */
-  skip?: number;
+  skip?: number
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
    *
    * Count returned OptionLists
    **/
-  _count?: true | OptionListCountAggregateInputType;
+  _count?: true | OptionListCountAggregateInputType
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
    *
    * Select which fields to average
    **/
-  _avg?: OptionListAvgAggregateInputType;
+  _avg?: OptionListAvgAggregateInputType
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
    *
    * Select which fields to sum
    **/
-  _sum?: OptionListSumAggregateInputType;
+  _sum?: OptionListSumAggregateInputType
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
    *
    * Select which fields to find the minimum value
    **/
-  _min?: OptionListMinAggregateInputType;
+  _min?: OptionListMinAggregateInputType
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
    *
    * Select which fields to find the maximum value
    **/
-  _max?: OptionListMaxAggregateInputType;
-};
+  _max?: OptionListMaxAggregateInputType
+}
 
 export type GetOptionListAggregateType<T extends OptionListAggregateArgs> = {
-  [P in keyof T & keyof AggregateOptionList]: P extends "_count" | "count"
+  [P in keyof T & keyof AggregateOptionList]: P extends '_count' | 'count'
     ? T[P] extends true
       ? number
       : Prisma.GetScalarType<T[P], AggregateOptionList[P]>
-    : Prisma.GetScalarType<T[P], AggregateOptionList[P]>;
-};
+    : Prisma.GetScalarType<T[P], AggregateOptionList[P]>
+}
 
 export type OptionListGroupByArgs<
   ExtArgs extends runtime.Types.Extensions.InternalArgs =
     runtime.Types.Extensions.DefaultArgs,
 > = {
-  where?: Prisma.OptionListWhereInput;
+  where?: Prisma.OptionListWhereInput
   orderBy?:
     | Prisma.OptionListOrderByWithAggregationInput
-    | Prisma.OptionListOrderByWithAggregationInput[];
-  by: Prisma.OptionListScalarFieldEnum[] | Prisma.OptionListScalarFieldEnum;
-  having?: Prisma.OptionListScalarWhereWithAggregatesInput;
-  take?: number;
-  skip?: number;
-  _count?: OptionListCountAggregateInputType | true;
-  _avg?: OptionListAvgAggregateInputType;
-  _sum?: OptionListSumAggregateInputType;
-  _min?: OptionListMinAggregateInputType;
-  _max?: OptionListMaxAggregateInputType;
-};
+    | Prisma.OptionListOrderByWithAggregationInput[]
+  by: Prisma.OptionListScalarFieldEnum[] | Prisma.OptionListScalarFieldEnum
+  having?: Prisma.OptionListScalarWhereWithAggregatesInput
+  take?: number
+  skip?: number
+  _count?: OptionListCountAggregateInputType | true
+  _avg?: OptionListAvgAggregateInputType
+  _sum?: OptionListSumAggregateInputType
+  _min?: OptionListMinAggregateInputType
+  _max?: OptionListMaxAggregateInputType
+}
 
 export type OptionListGroupByOutputType = {
-  id: string;
-  field: string;
-  value: string;
-  order: number;
-  _count: OptionListCountAggregateOutputType | null;
-  _avg: OptionListAvgAggregateOutputType | null;
-  _sum: OptionListSumAggregateOutputType | null;
-  _min: OptionListMinAggregateOutputType | null;
-  _max: OptionListMaxAggregateOutputType | null;
-};
+  id: string
+  field: string
+  value: string
+  order: number
+  _count: OptionListCountAggregateOutputType | null
+  _avg: OptionListAvgAggregateOutputType | null
+  _sum: OptionListSumAggregateOutputType | null
+  _min: OptionListMinAggregateOutputType | null
+  _max: OptionListMaxAggregateOutputType | null
+}
 
 export type GetOptionListGroupByPayload<T extends OptionListGroupByArgs> =
   Prisma.PrismaPromise<
     Array<
-      Prisma.PickEnumerable<OptionListGroupByOutputType, T["by"]> & {
-        [P in keyof T & keyof OptionListGroupByOutputType]: P extends "_count"
+      Prisma.PickEnumerable<OptionListGroupByOutputType, T['by']> & {
+        [P in keyof T & keyof OptionListGroupByOutputType]: P extends '_count'
           ? T[P] extends boolean
             ? number
             : Prisma.GetScalarType<T[P], OptionListGroupByOutputType[P]>
-          : Prisma.GetScalarType<T[P], OptionListGroupByOutputType[P]>;
+          : Prisma.GetScalarType<T[P], OptionListGroupByOutputType[P]>
       }
     >
-  >;
+  >
 
 export type OptionListWhereInput = {
-  AND?: Prisma.OptionListWhereInput | Prisma.OptionListWhereInput[];
-  OR?: Prisma.OptionListWhereInput[];
-  NOT?: Prisma.OptionListWhereInput | Prisma.OptionListWhereInput[];
-  id?: Prisma.StringFilter<"OptionList"> | string;
-  field?: Prisma.StringFilter<"OptionList"> | string;
-  value?: Prisma.StringFilter<"OptionList"> | string;
-  order?: Prisma.IntFilter<"OptionList"> | number;
-};
+  AND?: Prisma.OptionListWhereInput | Prisma.OptionListWhereInput[]
+  OR?: Prisma.OptionListWhereInput[]
+  NOT?: Prisma.OptionListWhereInput | Prisma.OptionListWhereInput[]
+  id?: Prisma.StringFilter<'OptionList'> | string
+  field?: Prisma.StringFilter<'OptionList'> | string
+  value?: Prisma.StringFilter<'OptionList'> | string
+  order?: Prisma.IntFilter<'OptionList'> | number
+}
 
 export type OptionListOrderByWithRelationInput = {
-  id?: Prisma.SortOrder;
-  field?: Prisma.SortOrder;
-  value?: Prisma.SortOrder;
-  order?: Prisma.SortOrder;
-};
+  id?: Prisma.SortOrder
+  field?: Prisma.SortOrder
+  value?: Prisma.SortOrder
+  order?: Prisma.SortOrder
+}
 
 export type OptionListWhereUniqueInput = Prisma.AtLeast<
   {
-    id?: string;
-    field_value?: Prisma.OptionListFieldValueCompoundUniqueInput;
-    AND?: Prisma.OptionListWhereInput | Prisma.OptionListWhereInput[];
-    OR?: Prisma.OptionListWhereInput[];
-    NOT?: Prisma.OptionListWhereInput | Prisma.OptionListWhereInput[];
-    field?: Prisma.StringFilter<"OptionList"> | string;
-    value?: Prisma.StringFilter<"OptionList"> | string;
-    order?: Prisma.IntFilter<"OptionList"> | number;
+    id?: string
+    field_value?: Prisma.OptionListFieldValueCompoundUniqueInput
+    AND?: Prisma.OptionListWhereInput | Prisma.OptionListWhereInput[]
+    OR?: Prisma.OptionListWhereInput[]
+    NOT?: Prisma.OptionListWhereInput | Prisma.OptionListWhereInput[]
+    field?: Prisma.StringFilter<'OptionList'> | string
+    value?: Prisma.StringFilter<'OptionList'> | string
+    order?: Prisma.IntFilter<'OptionList'> | number
   },
-  "id" | "field_value"
->;
+  'id' | 'field_value'
+>
 
 export type OptionListOrderByWithAggregationInput = {
-  id?: Prisma.SortOrder;
-  field?: Prisma.SortOrder;
-  value?: Prisma.SortOrder;
-  order?: Prisma.SortOrder;
-  _count?: Prisma.OptionListCountOrderByAggregateInput;
-  _avg?: Prisma.OptionListAvgOrderByAggregateInput;
-  _max?: Prisma.OptionListMaxOrderByAggregateInput;
-  _min?: Prisma.OptionListMinOrderByAggregateInput;
-  _sum?: Prisma.OptionListSumOrderByAggregateInput;
-};
+  id?: Prisma.SortOrder
+  field?: Prisma.SortOrder
+  value?: Prisma.SortOrder
+  order?: Prisma.SortOrder
+  _count?: Prisma.OptionListCountOrderByAggregateInput
+  _avg?: Prisma.OptionListAvgOrderByAggregateInput
+  _max?: Prisma.OptionListMaxOrderByAggregateInput
+  _min?: Prisma.OptionListMinOrderByAggregateInput
+  _sum?: Prisma.OptionListSumOrderByAggregateInput
+}
 
 export type OptionListScalarWhereWithAggregatesInput = {
   AND?:
     | Prisma.OptionListScalarWhereWithAggregatesInput
-    | Prisma.OptionListScalarWhereWithAggregatesInput[];
-  OR?: Prisma.OptionListScalarWhereWithAggregatesInput[];
+    | Prisma.OptionListScalarWhereWithAggregatesInput[]
+  OR?: Prisma.OptionListScalarWhereWithAggregatesInput[]
   NOT?:
     | Prisma.OptionListScalarWhereWithAggregatesInput
-    | Prisma.OptionListScalarWhereWithAggregatesInput[];
-  id?: Prisma.StringWithAggregatesFilter<"OptionList"> | string;
-  field?: Prisma.StringWithAggregatesFilter<"OptionList"> | string;
-  value?: Prisma.StringWithAggregatesFilter<"OptionList"> | string;
-  order?: Prisma.IntWithAggregatesFilter<"OptionList"> | number;
-};
+    | Prisma.OptionListScalarWhereWithAggregatesInput[]
+  id?: Prisma.StringWithAggregatesFilter<'OptionList'> | string
+  field?: Prisma.StringWithAggregatesFilter<'OptionList'> | string
+  value?: Prisma.StringWithAggregatesFilter<'OptionList'> | string
+  order?: Prisma.IntWithAggregatesFilter<'OptionList'> | number
+}
 
 export type OptionListCreateInput = {
-  id?: string;
-  field: string;
-  value: string;
-  order?: number;
-};
+  id?: string
+  field: string
+  value: string
+  order?: number
+}
 
 export type OptionListUncheckedCreateInput = {
-  id?: string;
-  field: string;
-  value: string;
-  order?: number;
-};
+  id?: string
+  field: string
+  value: string
+  order?: number
+}
 
 export type OptionListUpdateInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string;
-  field?: Prisma.StringFieldUpdateOperationsInput | string;
-  value?: Prisma.StringFieldUpdateOperationsInput | string;
-  order?: Prisma.IntFieldUpdateOperationsInput | number;
-};
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  field?: Prisma.StringFieldUpdateOperationsInput | string
+  value?: Prisma.StringFieldUpdateOperationsInput | string
+  order?: Prisma.IntFieldUpdateOperationsInput | number
+}
 
 export type OptionListUncheckedUpdateInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string;
-  field?: Prisma.StringFieldUpdateOperationsInput | string;
-  value?: Prisma.StringFieldUpdateOperationsInput | string;
-  order?: Prisma.IntFieldUpdateOperationsInput | number;
-};
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  field?: Prisma.StringFieldUpdateOperationsInput | string
+  value?: Prisma.StringFieldUpdateOperationsInput | string
+  order?: Prisma.IntFieldUpdateOperationsInput | number
+}
 
 export type OptionListCreateManyInput = {
-  id?: string;
-  field: string;
-  value: string;
-  order?: number;
-};
+  id?: string
+  field: string
+  value: string
+  order?: number
+}
 
 export type OptionListUpdateManyMutationInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string;
-  field?: Prisma.StringFieldUpdateOperationsInput | string;
-  value?: Prisma.StringFieldUpdateOperationsInput | string;
-  order?: Prisma.IntFieldUpdateOperationsInput | number;
-};
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  field?: Prisma.StringFieldUpdateOperationsInput | string
+  value?: Prisma.StringFieldUpdateOperationsInput | string
+  order?: Prisma.IntFieldUpdateOperationsInput | number
+}
 
 export type OptionListUncheckedUpdateManyInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string;
-  field?: Prisma.StringFieldUpdateOperationsInput | string;
-  value?: Prisma.StringFieldUpdateOperationsInput | string;
-  order?: Prisma.IntFieldUpdateOperationsInput | number;
-};
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  field?: Prisma.StringFieldUpdateOperationsInput | string
+  value?: Prisma.StringFieldUpdateOperationsInput | string
+  order?: Prisma.IntFieldUpdateOperationsInput | number
+}
 
 export type OptionListFieldValueCompoundUniqueInput = {
-  field: string;
-  value: string;
-};
+  field: string
+  value: string
+}
 
 export type OptionListCountOrderByAggregateInput = {
-  id?: Prisma.SortOrder;
-  field?: Prisma.SortOrder;
-  value?: Prisma.SortOrder;
-  order?: Prisma.SortOrder;
-};
+  id?: Prisma.SortOrder
+  field?: Prisma.SortOrder
+  value?: Prisma.SortOrder
+  order?: Prisma.SortOrder
+}
 
 export type OptionListAvgOrderByAggregateInput = {
-  order?: Prisma.SortOrder;
-};
+  order?: Prisma.SortOrder
+}
 
 export type OptionListMaxOrderByAggregateInput = {
-  id?: Prisma.SortOrder;
-  field?: Prisma.SortOrder;
-  value?: Prisma.SortOrder;
-  order?: Prisma.SortOrder;
-};
+  id?: Prisma.SortOrder
+  field?: Prisma.SortOrder
+  value?: Prisma.SortOrder
+  order?: Prisma.SortOrder
+}
 
 export type OptionListMinOrderByAggregateInput = {
-  id?: Prisma.SortOrder;
-  field?: Prisma.SortOrder;
-  value?: Prisma.SortOrder;
-  order?: Prisma.SortOrder;
-};
+  id?: Prisma.SortOrder
+  field?: Prisma.SortOrder
+  value?: Prisma.SortOrder
+  order?: Prisma.SortOrder
+}
 
 export type OptionListSumOrderByAggregateInput = {
-  order?: Prisma.SortOrder;
-};
+  order?: Prisma.SortOrder
+}
 
 export type IntFieldUpdateOperationsInput = {
-  set?: number;
-  increment?: number;
-  decrement?: number;
-  multiply?: number;
-  divide?: number;
-};
+  set?: number
+  increment?: number
+  decrement?: number
+  multiply?: number
+  divide?: number
+}
 
 export type OptionListSelect<
   ExtArgs extends runtime.Types.Extensions.InternalArgs =
     runtime.Types.Extensions.DefaultArgs,
 > = runtime.Types.Extensions.GetSelect<
   {
-    id?: boolean;
-    field?: boolean;
-    value?: boolean;
-    order?: boolean;
+    id?: boolean
+    field?: boolean
+    value?: boolean
+    order?: boolean
   },
-  ExtArgs["result"]["optionList"]
->;
+  ExtArgs['result']['optionList']
+>
 
 export type OptionListSelectCreateManyAndReturn<
   ExtArgs extends runtime.Types.Extensions.InternalArgs =
     runtime.Types.Extensions.DefaultArgs,
 > = runtime.Types.Extensions.GetSelect<
   {
-    id?: boolean;
-    field?: boolean;
-    value?: boolean;
-    order?: boolean;
+    id?: boolean
+    field?: boolean
+    value?: boolean
+    order?: boolean
   },
-  ExtArgs["result"]["optionList"]
->;
+  ExtArgs['result']['optionList']
+>
 
 export type OptionListSelectUpdateManyAndReturn<
   ExtArgs extends runtime.Types.Extensions.InternalArgs =
     runtime.Types.Extensions.DefaultArgs,
 > = runtime.Types.Extensions.GetSelect<
   {
-    id?: boolean;
-    field?: boolean;
-    value?: boolean;
-    order?: boolean;
+    id?: boolean
+    field?: boolean
+    value?: boolean
+    order?: boolean
   },
-  ExtArgs["result"]["optionList"]
->;
+  ExtArgs['result']['optionList']
+>
 
 export type OptionListSelectScalar = {
-  id?: boolean;
-  field?: boolean;
-  value?: boolean;
-  order?: boolean;
-};
+  id?: boolean
+  field?: boolean
+  value?: boolean
+  order?: boolean
+}
 
 export type OptionListOmit<
   ExtArgs extends runtime.Types.Extensions.InternalArgs =
     runtime.Types.Extensions.DefaultArgs,
 > = runtime.Types.Extensions.GetOmit<
-  "id" | "field" | "value" | "order",
-  ExtArgs["result"]["optionList"]
->;
+  'id' | 'field' | 'value' | 'order',
+  ExtArgs['result']['optionList']
+>
 
 export type $OptionListPayload<
   ExtArgs extends runtime.Types.Extensions.InternalArgs =
     runtime.Types.Extensions.DefaultArgs,
 > = {
-  name: "OptionList";
-  objects: {};
+  name: 'OptionList'
+  objects: {}
   scalars: runtime.Types.Extensions.GetPayloadResult<
     {
-      id: string;
-      field: string;
-      value: string;
-      order: number;
+      id: string
+      field: string
+      value: string
+      order: number
     },
-    ExtArgs["result"]["optionList"]
-  >;
-  composites: {};
-};
+    ExtArgs['result']['optionList']
+  >
+  composites: {}
+}
 
 export type OptionListGetPayload<
   S extends boolean | null | undefined | OptionListDefaultArgs,
-> = runtime.Types.Result.GetResult<Prisma.$OptionListPayload, S>;
+> = runtime.Types.Result.GetResult<Prisma.$OptionListPayload, S>
 
 export type OptionListCountArgs<
   ExtArgs extends runtime.Types.Extensions.InternalArgs =
     runtime.Types.Extensions.DefaultArgs,
-> = Omit<OptionListFindManyArgs, "select" | "include" | "distinct" | "omit"> & {
-  select?: OptionListCountAggregateInputType | true;
-};
+> = Omit<OptionListFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+  select?: OptionListCountAggregateInputType | true
+}
 
 export interface OptionListDelegate<
   ExtArgs extends runtime.Types.Extensions.InternalArgs =
@@ -441,9 +442,9 @@ export interface OptionListDelegate<
   GlobalOmitOptions = {},
 > {
   [K: symbol]: {
-    types: Prisma.TypeMap<ExtArgs>["model"]["OptionList"];
-    meta: { name: "OptionList" };
-  };
+    types: Prisma.TypeMap<ExtArgs>['model']['OptionList']
+    meta: { name: 'OptionList' }
+  }
   /**
    * Find zero or one OptionList that matches the filter.
    * @param {OptionListFindUniqueArgs} args - Arguments to find a OptionList
@@ -456,18 +457,18 @@ export interface OptionListDelegate<
    * })
    */
   findUnique<T extends OptionListFindUniqueArgs>(
-    args: Prisma.SelectSubset<T, OptionListFindUniqueArgs<ExtArgs>>
+    args: Prisma.SelectSubset<T, OptionListFindUniqueArgs<ExtArgs>>,
   ): Prisma.Prisma__OptionListClient<
     runtime.Types.Result.GetResult<
       Prisma.$OptionListPayload<ExtArgs>,
       T,
-      "findUnique",
+      'findUnique',
       GlobalOmitOptions
     > | null,
     null,
     ExtArgs,
     GlobalOmitOptions
-  >;
+  >
 
   /**
    * Find one OptionList that matches the filter or throw an error with `error.code='P2025'`
@@ -482,18 +483,18 @@ export interface OptionListDelegate<
    * })
    */
   findUniqueOrThrow<T extends OptionListFindUniqueOrThrowArgs>(
-    args: Prisma.SelectSubset<T, OptionListFindUniqueOrThrowArgs<ExtArgs>>
+    args: Prisma.SelectSubset<T, OptionListFindUniqueOrThrowArgs<ExtArgs>>,
   ): Prisma.Prisma__OptionListClient<
     runtime.Types.Result.GetResult<
       Prisma.$OptionListPayload<ExtArgs>,
       T,
-      "findUniqueOrThrow",
+      'findUniqueOrThrow',
       GlobalOmitOptions
     >,
     never,
     ExtArgs,
     GlobalOmitOptions
-  >;
+  >
 
   /**
    * Find the first OptionList that matches the filter.
@@ -509,18 +510,18 @@ export interface OptionListDelegate<
    * })
    */
   findFirst<T extends OptionListFindFirstArgs>(
-    args?: Prisma.SelectSubset<T, OptionListFindFirstArgs<ExtArgs>>
+    args?: Prisma.SelectSubset<T, OptionListFindFirstArgs<ExtArgs>>,
   ): Prisma.Prisma__OptionListClient<
     runtime.Types.Result.GetResult<
       Prisma.$OptionListPayload<ExtArgs>,
       T,
-      "findFirst",
+      'findFirst',
       GlobalOmitOptions
     > | null,
     null,
     ExtArgs,
     GlobalOmitOptions
-  >;
+  >
 
   /**
    * Find the first OptionList that matches the filter or
@@ -537,18 +538,18 @@ export interface OptionListDelegate<
    * })
    */
   findFirstOrThrow<T extends OptionListFindFirstOrThrowArgs>(
-    args?: Prisma.SelectSubset<T, OptionListFindFirstOrThrowArgs<ExtArgs>>
+    args?: Prisma.SelectSubset<T, OptionListFindFirstOrThrowArgs<ExtArgs>>,
   ): Prisma.Prisma__OptionListClient<
     runtime.Types.Result.GetResult<
       Prisma.$OptionListPayload<ExtArgs>,
       T,
-      "findFirstOrThrow",
+      'findFirstOrThrow',
       GlobalOmitOptions
     >,
     never,
     ExtArgs,
     GlobalOmitOptions
-  >;
+  >
 
   /**
    * Find zero or more OptionLists that matches the filter.
@@ -567,15 +568,15 @@ export interface OptionListDelegate<
    *
    */
   findMany<T extends OptionListFindManyArgs>(
-    args?: Prisma.SelectSubset<T, OptionListFindManyArgs<ExtArgs>>
+    args?: Prisma.SelectSubset<T, OptionListFindManyArgs<ExtArgs>>,
   ): Prisma.PrismaPromise<
     runtime.Types.Result.GetResult<
       Prisma.$OptionListPayload<ExtArgs>,
       T,
-      "findMany",
+      'findMany',
       GlobalOmitOptions
     >
-  >;
+  >
 
   /**
    * Create a OptionList.
@@ -590,18 +591,18 @@ export interface OptionListDelegate<
    *
    */
   create<T extends OptionListCreateArgs>(
-    args: Prisma.SelectSubset<T, OptionListCreateArgs<ExtArgs>>
+    args: Prisma.SelectSubset<T, OptionListCreateArgs<ExtArgs>>,
   ): Prisma.Prisma__OptionListClient<
     runtime.Types.Result.GetResult<
       Prisma.$OptionListPayload<ExtArgs>,
       T,
-      "create",
+      'create',
       GlobalOmitOptions
     >,
     never,
     ExtArgs,
     GlobalOmitOptions
-  >;
+  >
 
   /**
    * Create many OptionLists.
@@ -616,8 +617,8 @@ export interface OptionListDelegate<
    *
    */
   createMany<T extends OptionListCreateManyArgs>(
-    args?: Prisma.SelectSubset<T, OptionListCreateManyArgs<ExtArgs>>
-  ): Prisma.PrismaPromise<Prisma.BatchPayload>;
+    args?: Prisma.SelectSubset<T, OptionListCreateManyArgs<ExtArgs>>,
+  ): Prisma.PrismaPromise<Prisma.BatchPayload>
 
   /**
    * Create many OptionLists and returns the data saved in the database.
@@ -642,15 +643,15 @@ export interface OptionListDelegate<
    *
    */
   createManyAndReturn<T extends OptionListCreateManyAndReturnArgs>(
-    args?: Prisma.SelectSubset<T, OptionListCreateManyAndReturnArgs<ExtArgs>>
+    args?: Prisma.SelectSubset<T, OptionListCreateManyAndReturnArgs<ExtArgs>>,
   ): Prisma.PrismaPromise<
     runtime.Types.Result.GetResult<
       Prisma.$OptionListPayload<ExtArgs>,
       T,
-      "createManyAndReturn",
+      'createManyAndReturn',
       GlobalOmitOptions
     >
-  >;
+  >
 
   /**
    * Delete a OptionList.
@@ -665,18 +666,18 @@ export interface OptionListDelegate<
    *
    */
   delete<T extends OptionListDeleteArgs>(
-    args: Prisma.SelectSubset<T, OptionListDeleteArgs<ExtArgs>>
+    args: Prisma.SelectSubset<T, OptionListDeleteArgs<ExtArgs>>,
   ): Prisma.Prisma__OptionListClient<
     runtime.Types.Result.GetResult<
       Prisma.$OptionListPayload<ExtArgs>,
       T,
-      "delete",
+      'delete',
       GlobalOmitOptions
     >,
     never,
     ExtArgs,
     GlobalOmitOptions
-  >;
+  >
 
   /**
    * Update one OptionList.
@@ -694,18 +695,18 @@ export interface OptionListDelegate<
    *
    */
   update<T extends OptionListUpdateArgs>(
-    args: Prisma.SelectSubset<T, OptionListUpdateArgs<ExtArgs>>
+    args: Prisma.SelectSubset<T, OptionListUpdateArgs<ExtArgs>>,
   ): Prisma.Prisma__OptionListClient<
     runtime.Types.Result.GetResult<
       Prisma.$OptionListPayload<ExtArgs>,
       T,
-      "update",
+      'update',
       GlobalOmitOptions
     >,
     never,
     ExtArgs,
     GlobalOmitOptions
-  >;
+  >
 
   /**
    * Delete zero or more OptionLists.
@@ -720,8 +721,8 @@ export interface OptionListDelegate<
    *
    */
   deleteMany<T extends OptionListDeleteManyArgs>(
-    args?: Prisma.SelectSubset<T, OptionListDeleteManyArgs<ExtArgs>>
-  ): Prisma.PrismaPromise<Prisma.BatchPayload>;
+    args?: Prisma.SelectSubset<T, OptionListDeleteManyArgs<ExtArgs>>,
+  ): Prisma.PrismaPromise<Prisma.BatchPayload>
 
   /**
    * Update zero or more OptionLists.
@@ -741,8 +742,8 @@ export interface OptionListDelegate<
    *
    */
   updateMany<T extends OptionListUpdateManyArgs>(
-    args: Prisma.SelectSubset<T, OptionListUpdateManyArgs<ExtArgs>>
-  ): Prisma.PrismaPromise<Prisma.BatchPayload>;
+    args: Prisma.SelectSubset<T, OptionListUpdateManyArgs<ExtArgs>>,
+  ): Prisma.PrismaPromise<Prisma.BatchPayload>
 
   /**
    * Update zero or more OptionLists and returns the data updated in the database.
@@ -773,15 +774,15 @@ export interface OptionListDelegate<
    *
    */
   updateManyAndReturn<T extends OptionListUpdateManyAndReturnArgs>(
-    args: Prisma.SelectSubset<T, OptionListUpdateManyAndReturnArgs<ExtArgs>>
+    args: Prisma.SelectSubset<T, OptionListUpdateManyAndReturnArgs<ExtArgs>>,
   ): Prisma.PrismaPromise<
     runtime.Types.Result.GetResult<
       Prisma.$OptionListPayload<ExtArgs>,
       T,
-      "updateManyAndReturn",
+      'updateManyAndReturn',
       GlobalOmitOptions
     >
-  >;
+  >
 
   /**
    * Create or update one OptionList.
@@ -801,18 +802,18 @@ export interface OptionListDelegate<
    * })
    */
   upsert<T extends OptionListUpsertArgs>(
-    args: Prisma.SelectSubset<T, OptionListUpsertArgs<ExtArgs>>
+    args: Prisma.SelectSubset<T, OptionListUpsertArgs<ExtArgs>>,
   ): Prisma.Prisma__OptionListClient<
     runtime.Types.Result.GetResult<
       Prisma.$OptionListPayload<ExtArgs>,
       T,
-      "upsert",
+      'upsert',
       GlobalOmitOptions
     >,
     never,
     ExtArgs,
     GlobalOmitOptions
-  >;
+  >
 
   /**
    * Count the number of OptionLists.
@@ -828,14 +829,14 @@ export interface OptionListDelegate<
    * })
    **/
   count<T extends OptionListCountArgs>(
-    args?: Prisma.Subset<T, OptionListCountArgs>
+    args?: Prisma.Subset<T, OptionListCountArgs>,
   ): Prisma.PrismaPromise<
-    T extends runtime.Types.Utils.Record<"select", any>
-      ? T["select"] extends true
+    T extends runtime.Types.Utils.Record<'select', any>
+      ? T['select'] extends true
         ? number
-        : Prisma.GetScalarType<T["select"], OptionListCountAggregateOutputType>
+        : Prisma.GetScalarType<T['select'], OptionListCountAggregateOutputType>
       : number
-  >;
+  >
 
   /**
    * Allows you to perform aggregations operations on a OptionList.
@@ -862,8 +863,8 @@ export interface OptionListDelegate<
    * })
    **/
   aggregate<T extends OptionListAggregateArgs>(
-    args: Prisma.Subset<T, OptionListAggregateArgs>
-  ): Prisma.PrismaPromise<GetOptionListAggregateType<T>>;
+    args: Prisma.Subset<T, OptionListAggregateArgs>,
+  ): Prisma.PrismaPromise<GetOptionListAggregateType<T>>
 
   /**
    * Group by OptionList.
@@ -886,20 +887,20 @@ export interface OptionListDelegate<
   groupBy<
     T extends OptionListGroupByArgs,
     HasSelectOrTake extends Prisma.Or<
-      Prisma.Extends<"skip", Prisma.Keys<T>>,
-      Prisma.Extends<"take", Prisma.Keys<T>>
+      Prisma.Extends<'skip', Prisma.Keys<T>>,
+      Prisma.Extends<'take', Prisma.Keys<T>>
     >,
     OrderByArg extends Prisma.True extends HasSelectOrTake
-      ? { orderBy: OptionListGroupByArgs["orderBy"] }
-      : { orderBy?: OptionListGroupByArgs["orderBy"] },
+      ? { orderBy: OptionListGroupByArgs['orderBy'] }
+      : { orderBy?: OptionListGroupByArgs['orderBy'] },
     OrderFields extends Prisma.ExcludeUnderscoreKeys<
-      Prisma.Keys<Prisma.MaybeTupleToUnion<T["orderBy"]>>
+      Prisma.Keys<Prisma.MaybeTupleToUnion<T['orderBy']>>
     >,
-    ByFields extends Prisma.MaybeTupleToUnion<T["by"]>,
+    ByFields extends Prisma.MaybeTupleToUnion<T['by']>,
     ByValid extends Prisma.Has<ByFields, OrderFields>,
-    HavingFields extends Prisma.GetHavingFields<T["having"]>,
+    HavingFields extends Prisma.GetHavingFields<T['having']>,
     HavingValid extends Prisma.Has<ByFields, HavingFields>,
-    ByEmpty extends T["by"] extends never[] ? Prisma.True : Prisma.False,
+    ByEmpty extends T['by'] extends never[] ? Prisma.True : Prisma.False,
     InputErrors extends ByEmpty extends Prisma.True
       ? `Error: "by" must not be empty.`
       : HavingValid extends Prisma.False
@@ -910,29 +911,29 @@ export interface OptionListDelegate<
                 ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
                 : [
                     Error,
-                    "Field ",
+                    'Field ',
                     P,
                     ` in "having" needs to be provided in "by"`,
-                  ];
+                  ]
           }[HavingFields]
-        : "take" extends Prisma.Keys<T>
-          ? "orderBy" extends Prisma.Keys<T>
+        : 'take' extends Prisma.Keys<T>
+          ? 'orderBy' extends Prisma.Keys<T>
             ? ByValid extends Prisma.True
               ? {}
               : {
                   [P in OrderFields]: P extends ByFields
                     ? never
-                    : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`;
+                    : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
                 }[OrderFields]
             : 'Error: If you provide "take", you also need to provide "orderBy"'
-          : "skip" extends Prisma.Keys<T>
-            ? "orderBy" extends Prisma.Keys<T>
+          : 'skip' extends Prisma.Keys<T>
+            ? 'orderBy' extends Prisma.Keys<T>
               ? ByValid extends Prisma.True
                 ? {}
                 : {
                     [P in OrderFields]: P extends ByFields
                       ? never
-                      : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`;
+                      : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
                   }[OrderFields]
               : 'Error: If you provide "skip", you also need to provide "orderBy"'
             : ByValid extends Prisma.True
@@ -940,18 +941,18 @@ export interface OptionListDelegate<
               : {
                   [P in OrderFields]: P extends ByFields
                     ? never
-                    : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`;
+                    : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
                 }[OrderFields],
   >(
     args: Prisma.SubsetIntersection<T, OptionListGroupByArgs, OrderByArg> &
-      InputErrors
+      InputErrors,
   ): {} extends InputErrors
     ? GetOptionListGroupByPayload<T>
-    : Prisma.PrismaPromise<InputErrors>;
+    : Prisma.PrismaPromise<InputErrors>
   /**
    * Fields of the OptionList model
    */
-  readonly fields: OptionListFieldRefs;
+  readonly fields: OptionListFieldRefs
 }
 
 /**
@@ -967,7 +968,7 @@ export interface Prisma__OptionListClient<
     runtime.Types.Extensions.DefaultArgs,
   GlobalOmitOptions = {},
 > extends Prisma.PrismaPromise<T> {
-  readonly [Symbol.toStringTag]: "PrismaPromise";
+  readonly [Symbol.toStringTag]: 'PrismaPromise'
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -982,8 +983,8 @@ export interface Prisma__OptionListClient<
     onrejected?:
       | ((reason: any) => TResult2 | PromiseLike<TResult2>)
       | undefined
-      | null
-  ): runtime.Types.Utils.JsPromise<TResult1 | TResult2>;
+      | null,
+  ): runtime.Types.Utils.JsPromise<TResult1 | TResult2>
   /**
    * Attaches a callback for only the rejection of the Promise.
    * @param onrejected The callback to execute when the Promise is rejected.
@@ -993,8 +994,8 @@ export interface Prisma__OptionListClient<
     onrejected?:
       | ((reason: any) => TResult | PromiseLike<TResult>)
       | undefined
-      | null
-  ): runtime.Types.Utils.JsPromise<T | TResult>;
+      | null,
+  ): runtime.Types.Utils.JsPromise<T | TResult>
   /**
    * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
    * resolved value cannot be modified from the callback.
@@ -1002,18 +1003,18 @@ export interface Prisma__OptionListClient<
    * @returns A Promise for the completion of the callback.
    */
   finally(
-    onfinally?: (() => void) | undefined | null
-  ): runtime.Types.Utils.JsPromise<T>;
+    onfinally?: (() => void) | undefined | null,
+  ): runtime.Types.Utils.JsPromise<T>
 }
 
 /**
  * Fields of the OptionList model
  */
 export interface OptionListFieldRefs {
-  readonly id: Prisma.FieldRef<"OptionList", "String">;
-  readonly field: Prisma.FieldRef<"OptionList", "String">;
-  readonly value: Prisma.FieldRef<"OptionList", "String">;
-  readonly order: Prisma.FieldRef<"OptionList", "Int">;
+  readonly id: Prisma.FieldRef<'OptionList', 'String'>
+  readonly field: Prisma.FieldRef<'OptionList', 'String'>
+  readonly value: Prisma.FieldRef<'OptionList', 'String'>
+  readonly order: Prisma.FieldRef<'OptionList', 'Int'>
 }
 
 // Custom InputTypes
@@ -1027,16 +1028,16 @@ export type OptionListFindUniqueArgs<
   /**
    * Select specific fields to fetch from the OptionList
    */
-  select?: Prisma.OptionListSelect<ExtArgs> | null;
+  select?: Prisma.OptionListSelect<ExtArgs> | null
   /**
    * Omit specific fields from the OptionList
    */
-  omit?: Prisma.OptionListOmit<ExtArgs> | null;
+  omit?: Prisma.OptionListOmit<ExtArgs> | null
   /**
    * Filter, which OptionList to fetch.
    */
-  where: Prisma.OptionListWhereUniqueInput;
-};
+  where: Prisma.OptionListWhereUniqueInput
+}
 
 /**
  * OptionList findUniqueOrThrow
@@ -1048,16 +1049,16 @@ export type OptionListFindUniqueOrThrowArgs<
   /**
    * Select specific fields to fetch from the OptionList
    */
-  select?: Prisma.OptionListSelect<ExtArgs> | null;
+  select?: Prisma.OptionListSelect<ExtArgs> | null
   /**
    * Omit specific fields from the OptionList
    */
-  omit?: Prisma.OptionListOmit<ExtArgs> | null;
+  omit?: Prisma.OptionListOmit<ExtArgs> | null
   /**
    * Filter, which OptionList to fetch.
    */
-  where: Prisma.OptionListWhereUniqueInput;
-};
+  where: Prisma.OptionListWhereUniqueInput
+}
 
 /**
  * OptionList findFirst
@@ -1069,15 +1070,15 @@ export type OptionListFindFirstArgs<
   /**
    * Select specific fields to fetch from the OptionList
    */
-  select?: Prisma.OptionListSelect<ExtArgs> | null;
+  select?: Prisma.OptionListSelect<ExtArgs> | null
   /**
    * Omit specific fields from the OptionList
    */
-  omit?: Prisma.OptionListOmit<ExtArgs> | null;
+  omit?: Prisma.OptionListOmit<ExtArgs> | null
   /**
    * Filter, which OptionList to fetch.
    */
-  where?: Prisma.OptionListWhereInput;
+  where?: Prisma.OptionListWhereInput
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
    *
@@ -1085,25 +1086,25 @@ export type OptionListFindFirstArgs<
    */
   orderBy?:
     | Prisma.OptionListOrderByWithRelationInput
-    | Prisma.OptionListOrderByWithRelationInput[];
+    | Prisma.OptionListOrderByWithRelationInput[]
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
    *
    * Sets the position for searching for OptionLists.
    */
-  cursor?: Prisma.OptionListWhereUniqueInput;
+  cursor?: Prisma.OptionListWhereUniqueInput
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
    *
    * Take `±n` OptionLists from the position of the cursor.
    */
-  take?: number;
+  take?: number
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
    *
    * Skip the first `n` OptionLists.
    */
-  skip?: number;
+  skip?: number
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
    *
@@ -1111,8 +1112,8 @@ export type OptionListFindFirstArgs<
    */
   distinct?:
     | Prisma.OptionListScalarFieldEnum
-    | Prisma.OptionListScalarFieldEnum[];
-};
+    | Prisma.OptionListScalarFieldEnum[]
+}
 
 /**
  * OptionList findFirstOrThrow
@@ -1124,15 +1125,15 @@ export type OptionListFindFirstOrThrowArgs<
   /**
    * Select specific fields to fetch from the OptionList
    */
-  select?: Prisma.OptionListSelect<ExtArgs> | null;
+  select?: Prisma.OptionListSelect<ExtArgs> | null
   /**
    * Omit specific fields from the OptionList
    */
-  omit?: Prisma.OptionListOmit<ExtArgs> | null;
+  omit?: Prisma.OptionListOmit<ExtArgs> | null
   /**
    * Filter, which OptionList to fetch.
    */
-  where?: Prisma.OptionListWhereInput;
+  where?: Prisma.OptionListWhereInput
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
    *
@@ -1140,25 +1141,25 @@ export type OptionListFindFirstOrThrowArgs<
    */
   orderBy?:
     | Prisma.OptionListOrderByWithRelationInput
-    | Prisma.OptionListOrderByWithRelationInput[];
+    | Prisma.OptionListOrderByWithRelationInput[]
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
    *
    * Sets the position for searching for OptionLists.
    */
-  cursor?: Prisma.OptionListWhereUniqueInput;
+  cursor?: Prisma.OptionListWhereUniqueInput
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
    *
    * Take `±n` OptionLists from the position of the cursor.
    */
-  take?: number;
+  take?: number
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
    *
    * Skip the first `n` OptionLists.
    */
-  skip?: number;
+  skip?: number
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
    *
@@ -1166,8 +1167,8 @@ export type OptionListFindFirstOrThrowArgs<
    */
   distinct?:
     | Prisma.OptionListScalarFieldEnum
-    | Prisma.OptionListScalarFieldEnum[];
-};
+    | Prisma.OptionListScalarFieldEnum[]
+}
 
 /**
  * OptionList findMany
@@ -1179,15 +1180,15 @@ export type OptionListFindManyArgs<
   /**
    * Select specific fields to fetch from the OptionList
    */
-  select?: Prisma.OptionListSelect<ExtArgs> | null;
+  select?: Prisma.OptionListSelect<ExtArgs> | null
   /**
    * Omit specific fields from the OptionList
    */
-  omit?: Prisma.OptionListOmit<ExtArgs> | null;
+  omit?: Prisma.OptionListOmit<ExtArgs> | null
   /**
    * Filter, which OptionLists to fetch.
    */
-  where?: Prisma.OptionListWhereInput;
+  where?: Prisma.OptionListWhereInput
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
    *
@@ -1195,25 +1196,25 @@ export type OptionListFindManyArgs<
    */
   orderBy?:
     | Prisma.OptionListOrderByWithRelationInput
-    | Prisma.OptionListOrderByWithRelationInput[];
+    | Prisma.OptionListOrderByWithRelationInput[]
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
    *
    * Sets the position for listing OptionLists.
    */
-  cursor?: Prisma.OptionListWhereUniqueInput;
+  cursor?: Prisma.OptionListWhereUniqueInput
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
    *
    * Take `±n` OptionLists from the position of the cursor.
    */
-  take?: number;
+  take?: number
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
    *
    * Skip the first `n` OptionLists.
    */
-  skip?: number;
+  skip?: number
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
    *
@@ -1221,8 +1222,8 @@ export type OptionListFindManyArgs<
    */
   distinct?:
     | Prisma.OptionListScalarFieldEnum
-    | Prisma.OptionListScalarFieldEnum[];
-};
+    | Prisma.OptionListScalarFieldEnum[]
+}
 
 /**
  * OptionList create
@@ -1234,19 +1235,19 @@ export type OptionListCreateArgs<
   /**
    * Select specific fields to fetch from the OptionList
    */
-  select?: Prisma.OptionListSelect<ExtArgs> | null;
+  select?: Prisma.OptionListSelect<ExtArgs> | null
   /**
    * Omit specific fields from the OptionList
    */
-  omit?: Prisma.OptionListOmit<ExtArgs> | null;
+  omit?: Prisma.OptionListOmit<ExtArgs> | null
   /**
    * The data needed to create a OptionList.
    */
   data: Prisma.XOR<
     Prisma.OptionListCreateInput,
     Prisma.OptionListUncheckedCreateInput
-  >;
-};
+  >
+}
 
 /**
  * OptionList createMany
@@ -1258,9 +1259,9 @@ export type OptionListCreateManyArgs<
   /**
    * The data used to create many OptionLists.
    */
-  data: Prisma.OptionListCreateManyInput | Prisma.OptionListCreateManyInput[];
-  skipDuplicates?: boolean;
-};
+  data: Prisma.OptionListCreateManyInput | Prisma.OptionListCreateManyInput[]
+  skipDuplicates?: boolean
+}
 
 /**
  * OptionList createManyAndReturn
@@ -1272,17 +1273,17 @@ export type OptionListCreateManyAndReturnArgs<
   /**
    * Select specific fields to fetch from the OptionList
    */
-  select?: Prisma.OptionListSelectCreateManyAndReturn<ExtArgs> | null;
+  select?: Prisma.OptionListSelectCreateManyAndReturn<ExtArgs> | null
   /**
    * Omit specific fields from the OptionList
    */
-  omit?: Prisma.OptionListOmit<ExtArgs> | null;
+  omit?: Prisma.OptionListOmit<ExtArgs> | null
   /**
    * The data used to create many OptionLists.
    */
-  data: Prisma.OptionListCreateManyInput | Prisma.OptionListCreateManyInput[];
-  skipDuplicates?: boolean;
-};
+  data: Prisma.OptionListCreateManyInput | Prisma.OptionListCreateManyInput[]
+  skipDuplicates?: boolean
+}
 
 /**
  * OptionList update
@@ -1294,23 +1295,23 @@ export type OptionListUpdateArgs<
   /**
    * Select specific fields to fetch from the OptionList
    */
-  select?: Prisma.OptionListSelect<ExtArgs> | null;
+  select?: Prisma.OptionListSelect<ExtArgs> | null
   /**
    * Omit specific fields from the OptionList
    */
-  omit?: Prisma.OptionListOmit<ExtArgs> | null;
+  omit?: Prisma.OptionListOmit<ExtArgs> | null
   /**
    * The data needed to update a OptionList.
    */
   data: Prisma.XOR<
     Prisma.OptionListUpdateInput,
     Prisma.OptionListUncheckedUpdateInput
-  >;
+  >
   /**
    * Choose, which OptionList to update.
    */
-  where: Prisma.OptionListWhereUniqueInput;
-};
+  where: Prisma.OptionListWhereUniqueInput
+}
 
 /**
  * OptionList updateMany
@@ -1325,16 +1326,16 @@ export type OptionListUpdateManyArgs<
   data: Prisma.XOR<
     Prisma.OptionListUpdateManyMutationInput,
     Prisma.OptionListUncheckedUpdateManyInput
-  >;
+  >
   /**
    * Filter which OptionLists to update
    */
-  where?: Prisma.OptionListWhereInput;
+  where?: Prisma.OptionListWhereInput
   /**
    * Limit how many OptionLists to update.
    */
-  limit?: number;
-};
+  limit?: number
+}
 
 /**
  * OptionList updateManyAndReturn
@@ -1346,27 +1347,27 @@ export type OptionListUpdateManyAndReturnArgs<
   /**
    * Select specific fields to fetch from the OptionList
    */
-  select?: Prisma.OptionListSelectUpdateManyAndReturn<ExtArgs> | null;
+  select?: Prisma.OptionListSelectUpdateManyAndReturn<ExtArgs> | null
   /**
    * Omit specific fields from the OptionList
    */
-  omit?: Prisma.OptionListOmit<ExtArgs> | null;
+  omit?: Prisma.OptionListOmit<ExtArgs> | null
   /**
    * The data used to update OptionLists.
    */
   data: Prisma.XOR<
     Prisma.OptionListUpdateManyMutationInput,
     Prisma.OptionListUncheckedUpdateManyInput
-  >;
+  >
   /**
    * Filter which OptionLists to update
    */
-  where?: Prisma.OptionListWhereInput;
+  where?: Prisma.OptionListWhereInput
   /**
    * Limit how many OptionLists to update.
    */
-  limit?: number;
-};
+  limit?: number
+}
 
 /**
  * OptionList upsert
@@ -1378,30 +1379,30 @@ export type OptionListUpsertArgs<
   /**
    * Select specific fields to fetch from the OptionList
    */
-  select?: Prisma.OptionListSelect<ExtArgs> | null;
+  select?: Prisma.OptionListSelect<ExtArgs> | null
   /**
    * Omit specific fields from the OptionList
    */
-  omit?: Prisma.OptionListOmit<ExtArgs> | null;
+  omit?: Prisma.OptionListOmit<ExtArgs> | null
   /**
    * The filter to search for the OptionList to update in case it exists.
    */
-  where: Prisma.OptionListWhereUniqueInput;
+  where: Prisma.OptionListWhereUniqueInput
   /**
    * In case the OptionList found by the `where` argument doesn't exist, create a new OptionList with this data.
    */
   create: Prisma.XOR<
     Prisma.OptionListCreateInput,
     Prisma.OptionListUncheckedCreateInput
-  >;
+  >
   /**
    * In case the OptionList was found with the provided `where` argument, update it with this data.
    */
   update: Prisma.XOR<
     Prisma.OptionListUpdateInput,
     Prisma.OptionListUncheckedUpdateInput
-  >;
-};
+  >
+}
 
 /**
  * OptionList delete
@@ -1413,16 +1414,16 @@ export type OptionListDeleteArgs<
   /**
    * Select specific fields to fetch from the OptionList
    */
-  select?: Prisma.OptionListSelect<ExtArgs> | null;
+  select?: Prisma.OptionListSelect<ExtArgs> | null
   /**
    * Omit specific fields from the OptionList
    */
-  omit?: Prisma.OptionListOmit<ExtArgs> | null;
+  omit?: Prisma.OptionListOmit<ExtArgs> | null
   /**
    * Filter which OptionList to delete.
    */
-  where: Prisma.OptionListWhereUniqueInput;
-};
+  where: Prisma.OptionListWhereUniqueInput
+}
 
 /**
  * OptionList deleteMany
@@ -1434,12 +1435,12 @@ export type OptionListDeleteManyArgs<
   /**
    * Filter which OptionLists to delete
    */
-  where?: Prisma.OptionListWhereInput;
+  where?: Prisma.OptionListWhereInput
   /**
    * Limit how many OptionLists to delete.
    */
-  limit?: number;
-};
+  limit?: number
+}
 
 /**
  * OptionList without action
@@ -1451,9 +1452,9 @@ export type OptionListDefaultArgs<
   /**
    * Select specific fields to fetch from the OptionList
    */
-  select?: Prisma.OptionListSelect<ExtArgs> | null;
+  select?: Prisma.OptionListSelect<ExtArgs> | null
   /**
    * Omit specific fields from the OptionList
    */
-  omit?: Prisma.OptionListOmit<ExtArgs> | null;
-};
+  omit?: Prisma.OptionListOmit<ExtArgs> | null
+}

@@ -1,19 +1,20 @@
-"use client";
+'use client'
 
-import { useState } from "react";
-import { Combobox as BaseCombobox } from "@base-ui/react/combobox";
-import { addFieldOption } from "@/actions/field-options";
-import { cn } from "@/lib/utils";
-import { X } from "lucide-react";
+import { useState } from 'react'
+
+import { Combobox as BaseCombobox } from '@base-ui/react/combobox'
+import { X } from 'lucide-react'
+
+import { cn } from '@/lib/utils'
 
 export interface ComboboxProps {
-  id?: string;
-  name?: string;
-  options: string[];
-  placeholder?: string;
-  required?: boolean;
-  allowNew?: boolean;
-  persistField?: string;
+  id?: string
+  name?: string
+  options: string[]
+  placeholder?: string
+  required?: boolean
+  allowNew?: boolean
+  onAddNew?: (value: string) => void | Promise<void>
 }
 
 export function Combobox({
@@ -23,32 +24,30 @@ export function Combobox({
   placeholder,
   required,
   allowNew = false,
-  persistField,
+  onAddNew,
 }: ComboboxProps) {
-  const [localItems, setLocalItems] = useState<string[]>(options);
-  const [query, setQuery] = useState("");
-  const [value, setValue] = useState<string | null>(null);
+  const [localItems, setLocalItems] = useState<string[]>(options)
+  const [query, setQuery] = useState('')
+  const [value, setValue] = useState<string | null>(null)
 
-  const isSearching = query.trim() !== "" && query !== value;
+  const isSearching = query.trim() !== '' && query !== value
   const filtered = isSearching
     ? localItems.filter((item) =>
-        item.toLowerCase().includes(query.toLowerCase())
+        item.toLowerCase().includes(query.toLowerCase()),
       )
-    : localItems;
+    : localItems
 
-  const showPortal = filtered.length > 0 || Boolean(query.trim());
+  const showPortal = filtered.length > 0 || Boolean(query.trim())
 
   function handleValueChange(v: string | null) {
-    setValue(v);
+    setValue(v)
     if (
       allowNew &&
       v &&
       !localItems.some((item) => item.toLowerCase() === v.toLowerCase())
     ) {
-      setLocalItems((prev) => [...prev, v]);
-      if (persistField) {
-        addFieldOption(persistField, v).catch(console.error);
-      }
+      setLocalItems((prev) => [...prev, v])
+      onAddNew?.(v)
     }
   }
 
@@ -58,18 +57,18 @@ export function Combobox({
       onInputValueChange={setQuery}
       onValueChange={handleValueChange}
     >
-      <div className="relative">
+      <div className='relative'>
         <BaseCombobox.Input
           id={id}
           name={name}
           placeholder={placeholder}
           required={required}
-          className={cn("input-auth", value && "pr-9")}
-          autoComplete="off"
+          className={cn('input-auth', value && 'pr-9')}
+          autoComplete='off'
         />
         <BaseCombobox.Clear
-          aria-label="Clear"
-          className="text-gray-4 hover:text-gray-2 absolute top-1/2 right-2.5 flex h-5 w-5 -translate-y-1/2 cursor-pointer items-center justify-center rounded transition-colors"
+          aria-label='Clear'
+          className='text-gray-4 hover:text-gray-2 absolute top-1/2 right-2.5 flex h-5 w-5 -translate-y-1/2 cursor-pointer items-center justify-center rounded transition-colors'
         >
           <X size={10} />
         </BaseCombobox.Clear>
@@ -78,17 +77,17 @@ export function Combobox({
         <BaseCombobox.Portal>
           <BaseCombobox.Positioner
             sideOffset={6}
-            align="start"
-            positionMethod="fixed"
-            className="z-50"
+            align='start'
+            positionMethod='fixed'
+            className='z-50'
           >
-            <BaseCombobox.Popup className="select-popup select-popup-panel min-w-[var(--anchor-width)]">
-              <BaseCombobox.List className="max-h-[220px] overflow-y-auto py-1">
+            <BaseCombobox.Popup className='select-popup select-popup-panel min-w-[var(--anchor-width)]'>
+              <BaseCombobox.List className='max-h-[220px] overflow-y-auto py-1'>
                 {filtered.map((item) => (
                   <BaseCombobox.Item
                     key={item}
                     value={item}
-                    className="select-item"
+                    className='select-item'
                   >
                     {item}
                   </BaseCombobox.Item>
@@ -98,12 +97,12 @@ export function Combobox({
                   (allowNew ? (
                     <BaseCombobox.Item
                       value={query.trim()}
-                      className="select-item"
+                      className='select-item'
                     >
                       Add &ldquo;{query.trim()}&rdquo;
                     </BaseCombobox.Item>
                   ) : (
-                    <p className="select-item cursor-default opacity-50">
+                    <p className='select-item cursor-default opacity-50'>
                       No results
                     </p>
                   ))}
@@ -113,5 +112,5 @@ export function Combobox({
         </BaseCombobox.Portal>
       )}
     </BaseCombobox.Root>
-  );
+  )
 }

@@ -12,27 +12,28 @@
  * 🟢 You can import this file directly.
  */
 
-import * as Prisma from "./internal/prismaNamespaceBrowser";
-export { Prisma };
-export * as $Enums from "./enums";
-export * from "./enums";
+import * as Prisma from './internal/prismaNamespaceBrowser'
+
+export { Prisma }
+export * as $Enums from './enums'
+export * from './enums'
 /**
  * Model User
  *
  */
-export type User = Prisma.UserModel;
+export type User = Prisma.UserModel
 /**
  * Model Account
  *
  */
-export type Account = Prisma.AccountModel;
+export type Account = Prisma.AccountModel
 /**
  * Model VerificationToken
  *
  */
-export type VerificationToken = Prisma.VerificationTokenModel;
+export type VerificationToken = Prisma.VerificationTokenModel
 /**
  * Model OptionList
  *
  */
-export type OptionList = Prisma.OptionListModel;
+export type OptionList = Prisma.OptionListModel

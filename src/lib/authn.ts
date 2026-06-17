@@ -1,12 +1,14 @@
-import NextAuth from "next-auth";
-import Credentials from "next-auth/providers/credentials";
-import Google from "next-auth/providers/google";
-import { PrismaAdapter } from "@auth/prisma-adapter";
-import { z } from "zod";
-import bcrypt from "bcryptjs";
-import { db } from "@/lib/db";
-import { authConfig } from "@/lib/authn.config";
-import type { AppRole } from "@/types";
+import NextAuth from 'next-auth'
+import Credentials from 'next-auth/providers/credentials'
+import Google from 'next-auth/providers/google'
+
+import { PrismaAdapter } from '@auth/prisma-adapter'
+import bcrypt from 'bcryptjs'
+import { z } from 'zod'
+
+import { authConfig } from '@/lib/authn.config'
+import { db } from '@/lib/db'
+import type { AppRole } from '@/types'
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   ...authConfig,
@@ -15,24 +17,24 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   providers: [
     Credentials({
       credentials: {
-        email: { label: "Email", type: "email" },
-        password: { label: "Password", type: "password" },
+        email: { label: 'Email', type: 'email' },
+        password: { label: 'Password', type: 'password' },
       },
       async authorize(credentials) {
         const parsed = z
           .object({ email: z.email(), password: z.string().min(1) })
-          .safeParse(credentials);
+          .safeParse(credentials)
 
-        if (!parsed.success) return null;
+        if (!parsed.success) return null
 
         const user = await db.user.findUnique({
           where: { email: parsed.data.email },
-        });
+        })
 
-        if (!user?.password) return null;
+        if (!user?.password) return null
 
-        const valid = await bcrypt.compare(parsed.data.password, user.password);
-        if (!valid) return null;
+        const valid = await bcrypt.compare(parsed.data.password, user.password)
+        if (!valid) return null
 
         return {
           id: user.id,
@@ -40,7 +42,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           email: user.email,
           role: user.role as AppRole,
           chapterId: user.chapterId,
-        };
+        }
       },
     }),
     ...(process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET
@@ -55,9 +57,9 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   callbacks: {
     session: authConfig.callbacks!.session!,
     async jwt({ token, user, trigger }) {
-      if (trigger === "signIn" && user) {
-        token.role = user.role;
-        token.chapterId = user.chapterId;
+      if (trigger === 'signIn' && user) {
+        token.role = user.role
+        token.chapterId = user.chapterId
 
         // OAuth sign-ins: role/chapterId may not be on the user object —
         // fetch from DB to pick up the persisted defaults.
@@ -65,18 +67,18 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           const dbUser = await db.user.findUnique({
             where: { id: user.id },
             select: { role: true, chapterId: true },
-          });
-          token.role = (dbUser?.role as AppRole) ?? "VOLUNTEER";
-          token.chapterId = dbUser?.chapterId ?? null;
+          })
+          token.role = (dbUser?.role as AppRole) ?? 'VOLUNTEER'
+          token.chapterId = dbUser?.chapterId ?? null
         }
       } else if (token.sub) {
         const exists = await db.user.findUnique({
           where: { id: token.sub },
           select: { id: true },
-        });
-        if (!exists) return null;
+        })
+        if (!exists) return null
       }
-      return token;
+      return token
     },
   },
-});
+})

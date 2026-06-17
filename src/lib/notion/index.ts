@@ -1,14 +1,14 @@
 import {
-  getChapters,
   getChapterBySlug,
-  getProjects,
-  getProjectBySlug,
-  getPartners,
-  getPartnerBySlug,
-  getVolunteers,
-  getVolunteerCounts,
+  getChapters,
   getDoneProjectCount,
-} from "./api";
+  getPartnerBySlug,
+  getPartners,
+  getProjectBySlug,
+  getProjects,
+  getVolunteerCounts,
+  getVolunteers,
+} from './api'
 
 export const notionApi = {
   getChapters,
@@ -20,8 +20,8 @@ export const notionApi = {
   getVolunteers,
   getVolunteerCounts,
   getDoneProjectCount,
-};
+}
 
-export { toSlug, NotionUtils } from "./utils";
+export { toSlug, NotionUtils } from './utils'
 
-export { mapProgram, mapPartner, mapVolunteer, mapProject } from "./mappers";
+export { mapProgram, mapPartner, mapVolunteer, mapProject } from './mappers'

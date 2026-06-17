@@ -84,10 +84,10 @@ Open [http://localhost:3000](http://localhost:3000).
 If a user's officer assignment changes, their role in the JWT will be stale until they sign out and back in. To force an immediate refresh, call `update()` from the client after making the assignment change:
 
 ```ts
-import { useSession } from "next-auth/react";
+import { useSession } from 'next-auth/react'
 
-const { update } = useSession();
-await update(); // re-triggers jwt callback with trigger === "update"
+const { update } = useSession()
+await update() // re-triggers jwt callback with trigger === "update"
 ```
 
 ## Project structure

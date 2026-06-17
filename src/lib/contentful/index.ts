@@ -1,15 +1,15 @@
 import {
-  getJournalEntries,
-  getPaginatedJournalEntries,
-  getJournalEntryBySlug,
+  getAssetUrl,
   getBoardTeamMembers,
+  getFAQs,
+  getInfoCards,
+  getJournalEntries,
+  getJournalEntryBySlug,
+  getPaginatedJournalEntries,
+  getProcess,
   getSponsors,
   getSponsorshipTiers,
-  getAssetUrl,
-  getFAQs,
-  getProcess,
-  getInfoCards,
-} from "./api";
+} from './api'
 
 export const contentfulApi = {
   getJournalEntries,
@@ -22,4 +22,4 @@ export const contentfulApi = {
   getFAQs,
   getProcess,
   getInfoCards,
-};
+}

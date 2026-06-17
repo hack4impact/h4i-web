@@ -190,7 +190,7 @@ export default function SignUpForm({
         <p className="label-xs -mt-1 text-orange-500">{state.error}</p>
       )}
 
-      <div className="mt-1 flex items-center justify-between">
+      <div className="mt-6 flex items-center justify-between">
         {currentStep > 0 ? (
           <button
             type="button"

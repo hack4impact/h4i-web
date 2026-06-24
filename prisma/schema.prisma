@@ -36,7 +36,7 @@ model User {
   // Demographic (self-reported, optional)
   birthYear      Int?
   gender         String?
-  raceEthnicity  String?
+  ethnicity      String?
   graduationYear Int?
   major          String?
 

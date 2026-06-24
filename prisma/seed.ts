@@ -2,29 +2,19 @@ import { PrismaPg } from '@prisma/adapter-pg'
 import bcrypt from 'bcryptjs'
 
 import { PrismaClient } from '../src/generated/client'
-import {
-  COMPANY_SUGGESTIONS,
-  GENDER_SUGGESTIONS,
-  MAJOR_SUGGESTIONS,
-  RACE_SUGGESTIONS,
-} from '../src/lib/field-options'
+import { OPTION_LISTS, SEED_USERS } from './seed-data'
 
 const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL! })
 const db = new PrismaClient({ adapter })
 
-const OPTION_LISTS: { field: string; values: string[] }[] = [
-  { field: 'major', values: MAJOR_SUGGESTIONS },
-  { field: 'employer', values: COMPANY_SUGGESTIONS },
-  { field: 'gender', values: GENDER_SUGGESTIONS },
-  { field: 'race_ethnicity', values: RACE_SUGGESTIONS },
-]
-
 async function main() {
+  // Clean up all tables in dependency order
   await db.account.deleteMany()
   await db.verificationToken.deleteMany()
   await db.user.deleteMany()
   await db.optionList.deleteMany()
 
+  // Seed field option lists
   for (const { field, values } of OPTION_LISTS) {
     await db.optionList.createMany({
       data: values.map((value, order) => ({ field, value, order })),
@@ -32,22 +22,49 @@ async function main() {
     console.log(`Seeded ${values.length} options for "${field}"`)
   }
 
-  const email = process.env.SEED_ADMIN_EMAIL
-  const password = process.env.SEED_ADMIN_PASSWORD
-  const name = process.env.SEED_ADMIN_NAME ?? 'Admin'
+  const devPassword = process.env.SEED_PASSWORD ?? 'password123'
+  const hashed = await bcrypt.hash(devPassword, 12)
 
-  if (!email || !password) {
-    console.warn(
-      'Skipping admin account: set SEED_ADMIN_EMAIL and SEED_ADMIN_PASSWORD in .env.local to seed it.',
-    )
-    return
+  // Seed chapter leaders and volunteers
+  let created = 0
+  for (const user of SEED_USERS) {
+    await db.user.create({
+      data: {
+        name: user.name,
+        email: user.email,
+        password: hashed,
+        role: user.role,
+        chapterId: user.chapterId ?? null,
+        volunteerType: user.volunteerType,
+        startYear: user.startYear,
+        employer: user.employer ?? null,
+        major: user.major ?? null,
+        birthYear: user.birthYear,
+        gender: user.gender,
+        ethnicity: user.ethnicity,
+        graduationYear: user.graduationYear ?? null,
+      },
+    })
+    created++
   }
+  console.log(`Seeded ${created} volunteer/leader accounts`)
 
-  const hashed = await bcrypt.hash(password, 12)
+  // Seed global admin
+  const adminEmail = process.env.SEED_ADMIN_EMAIL ?? 'admin@example.com'
+  const adminPassword = process.env.SEED_ADMIN_PASSWORD
+    ? await bcrypt.hash(process.env.SEED_ADMIN_PASSWORD, 12)
+    : hashed
+  const adminName = process.env.SEED_ADMIN_NAME ?? 'Admin'
+
   await db.user.create({
-    data: { name, email, password: hashed, role: 'ADMIN' },
+    data: {
+      name: adminName,
+      email: adminEmail,
+      password: adminPassword,
+      role: 'ADMIN',
+    },
   })
-  console.log(`Seeded admin account: ${email}`)
+  console.log(`Seeded admin account: ${adminEmail}`)
 }
 
 main()

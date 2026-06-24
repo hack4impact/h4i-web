@@ -29,6 +29,7 @@
     "@paper-design/shaders-react": "^0.0.76",
     "@prisma/adapter-pg": "^7.8.0",
     "@prisma/client": "^7.8.0",
+    "@tanstack/react-table": "^8.21.3",
     "@tanstack/react-virtual": "^3.14.2",
     "bcryptjs": "^3.0.3",
     "clsx": "^2.1.1",

@@ -8,7 +8,10 @@ import {
   Users,
 } from 'lucide-react'
 
+import { db } from '@/lib/db'
 import { notionApi } from '@/lib/notion'
+
+import { AdminDataSection } from './AdminDataSection'
 
 function StatCard({
   label,
@@ -62,13 +65,58 @@ export async function AdminDashboard({
 }: {
   userName?: string | null
 }) {
-  const [volunteerCounts, chapters, partners, doneProjectCount] =
-    await Promise.all([
-      notionApi.getVolunteerCounts(),
-      notionApi.getChapters(),
-      notionApi.getPartners(),
-      notionApi.getDoneProjectCount(),
-    ])
+  const [
+    volunteerCounts,
+    chapters,
+    partners,
+    doneProjectCount,
+    users,
+    accounts,
+    options,
+  ] = await Promise.all([
+    notionApi.getVolunteerCounts(),
+    notionApi.getChapters(),
+    notionApi.getPartners(),
+    notionApi.getDoneProjectCount(),
+    db.user.findMany({
+      orderBy: { createdAt: 'desc' },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        emailVerified: true,
+        image: true,
+        role: true,
+        chapterId: true,
+        volunteerType: true,
+        startYear: true,
+        employer: true,
+        birthYear: true,
+        gender: true,
+        raceEthnicity: true,
+        graduationYear: true,
+        major: true,
+        createdAt: true,
+        updatedAt: true,
+        _count: { select: { accounts: true } },
+      },
+    }),
+    db.account.findMany({
+      orderBy: { provider: 'asc' },
+      select: {
+        id: true,
+        userId: true,
+        type: true,
+        provider: true,
+        providerAccountId: true,
+        token_type: true,
+        scope: true,
+        expires_at: true,
+        session_state: true,
+      },
+    }),
+    db.optionList.findMany({ orderBy: [{ field: 'asc' }, { order: 'asc' }] }),
+  ])
 
   const firstName = userName?.split(' ')[0] ?? 'there'
   const activeChapters = chapters.filter((c) => c.status === 'Active').length
@@ -77,11 +125,8 @@ export async function AdminDashboard({
     <main className='flex flex-1 flex-col overflow-hidden'>
       <header className='border-separator border-b px-8 py-6'>
         <h1 className='text-inverse font-serif text-[28px] leading-snug font-light tracking-tight'>
-          Good morning, {firstName}
+          {firstName}'s Dashboard
         </h1>
-        <p className='label text-gray-3 mt-1'>
-          Here&apos;s what&apos;s happening across Hack4Impact.
-        </p>
       </header>
 
       <div className='flex-1 overflow-y-auto p-8'>
@@ -125,6 +170,8 @@ export async function AdminDashboard({
             ))}
           </div>
         </div>
+
+        <AdminDataSection users={users} accounts={accounts} options={options} />
       </div>
     </main>
   )

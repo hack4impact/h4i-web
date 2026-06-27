@@ -1,0 +1,21 @@
+services:
+  dev-db:
+    container_name: dev-db
+    image: postgres:17
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${DEV_DB_USER}
+      POSTGRES_PASSWORD: ${DEV_DB_PASSWORD}
+      POSTGRES_DB: ${DEV_DB_NAME}
+    ports:
+      - '5432:5432'
+    volumes:
+      - dev-db-volume:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U ${DEV_DB_USER} -d ${DEV_DB_NAME}']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  dev-db-volume:

@@ -1,21 +1,20 @@
-import { PageHeader } from "@/components/ui/PageHeader";
-import { Button } from "@/components/ui/Button";
-import { getPartners } from "@/actions/partners";
-import { PartnersTable } from "./PartnersTable";
+import { notionApi } from "@/lib/notion";
+import { PartnersTable } from "@/components/ui/partners/PartnersTable";
 
 export default async function PartnersPage() {
-  const { rows } = await getPartners();
+  const partners = await notionApi.getPartners();
 
   return (
-    <div className="flex h-full flex-col pt-32">
-      <PageHeader title="Partners Directory">
-        <Button variant="high-contrast" className="h-full">
-          + Add Partner
-        </Button>
-      </PageHeader>
-      <div className="flex min-h-0 flex-1 p-32">
-        <PartnersTable data={rows} />
+    <main className="flex flex-1 flex-col overflow-hidden">
+      <header className="border-separator border-b px-8 py-6">
+        <h1 className="text-inverse font-serif text-[28px] leading-snug font-light tracking-tight">
+          Partners
+        </h1>
+        <p className="label text-gray-3 mt-1">{partners.length} total</p>
+      </header>
+      <div className="flex flex-1 flex-col overflow-hidden p-8">
+        <PartnersTable partners={partners} />
       </div>
-    </div>
+    </main>
   );
 }

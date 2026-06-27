@@ -1,10 +1,18 @@
-import { PageHeader } from "@/components/ui/PageHeader";
-export default function DashboardPage() {
-  return (
-    <div className="pt-32">
-      <PageHeader title="Dashboard">
-        <div className="h-36" />
-      </PageHeader>
-    </div>
-  );
+import { auth } from "@/lib/authn";
+import { AdminDashboard } from "./AdminDashboard";
+import { ChapterLeaderDashboard } from "./ChapterLeaderDashboard";
+
+export default async function DashboardPage() {
+  const session = await auth();
+
+  if (session?.user.role === "CHAPTER_LEADER") {
+    return (
+      <ChapterLeaderDashboard
+        userName={session.user.name}
+        chapterId={session.user.chapterId}
+      />
+    );
+  }
+
+  return <AdminDashboard userName={session?.user.name} />;
 }

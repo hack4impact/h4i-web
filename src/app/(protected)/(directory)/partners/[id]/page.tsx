@@ -4,5 +4,5 @@ export default async function PartnerPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  return <div>Partner: {id}</div>;
+  return <div>TODO: Partner {id}</div>;
 }

@@ -1,5 +1,6 @@
 generator client {
-  provider = "prisma-client-js"
+  provider = "prisma-client"
+  output="../src/generated"
 }
 
 datasource db {
@@ -17,43 +18,72 @@ enum Role {
   VOLUNTEER
 }
 
-model User {
-  id                   String   @id @default(cuid())
-  email                String   @unique
-  passwordHash         String?
-  role                 Role     @default(VOLUNTEER)
-  // Links this auth record to the volunteer record in the operations-api
-  operationsId         String?  @unique
-  // Cached from ops-api — the chapter this user belongs to
-  // TODO: remove once ops-api exposes role/assignment endpoints
-  operationsChapterId  String?
-  // User preference — controls whether they appear in the national directory
-  directoryOptIn       Boolean  @default(false)
-  createdAt            DateTime @default(now())
-  updatedAt            DateTime @updatedAt
-
-  sessions        Session[]
-  magicLinkTokens MagicLinkToken[]
+enum VolunteerType {
+  PROFESSIONAL
+  STUDENT
 }
 
-// Stores active login sessions — one row per logged-in device/browser
-model Session {
-  id        String   @id @default(cuid()) // opaque token sent as a cookie
-  userId    String
-  expiresAt DateTime
-  createdAt DateTime @default(now())
+model User {
+  id            String         @id @default(cuid())
+  name          String?
+  email         String         @unique
+  emailVerified DateTime?
+  image         String?
+  password      String?
+  role          Role           @default(VOLUNTEER)
+  chapterId     String?
+
+  // Volunteer profile
+  volunteerType  VolunteerType?
+  startYear      Int?
+  employer       String?
+
+  // Demographic (self-reported, optional)
+  birthYear      Int?
+  gender         String?
+  raceEthnicity  String?
+  graduationYear Int?
+  major          String?
+
+  accounts      Account[]
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
 }
 
-// One-time tokens sent via magic link email
-model MagicLinkToken {
-  id        String    @id @default(cuid()) // token sent in the email link
-  email     String
-  userId    String?
-  expiresAt DateTime
-  usedAt    DateTime? // null until clicked; stamped on use to prevent reuse
-  createdAt DateTime  @default(now())
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
 
-  user User? @relation(fields: [userId], references: [id], onDelete: Cascade)
+  @@unique([identifier, token])
+}
+
+// Persists user-contributed option values for combobox fields (major, employer, etc.)
+model OptionList {
+  id    String @id @default(cuid())
+  field String
+  value String
+  order Int    @default(0)
+
+  @@unique([field, value])
+  @@index([field])
 }

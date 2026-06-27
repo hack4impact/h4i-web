@@ -1,21 +1,20 @@
-import { PageHeader } from "@/components/ui/PageHeader";
-import { Button } from "@/components/ui/Button";
-import { getVolunteers } from "@/actions/volunteers";
-import { VolunteersTable } from "./VolunteersTable";
+import { notionApi } from "@/lib/notion";
+import { VolunteersTable } from "@/components/ui/volunteers/VolunteersTable";
 
 export default async function VolunteersPage() {
-  const { rows } = await getVolunteers();
+  const volunteers = await notionApi.getVolunteers();
 
   return (
-    <div className="flex h-full flex-col pt-32">
-      <PageHeader title="Volunteers Directory">
-        <Button variant="high-contrast" className="h-full">
-          + Add Volunteer
-        </Button>
-      </PageHeader>
-      <div className="flex min-h-0 flex-1 p-32">
-        <VolunteersTable data={rows} />
+    <main className="flex flex-1 flex-col overflow-hidden">
+      <header className="border-separator border-b px-8 py-6">
+        <h1 className="text-inverse font-serif text-[28px] leading-snug font-light tracking-tight">
+          Volunteers
+        </h1>
+        <p className="label text-gray-3 mt-1">{volunteers.length} total</p>
+      </header>
+      <div className="flex flex-1 flex-col overflow-hidden p-8">
+        <VolunteersTable volunteers={volunteers} />
       </div>
-    </div>
+    </main>
   );
 }

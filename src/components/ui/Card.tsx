@@ -1,19 +1,41 @@
-import { Separator } from "@base-ui/react/separator";
+import { ReactNode, ComponentPropsWithoutRef } from "react";
+import Link from "next/link";
 import { cn } from "@/lib/utils";
-import type { HTMLAttributes, ComponentPropsWithoutRef } from "react";
 
-export function Card({ className, ...props }: HTMLAttributes<HTMLDivElement>) {
-  return (
-    <div
-      className={cn("border-separator bg-panel border p-24", className)}
-      {...props}
-    />
-  );
+interface CardProps extends ComponentPropsWithoutRef<"div"> {
+  icon?: ReactNode;
+  title: string;
+  description: string;
+  href?: string;
 }
 
-export function CardDivider({
+export function Card({
+  icon,
+  title,
+  description,
   className,
+  href,
   ...props
-}: ComponentPropsWithoutRef<typeof Separator>) {
-  return <Separator className={className} {...props} />;
+}: CardProps) {
+  return (
+    <div
+      className={cn(
+        "flex h-full flex-col items-start rounded-lg bg-blue-50 px-6 py-8",
+        className
+      )}
+      {...props}
+    >
+      {icon && <div className="mb-6">{icon}</div>}
+      <h3 className="mb-2 font-sans text-xl">{title}</h3>
+      <p className="font-serif text-base">{description}</p>
+      {href && (
+        <Link
+          href={href}
+          className="mt-auto pt-4 font-mono text-sm hover:underline"
+        >
+          Learn more &rarr;
+        </Link>
+      )}
+    </div>
+  );
 }

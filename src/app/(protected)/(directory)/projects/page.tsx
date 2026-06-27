@@ -1,21 +1,20 @@
-import { PageHeader } from "@/components/ui/PageHeader";
-import { Button } from "@/components/ui/Button";
-import { getProjects } from "@/actions/projects";
-import { ProjectsTable } from "./ProjectsTable";
+import { notionApi } from "@/lib/notion";
+import { ProjectsTable } from "@/components/ui/projects/ProjectsTable";
 
 export default async function ProjectsPage() {
-  const { rows } = await getProjects();
+  const projects = await notionApi.getProjects();
 
   return (
-    <div className="flex h-full flex-col pt-32">
-      <PageHeader title="Projects Directory">
-        <Button variant="high-contrast" className="h-full">
-          + Add Project
-        </Button>
-      </PageHeader>
-      <div className="flex min-h-0 flex-1 p-32">
-        <ProjectsTable data={rows} />
+    <main className="flex flex-1 flex-col overflow-hidden">
+      <header className="border-separator border-b px-8 py-6">
+        <h1 className="text-inverse font-serif text-[28px] leading-snug font-light tracking-tight">
+          Projects
+        </h1>
+        <p className="label text-gray-3 mt-1">{projects.length} total</p>
+      </header>
+      <div className="flex flex-1 flex-col overflow-hidden p-8">
+        <ProjectsTable projects={projects} />
       </div>
-    </div>
+    </main>
   );
 }

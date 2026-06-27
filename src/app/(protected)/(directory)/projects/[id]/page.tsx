@@ -4,5 +4,5 @@ export default async function ProjectPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  return <div>Project: {id}</div>;
+  return <div>TODO: Project {id}</div>;
 }

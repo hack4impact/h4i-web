@@ -1,125 +1,124 @@
 "use client";
-import Link from "next/link";
+
+import { cn } from "@/lib/utils";
 import { usePathname } from "next/navigation";
-import { Menu } from "@base-ui/react/menu";
+import Link from "next/link";
+import Image from "next/image";
 import {
   LayoutDashboard,
   Building2,
   Handshake,
   FolderOpen,
   Users,
-  ChevronDown,
+  Settings,
+  LogOut,
 } from "lucide-react";
-import { credentialsSignOut } from "@/actions/auth";
-import { cn } from "@/lib/utils";
+import { credentialsSignOut } from "@/actions/authn";
 
-function UserMenu() {
-  const initials = "AD";
-  const name = "Administrator";
-  const email = "admin@hack4impact.org";
-
-  return (
-    <Menu.Root>
-      <Menu.Trigger className="rounded-4 hover:bg-ghost-hover data-[popup-open]:bg-ghost-hover flex w-fit max-w-full items-center gap-10 px-4 py-4 pr-8 outline-none focus-visible:outline-2 focus-visible:outline-[var(--color-focus)]">
-        <div
-          className="bg-blue-3 flex shrink-0 items-center justify-center rounded-full text-[11px] font-medium text-white"
-          style={{ width: 24, height: 24 }}
-        >
-          {initials}
-        </div>
-        <span className="text-gray-1 truncate text-lg font-medium">{name}</span>
-        <ChevronDown
-          size={8}
-          strokeWidth={1.5}
-          className="text-gray-4 shrink-0"
-        />
-      </Menu.Trigger>
-
-      <Menu.Portal>
-        <Menu.Positioner align="start" sideOffset={4} className="z-50">
-          <Menu.Popup className="menu-popup max-w-224">
-            <div className="flex flex-col gap-2 px-12 py-4">
-              <span className="text-gray-3">Signed in as</span>
-              <span className="text-gray-1 truncate">{email}</span>
-            </div>
-            <div className="menu-separator mx-0" />
-            <Menu.Item
-              className="menu-item"
-              onClick={() => credentialsSignOut()}
-            >
-              Sign out
-            </Menu.Item>
-          </Menu.Popup>
-        </Menu.Positioner>
-      </Menu.Portal>
-    </Menu.Root>
-  );
+interface SidebarProps {
+  userName?: string | null;
+  userRole?: string | null;
 }
 
-type NavItemProps = {
-  href: string;
-  label: string;
-  icon: React.ReactNode;
-  count?: number;
-};
+const navItems = [
+  { href: "/dashboard", label: "Dashboard", Icon: LayoutDashboard },
+  { href: "/chapters", label: "Chapters", Icon: Building2 },
+  { href: "/partners", label: "Partners", Icon: Handshake },
+  { href: "/projects", label: "Projects", Icon: FolderOpen },
+  { href: "/volunteers", label: "Volunteers", Icon: Users },
+];
 
-function NavItem({ href, label, icon, count }: NavItemProps) {
+function formatRole(role: string) {
+  return role
+    .toLowerCase()
+    .split("_")
+    .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+    .join(" ");
+}
+
+function getInitials(name: string): string {
+  const parts = name.trim().split(/\s+/);
+  if (parts.length >= 2)
+    return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+  return name.slice(0, 2).toUpperCase();
+}
+
+const navItemClass = (active: boolean) =>
+  cn(
+    "label flex items-center gap-2.5 rounded-[var(--radius-6)] px-3 py-2 transition-colors",
+    active
+      ? "bg-panel-highlight-1 text-blue-500"
+      : "text-gray-2 hover:bg-gray-5 hover:text-inverse"
+  );
+
+export function Sidebar({ userName, userRole }: SidebarProps) {
   const pathname = usePathname();
-  const isActive = pathname === href || pathname.startsWith(href + "/");
 
   return (
-    <Link
-      href={href}
-      className={cn(
-        "rounded-4 flex h-32 w-full cursor-default items-center gap-8 px-8 text-lg outline-none focus-visible:outline-2 focus-visible:outline-[var(--color-focus)]",
-        isActive
-          ? "bg-ghost-hover text-gray-1"
-          : "text-gray-2 hover:bg-ghost-hover"
-      )}
-    >
-      <span className="shrink-0">{icon}</span>
-      <span className="flex-1">{label}</span>
-      {count !== undefined && (
-        <span className="text-gray-3 tabular-nums">
-          {count.toLocaleString()}
-        </span>
-      )}
-    </Link>
-  );
-}
+    <aside className="border-separator bg-root sticky top-3 m-3 flex h-[calc(100vh-1.5rem)] w-64 shrink-0 flex-col rounded-xl border">
+      <div className="border-separator flex h-16 items-center border-b px-5">
+        <Link href="/dashboard">
+          <Image
+            src="/logo.svg"
+            alt="Hack4Impact"
+            width={120}
+            height={18}
+            className="logo-adaptive"
+          />
+        </Link>
+      </div>
 
-export function Sidebar() {
-  return (
-    <aside className="border-separator bg-panel flex h-full w-240 flex-none flex-col border-r">
-      <div className="flex flex-1 flex-col gap-24 p-12">
-        <UserMenu />
-        <nav aria-label="Main" className="space-y-2">
-          <NavItem
-            href="/dashboard"
-            label="Dashboard"
-            icon={<LayoutDashboard size={15} strokeWidth={1.5} />}
-          />
-          <NavItem
-            href="/chapters"
-            label="Chapters"
-            icon={<Building2 size={15} strokeWidth={1.5} />}
-          />
-          <NavItem
-            href="/partners"
-            label="Partners"
-            icon={<Handshake size={15} strokeWidth={1.5} />}
-          />
-          <NavItem
-            href="/projects"
-            label="Projects"
-            icon={<FolderOpen size={15} strokeWidth={1.5} />}
-          />
-          <NavItem
-            href="/volunteers"
-            label="Volunteers"
-            icon={<Users size={15} strokeWidth={1.5} />}
-          />
-        </nav>
+      <nav
+        aria-label="Main navigation"
+        className="flex flex-1 flex-col gap-0.5 p-3 pt-4"
+      >
+        {navItems.map(({ href, label, Icon }) => {
+          const active = pathname === href || pathname.startsWith(href + "/");
+          return (
+            <Link key={href} href={href} className={navItemClass(active)}>
+              <Icon size={14} strokeWidth={1.5} />
+              {label}
+            </Link>
+          );
+        })}
+      </nav>
+
+      <div className="border-separator flex flex-col gap-0.5 border-t p-3">
+        {userName && (
+          <div className="bg-panel mb-1 flex items-center gap-2.5 rounded-[var(--radius-6)] px-3 py-2.5">
+            <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-blue-500/10 font-mono text-[10px] font-semibold text-blue-500">
+              {getInitials(userName)}
+            </div>
+            <div className="min-w-0 flex-1">
+              <p className="label-xs text-inverse truncate">{userName}</p>
+              {userRole && (
+                <p className="label-xs text-gray-3 mt-0.5">
+                  {formatRole(userRole)}
+                </p>
+              )}
+            </div>
+          </div>
+        )}
+
+        <Link
+          href="/settings"
+          className={navItemClass(
+            pathname === "/settings" || pathname.startsWith("/settings/")
+          )}
+        >
+          <Settings size={14} strokeWidth={1.5} />
+          Settings
+        </Link>
+
+        <form action={credentialsSignOut}>
+          <button
+            type="submit"
+            className="label text-gray-2 hover:bg-gray-5 hover:text-inverse flex w-full cursor-pointer items-center gap-2.5 rounded-[var(--radius-6)] px-3 py-2 transition-colors"
+          >
+            <LogOut size={14} strokeWidth={1.5} />
+            Sign out
+          </button>
+        </form>
       </div>
     </aside>
   );

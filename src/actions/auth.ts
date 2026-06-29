@@ -38,7 +38,7 @@ const signUpSchema = z.object({
   employer: optionalString,
   birthYear: optionalYear,
   gender: optionalString,
-  raceEthnicity: optionalString,
+  ethnicity: optionalString,
   graduationYear: optionalYear,
   major: optionalString,
 })
@@ -70,7 +70,7 @@ export async function credentialsSignUp(formData: FormData) {
     employer: (formData.get('employer') ?? '') as string,
     birthYear: formData.get('birthYear') as string,
     gender: formData.get('gender') as string,
-    raceEthnicity: formData.get('raceEthnicity') as string,
+    ethnicity: formData.get('ethnicity') as string,
     graduationYear: formData.get('graduationYear') as string,
     major: formData.get('major') as string,
   })
@@ -90,7 +90,7 @@ export async function credentialsSignUp(formData: FormData) {
     employer,
     birthYear,
     gender,
-    raceEthnicity,
+    ethnicity,
     graduationYear,
     major,
   } = parsed.data
@@ -110,7 +110,7 @@ export async function credentialsSignUp(formData: FormData) {
       employer,
       birthYear,
       gender,
-      raceEthnicity,
+      ethnicity,
       graduationYear,
       major,
     },

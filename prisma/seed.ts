@@ -38,6 +38,7 @@ async function main() {
         volunteerType: user.volunteerType,
         startYear: user.startYear,
         employer: user.employer ?? null,
+        universityEmail: user.universityEmail ?? null,
         major: user.major ?? null,
         birthYear: user.birthYear,
         gender: user.gender,

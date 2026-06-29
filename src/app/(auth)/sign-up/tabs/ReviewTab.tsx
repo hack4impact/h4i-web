@@ -67,8 +67,8 @@ export function ReviewTab({ data, chapterOptions }: ReviewTabProps) {
           ? (['Birth year', get('birthYear')!] as [string, string])
           : null,
         get('gender') ? (['Gender', get('gender')!] as [string, string]) : null,
-        get('raceEthnicity')
-          ? (['Race & ethnicity', get('raceEthnicity')!] as [string, string])
+        get('ethnicity')
+          ? (['Ethnicity', get('ethnicity')!] as [string, string])
           : null,
       ].filter(Boolean) as [string, string][],
     },

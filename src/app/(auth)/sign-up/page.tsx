@@ -3,11 +3,6 @@ import { redirect } from 'next/navigation'
 import { AuthHeader } from '@/components/ui/AuthHeader'
 import { auth } from '@/lib/authn'
 import { db } from '@/lib/db'
-import {
-  GENDER_SUGGESTIONS,
-  MAJOR_SUGGESTIONS,
-  RACE_SUGGESTIONS,
-} from '@/lib/field-options'
 import { notionApi } from '@/lib/notion'
 
 import SignUpForm from './SignUpForm'
@@ -43,7 +38,7 @@ export default async function SignUpPage() {
         select: { value: true },
       }),
       db.optionList.findMany({
-        where: { field: 'race_ethnicity' },
+        where: { field: 'ethnicity' },
         orderBy: { order: 'asc' },
         select: { value: true },
       }),
@@ -54,20 +49,13 @@ export default async function SignUpPage() {
       <AuthHeader title='Volunteer Registration' />
       <SignUpForm
         chapters={chapters}
-        majorOptions={
-          majorRows.length > 0
-            ? majorRows.map((r) => r.value)
-            : MAJOR_SUGGESTIONS
-        }
+        majorOptions={majorRows.map((r) => r.value)}
         employerOptions={employerRows.map((r) => r.value)}
-        genderOptions={(genderRows.length > 0
-          ? genderRows.map((r) => r.value)
-          : GENDER_SUGGESTIONS
-        ).map((v) => ({ value: v, label: v }))}
-        raceOptions={(raceRows.length > 0
-          ? raceRows.map((r) => r.value)
-          : RACE_SUGGESTIONS
-        ).map((v) => ({ value: v, label: v }))}
+        genderOptions={genderRows.map((r) => ({
+          value: r.value,
+          label: r.value,
+        }))}
+        raceOptions={raceRows.map((r) => ({ value: r.value, label: r.value }))}
       />
     </main>
   )

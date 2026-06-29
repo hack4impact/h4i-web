@@ -46,8 +46,8 @@ export function BackgroundTab({
       </div>
 
       <SelectField
-        label='Race & ethnicity'
-        name='raceEthnicity'
+        label='Ethnicity'
+        name='ethnicity'
         options={raceOptions}
         placeholder='Select…'
         searchable

@@ -32,6 +32,7 @@ model User {
   volunteerType  VolunteerType?
   startYear      Int?
   employer       String?
+  universityEmail String?
 
   // Demographic (self-reported, optional)
   birthYear      Int?

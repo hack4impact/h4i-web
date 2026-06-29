@@ -41,7 +41,6 @@ export const COMPANY_SUGGESTIONS = [
   'VMware',
 ]
 
-// Order is meaningful — seeded and fetched with explicit order index.
 export const GENDER_SUGGESTIONS = [
   'Man',
   'Woman',
@@ -112,6 +111,7 @@ export const SEED_CHAPTERS: SeedChapter[] = [
 export type SeedUser = {
   name: string
   email: string
+  universityEmail?: string
   role: 'ADMIN' | 'CHAPTER_LEADER' | 'VOLUNTEER'
   chapterId?: string
   volunteerType: 'PROFESSIONAL' | 'STUDENT'
@@ -128,7 +128,8 @@ export const SEED_USERS: SeedUser[] = [
   // Boston University
   {
     name: 'Alex Chen',
-    email: 'alex.chen@bu.edu',
+    email: 'alex.chen@gmail.com',
+    universityEmail: 'alex.chen@bu.edu',
     role: 'CHAPTER_LEADER',
     chapterId: '27b197ab-f07b-8059-b6ea-cc0ac1ee9760',
     volunteerType: 'STUDENT',
@@ -141,7 +142,8 @@ export const SEED_USERS: SeedUser[] = [
   },
   {
     name: 'Priya Nair',
-    email: 'priya.nair@bu.edu',
+    email: 'priya.nair@gmail.com',
+    universityEmail: 'priya.nair@bu.edu',
     role: 'VOLUNTEER',
     chapterId: '27b197ab-f07b-8059-b6ea-cc0ac1ee9760',
     volunteerType: 'STUDENT',
@@ -154,7 +156,8 @@ export const SEED_USERS: SeedUser[] = [
   },
   {
     name: 'Jordan Taylor',
-    email: 'jordan.taylor@bu.edu',
+    email: 'jordan.taylor@gmail.com',
+    universityEmail: 'jordan.taylor@bu.edu',
     role: 'VOLUNTEER',
     chapterId: '27b197ab-f07b-8059-b6ea-cc0ac1ee9760',
     volunteerType: 'STUDENT',
@@ -169,7 +172,8 @@ export const SEED_USERS: SeedUser[] = [
   // Cal Poly, San Luis Obispo
   {
     name: 'Sofia Reyes',
-    email: 'sofia.reyes@calpoly.edu',
+    email: 'sofia.reyes@gmail.com',
+    universityEmail: 'sofia.reyes@calpoly.edu',
     role: 'CHAPTER_LEADER',
     chapterId: '27b197ab-f07b-80d3-95fa-deb14521cec4',
     volunteerType: 'PROFESSIONAL',
@@ -181,7 +185,8 @@ export const SEED_USERS: SeedUser[] = [
   },
   {
     name: 'Marcus Williams',
-    email: 'marcus.williams@calpoly.edu',
+    email: 'marcus.williams@gmail.com',
+    universityEmail: 'marcus.williams@calpoly.edu',
     role: 'VOLUNTEER',
     chapterId: '27b197ab-f07b-80d3-95fa-deb14521cec4',
     volunteerType: 'PROFESSIONAL',
@@ -193,7 +198,8 @@ export const SEED_USERS: SeedUser[] = [
   },
   {
     name: 'Aisha Okafor',
-    email: 'aisha.okafor@calpoly.edu',
+    email: 'aisha.okafor@gmail.com',
+    universityEmail: 'aisha.okafor@calpoly.edu',
     role: 'VOLUNTEER',
     chapterId: '27b197ab-f07b-80d3-95fa-deb14521cec4',
     volunteerType: 'STUDENT',
@@ -208,7 +214,8 @@ export const SEED_USERS: SeedUser[] = [
   // Carleton College
   {
     name: 'Liam Patel',
-    email: 'liam.patel@carleton.edu',
+    email: 'liam.patel@gmail.com',
+    universityEmail: 'liam.patel@carleton.edu',
     role: 'CHAPTER_LEADER',
     chapterId: '27c197ab-f07b-810c-ba5b-fe790d2bc238',
     volunteerType: 'PROFESSIONAL',
@@ -220,7 +227,8 @@ export const SEED_USERS: SeedUser[] = [
   },
   {
     name: 'Emma Nguyen',
-    email: 'emma.nguyen@carleton.edu',
+    email: 'emma.nguyen@gmail.com',
+    universityEmail: 'emma.nguyen@carleton.edu',
     role: 'VOLUNTEER',
     chapterId: '27c197ab-f07b-810c-ba5b-fe790d2bc238',
     volunteerType: 'STUDENT',
@@ -233,7 +241,8 @@ export const SEED_USERS: SeedUser[] = [
   },
   {
     name: 'Carlos Mendez',
-    email: 'carlos.mendez@carleton.edu',
+    email: 'carlos.mendez@gmail.com',
+    universityEmail: 'carlos.mendez@carleton.edu',
     role: 'VOLUNTEER',
     chapterId: '27c197ab-f07b-810c-ba5b-fe790d2bc238',
     volunteerType: 'STUDENT',
@@ -248,7 +257,8 @@ export const SEED_USERS: SeedUser[] = [
   // Cornell University
   {
     name: 'Yuna Kim',
-    email: 'yuna.kim@cornell.edu',
+    email: 'yuna.kim@gmail.com',
+    universityEmail: 'yuna.kim@cornell.edu',
     role: 'CHAPTER_LEADER',
     chapterId: '2a4197ab-f07b-800c-b8b3-f1117b029b2b',
     volunteerType: 'PROFESSIONAL',
@@ -260,7 +270,8 @@ export const SEED_USERS: SeedUser[] = [
   },
   {
     name: 'Darnell Brooks',
-    email: 'darnell.brooks@cornell.edu',
+    email: 'darnell.brooks@gmail.com',
+    universityEmail: 'darnell.brooks@cornell.edu',
     role: 'VOLUNTEER',
     chapterId: '2a4197ab-f07b-800c-b8b3-f1117b029b2b',
     volunteerType: 'STUDENT',
@@ -273,7 +284,8 @@ export const SEED_USERS: SeedUser[] = [
   },
   {
     name: 'Hannah Schultz',
-    email: 'hannah.schultz@cornell.edu',
+    email: 'hannah.schultz@gmail.com',
+    universityEmail: 'hannah.schultz@cornell.edu',
     role: 'VOLUNTEER',
     chapterId: '2a4197ab-f07b-800c-b8b3-f1117b029b2b',
     volunteerType: 'PROFESSIONAL',
@@ -287,7 +299,8 @@ export const SEED_USERS: SeedUser[] = [
   // University of Illinois, Urbana-Champaign
   {
     name: 'Ravi Sharma',
-    email: 'ravi.sharma@illinois.edu',
+    email: 'ravi.sharma@gmail.com',
+    universityEmail: 'ravi.sharma@illinois.edu',
     role: 'CHAPTER_LEADER',
     chapterId: '2a4197ab-f07b-801e-b8c7-d2b09c7f0360',
     volunteerType: 'PROFESSIONAL',
@@ -299,7 +312,8 @@ export const SEED_USERS: SeedUser[] = [
   },
   {
     name: 'Fatima Al-Hassan',
-    email: 'fatima.alhassan@illinois.edu',
+    email: 'fatima.alhassan@gmail.com',
+    universityEmail: 'fatima.alhassan@illinois.edu',
     role: 'VOLUNTEER',
     chapterId: '2a4197ab-f07b-801e-b8c7-d2b09c7f0360',
     volunteerType: 'STUDENT',
@@ -312,7 +326,8 @@ export const SEED_USERS: SeedUser[] = [
   },
   {
     name: 'Tyler Johnson',
-    email: 'tyler.johnson@illinois.edu',
+    email: 'tyler.johnson@gmail.com',
+    universityEmail: 'tyler.johnson@illinois.edu',
     role: 'VOLUNTEER',
     chapterId: '2a4197ab-f07b-801e-b8c7-d2b09c7f0360',
     volunteerType: 'STUDENT',
@@ -327,7 +342,8 @@ export const SEED_USERS: SeedUser[] = [
   // Georgia Tech
   {
     name: 'Naomi Park',
-    email: 'naomi.park@gatech.edu',
+    email: 'naomi.park@gmail.com',
+    universityEmail: 'naomi.park@gatech.edu',
     role: 'CHAPTER_LEADER',
     chapterId: '2a4197ab-f07b-8028-8cfd-e68a2979b830',
     volunteerType: 'PROFESSIONAL',
@@ -339,7 +355,8 @@ export const SEED_USERS: SeedUser[] = [
   },
   {
     name: 'Ethan Rivera',
-    email: 'ethan.rivera@gatech.edu',
+    email: 'ethan.rivera@gmail.com',
+    universityEmail: 'ethan.rivera@gatech.edu',
     role: 'VOLUNTEER',
     chapterId: '2a4197ab-f07b-8028-8cfd-e68a2979b830',
     volunteerType: 'STUDENT',
@@ -352,7 +369,8 @@ export const SEED_USERS: SeedUser[] = [
   },
   {
     name: 'Zoe Washington',
-    email: 'zoe.washington@gatech.edu',
+    email: 'zoe.washington@gmail.com',
+    universityEmail: 'zoe.washington@gatech.edu',
     role: 'VOLUNTEER',
     chapterId: '2a4197ab-f07b-8028-8cfd-e68a2979b830',
     volunteerType: 'STUDENT',
@@ -367,7 +385,8 @@ export const SEED_USERS: SeedUser[] = [
   // McGill University
   {
     name: 'Lucas Tremblay',
-    email: 'lucas.tremblay@mcgill.ca',
+    email: 'lucas.tremblay@gmail.com',
+    universityEmail: 'lucas.tremblay@mcgill.ca',
     role: 'CHAPTER_LEADER',
     chapterId: '2a4197ab-f07b-803a-b70a-da3c36d38a34',
     volunteerType: 'PROFESSIONAL',
@@ -379,7 +398,8 @@ export const SEED_USERS: SeedUser[] = [
   },
   {
     name: 'Mei Lin',
-    email: 'mei.lin@mcgill.ca',
+    email: 'mei.lin@gmail.com',
+    universityEmail: 'mei.lin@mcgill.ca',
     role: 'VOLUNTEER',
     chapterId: '2a4197ab-f07b-803a-b70a-da3c36d38a34',
     volunteerType: 'STUDENT',
@@ -392,7 +412,8 @@ export const SEED_USERS: SeedUser[] = [
   },
   {
     name: 'Omar Khalil',
-    email: 'omar.khalil@mcgill.ca',
+    email: 'omar.khalil@gmail.com',
+    universityEmail: 'omar.khalil@mcgill.ca',
     role: 'VOLUNTEER',
     chapterId: '2a4197ab-f07b-803a-b70a-da3c36d38a34',
     volunteerType: 'STUDENT',
@@ -407,7 +428,8 @@ export const SEED_USERS: SeedUser[] = [
   // University of Tennessee, Knoxville
   {
     name: 'Jade Morrison',
-    email: 'jade.morrison@utk.edu',
+    email: 'jade.morrison@gmail.com',
+    universityEmail: 'jade.morrison@utk.edu',
     role: 'CHAPTER_LEADER',
     chapterId: '2a4197ab-f07b-808a-9cac-ecace4c25575',
     volunteerType: 'PROFESSIONAL',
@@ -419,7 +441,8 @@ export const SEED_USERS: SeedUser[] = [
   },
   {
     name: 'Aaron Wells',
-    email: 'aaron.wells@utk.edu',
+    email: 'aaron.wells@gmail.com',
+    universityEmail: 'aaron.wells@utk.edu',
     role: 'VOLUNTEER',
     chapterId: '2a4197ab-f07b-808a-9cac-ecace4c25575',
     volunteerType: 'STUDENT',
@@ -432,7 +455,8 @@ export const SEED_USERS: SeedUser[] = [
   },
   {
     name: 'Isabella Cruz',
-    email: 'isabella.cruz@utk.edu',
+    email: 'isabella.cruz@gmail.com',
+    universityEmail: 'isabella.cruz@utk.edu',
     role: 'VOLUNTEER',
     chapterId: '2a4197ab-f07b-808a-9cac-ecace4c25575',
     volunteerType: 'STUDENT',
@@ -447,7 +471,8 @@ export const SEED_USERS: SeedUser[] = [
   // University of Pennsylvania
   {
     name: 'Ben Carter',
-    email: 'ben.carter@upenn.edu',
+    email: 'ben.carter@gmail.com',
+    universityEmail: 'ben.carter@upenn.edu',
     role: 'CHAPTER_LEADER',
     chapterId: '2a4197ab-f07b-80b5-9007-cc351d70305f',
     volunteerType: 'PROFESSIONAL',
@@ -459,7 +484,8 @@ export const SEED_USERS: SeedUser[] = [
   },
   {
     name: 'Nina Osei',
-    email: 'nina.osei@upenn.edu',
+    email: 'nina.osei@gmail.com',
+    universityEmail: 'nina.osei@upenn.edu',
     role: 'VOLUNTEER',
     chapterId: '2a4197ab-f07b-80b5-9007-cc351d70305f',
     volunteerType: 'STUDENT',
@@ -472,7 +498,8 @@ export const SEED_USERS: SeedUser[] = [
   },
   {
     name: 'Kevin Li',
-    email: 'kevin.li@upenn.edu',
+    email: 'kevin.li@gmail.com',
+    universityEmail: 'kevin.li@upenn.edu',
     role: 'VOLUNTEER',
     chapterId: '2a4197ab-f07b-80b5-9007-cc351d70305f',
     volunteerType: 'STUDENT',
@@ -487,7 +514,8 @@ export const SEED_USERS: SeedUser[] = [
   // Rutgers University, New Brunswick
   {
     name: 'Amara Diallo',
-    email: 'amara.diallo@rutgers.edu',
+    email: 'amara.diallo@gmail.com',
+    universityEmail: 'amara.diallo@rutgers.edu',
     role: 'CHAPTER_LEADER',
     chapterId: '2a4197ab-f07b-80bf-b117-d3833f021606',
     volunteerType: 'PROFESSIONAL',
@@ -499,7 +527,8 @@ export const SEED_USERS: SeedUser[] = [
   },
   {
     name: 'Sam Peterson',
-    email: 'sam.peterson@rutgers.edu',
+    email: 'sam.peterson@gmail.com',
+    universityEmail: 'sam.peterson@rutgers.edu',
     role: 'VOLUNTEER',
     chapterId: '2a4197ab-f07b-80bf-b117-d3833f021606',
     volunteerType: 'STUDENT',
@@ -512,7 +541,8 @@ export const SEED_USERS: SeedUser[] = [
   },
   {
     name: 'Raj Iyer',
-    email: 'raj.iyer@rutgers.edu',
+    email: 'raj.iyer@gmail.com',
+    universityEmail: 'raj.iyer@rutgers.edu',
     role: 'VOLUNTEER',
     chapterId: '2a4197ab-f07b-80bf-b117-d3833f021606',
     volunteerType: 'STUDENT',
@@ -527,7 +557,8 @@ export const SEED_USERS: SeedUser[] = [
   // University of Maryland, College Park
   {
     name: 'Diana Flores',
-    email: 'diana.flores@umd.edu',
+    email: 'diana.flores@gmail.com',
+    universityEmail: 'diana.flores@umd.edu',
     role: 'CHAPTER_LEADER',
     chapterId: '2a4197ab-f07b-80c9-b673-c7b95e00d23f',
     volunteerType: 'PROFESSIONAL',
@@ -539,7 +570,8 @@ export const SEED_USERS: SeedUser[] = [
   },
   {
     name: "James O'Brien",
-    email: 'james.obrien@umd.edu',
+    email: 'james.obrien@gmail.com',
+    universityEmail: 'james.obrien@umd.edu',
     role: 'VOLUNTEER',
     chapterId: '2a4197ab-f07b-80c9-b673-c7b95e00d23f',
     volunteerType: 'STUDENT',
@@ -552,7 +584,8 @@ export const SEED_USERS: SeedUser[] = [
   },
   {
     name: 'Tanya Brown',
-    email: 'tanya.brown@umd.edu',
+    email: 'tanya.brown@gmail.com',
+    universityEmail: 'tanya.brown@umd.edu',
     role: 'VOLUNTEER',
     chapterId: '2a4197ab-f07b-80c9-b673-c7b95e00d23f',
     volunteerType: 'STUDENT',
@@ -567,7 +600,8 @@ export const SEED_USERS: SeedUser[] = [
   // Emory University
   {
     name: 'Chris Nakamura',
-    email: 'chris.nakamura@emory.edu',
+    email: 'chris.nakamura@gmail.com',
+    universityEmail: 'chris.nakamura@emory.edu',
     role: 'CHAPTER_LEADER',
     chapterId: '2a4197ab-f07b-80cd-96bb-f5220c2dd9a3',
     volunteerType: 'PROFESSIONAL',
@@ -579,7 +613,8 @@ export const SEED_USERS: SeedUser[] = [
   },
   {
     name: 'Leila Hassan',
-    email: 'leila.hassan@emory.edu',
+    email: 'leila.hassan@gmail.com',
+    universityEmail: 'leila.hassan@emory.edu',
     role: 'VOLUNTEER',
     chapterId: '2a4197ab-f07b-80cd-96bb-f5220c2dd9a3',
     volunteerType: 'STUDENT',
@@ -592,7 +627,8 @@ export const SEED_USERS: SeedUser[] = [
   },
   {
     name: 'David Park',
-    email: 'david.park@emory.edu',
+    email: 'david.park@gmail.com',
+    universityEmail: 'david.park@emory.edu',
     role: 'VOLUNTEER',
     chapterId: '2a4197ab-f07b-80cd-96bb-f5220c2dd9a3',
     volunteerType: 'STUDENT',
@@ -607,7 +643,8 @@ export const SEED_USERS: SeedUser[] = [
   // Drexel University
   {
     name: 'Rachel Kim',
-    email: 'rachel.kim@drexel.edu',
+    email: 'rachel.kim@gmail.com',
+    universityEmail: 'rachel.kim@drexel.edu',
     role: 'CHAPTER_LEADER',
     chapterId: '2a4197ab-f07b-80e4-8938-d890d28e15fd',
     volunteerType: 'PROFESSIONAL',
@@ -619,7 +656,8 @@ export const SEED_USERS: SeedUser[] = [
   },
   {
     name: 'Marcus Thompson',
-    email: 'marcus.thompson@drexel.edu',
+    email: 'marcus.thompson@gmail.com',
+    universityEmail: 'marcus.thompson@drexel.edu',
     role: 'VOLUNTEER',
     chapterId: '2a4197ab-f07b-80e4-8938-d890d28e15fd',
     volunteerType: 'STUDENT',
@@ -632,7 +670,8 @@ export const SEED_USERS: SeedUser[] = [
   },
   {
     name: 'Sophia Greco',
-    email: 'sophia.greco@drexel.edu',
+    email: 'sophia.greco@gmail.com',
+    universityEmail: 'sophia.greco@drexel.edu',
     role: 'VOLUNTEER',
     chapterId: '2a4197ab-f07b-80e4-8938-d890d28e15fd',
     volunteerType: 'STUDENT',

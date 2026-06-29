@@ -37,10 +37,11 @@ export function AdminDataSection({
   }
 
   return (
-    <div className='mt-8'>
+    <div className='mt-8 flex flex-1 flex-col overflow-hidden'>
       <h2 className='label text-gray-2 mb-3'>Database</h2>
-      <div className='border-separator bg-panel overflow-hidden rounded-xl border'>
+      <div className='border-separator bg-panel flex flex-1 flex-col overflow-hidden rounded-xl border'>
         <Tabs.Root
+          className='flex flex-1 flex-col overflow-hidden'
           value={active}
           onValueChange={(val) => setActive(val as TabName)}
         >
@@ -71,21 +72,21 @@ export function AdminDataSection({
             ))}
           </Tabs.List>
 
-          <Tabs.Panel value='Users' className='p-0'>
+          <Tabs.Panel value='Users' className='flex-1 overflow-hidden p-0'>
             <DataTable
               columns={USER_COLUMNS}
               data={users}
               emptyMessage='No users found.'
             />
           </Tabs.Panel>
-          <Tabs.Panel value='Accounts' className='p-0'>
+          <Tabs.Panel value='Accounts' className='flex-1 overflow-hidden p-0'>
             <DataTable
               columns={ACCOUNT_COLUMNS}
               data={accounts}
               emptyMessage='No accounts found.'
             />
           </Tabs.Panel>
-          <Tabs.Panel value='Options' className='p-0'>
+          <Tabs.Panel value='Options' className='flex-1 overflow-hidden p-0'>
             <DataTable
               columns={OPTION_COLUMNS}
               data={options}

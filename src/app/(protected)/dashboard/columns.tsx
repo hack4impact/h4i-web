@@ -1,5 +1,3 @@
-'use client'
-
 import type { ColumnDef } from '@/components/ui/DataTable'
 
 export type UserRow = {
@@ -15,7 +13,7 @@ export type UserRow = {
   employer: string | null
   birthYear: number | null
   gender: string | null
-  raceEthnicity: string | null
+  ethnicity: string | null
   graduationYear: number | null
   major: string | null
   createdAt: Date
@@ -98,9 +96,9 @@ export const USER_COLUMNS: ColumnDef<UserRow>[] = [
     cell: ({ row }) => row.original.gender ?? '—',
   },
   {
-    accessorKey: 'raceEthnicity',
-    header: 'Race / Ethnicity',
-    cell: ({ row }) => row.original.raceEthnicity ?? '—',
+    accessorKey: 'ethnicity',
+    header: 'Ethnicity',
+    cell: ({ row }) => row.original.ethnicity ?? '—',
   },
   {
     accessorKey: 'graduationYear',

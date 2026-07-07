@@ -26,7 +26,7 @@
     "@contentful/rich-text-react-renderer": "^16.2.1",
     "@contentful/rich-text-types": "^17.2.7",
     "@notionhq/client": "^5.22.0",
-    "@paper-design/shaders-react": "^0.0.76",
+    "@paper-design/shaders-react": "^0.0.77",
     "@prisma/adapter-pg": "^7.8.0",
     "@prisma/client": "^7.8.0",
     "@tanstack/react-table": "^8.21.3",
@@ -36,7 +36,7 @@
     "contentful": "^11.12.6",
     "lucide-react": "^1.23.0",
     "motion": "^12.42.2",
-    "next": "16.2.7",
+    "next": "16.2.10",
     "next-auth": "5.0.0-beta.30",
     "pg": "^8.22.0",
     "prisma": "^7.8.0",
@@ -48,25 +48,15 @@
   "lint-staged": {
     "*.{ts,tsx,js,jsx,json,css,md}": "prettier --write"
   },
-  "pnpm": {
-    "onlyBuiltDependencies": [
-      "@prisma/engines",
-      "prisma"
-    ],
-    "ignoredBuiltDependencies": [
-      "sharp",
-      "unrs-resolver"
-    ]
-  },
   "devDependencies": {
     "@ianvs/prettier-plugin-sort-imports": "^4.7.1",
     "@tailwindcss/postcss": "^4.3.2",
-    "@types/node": "^25.9.4",
+    "@types/node": "^26.1.0",
     "@types/pg": "^8.20.0",
     "@types/react": "^19.2.17",
     "@types/react-dom": "^19.2.3",
     "eslint": "^10.6.0",
-    "eslint-config-next": "16.2.7",
+    "eslint-config-next": "16.2.10",
     "eslint-config-prettier": "^10.1.8",
     "husky": "^9.1.7",
     "lint-staged": "^17.0.8",

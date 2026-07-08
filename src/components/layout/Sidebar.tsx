@@ -14,7 +14,7 @@ import {
   Users,
 } from 'lucide-react'
 
-import { credentialsSignOut } from '@/actions/auth'
+import { handleSignOut } from '@/actions/auth'
 import { cn } from '@/lib/utils'
 
 interface SidebarProps {
@@ -112,7 +112,7 @@ export function Sidebar({ userName, userRole }: SidebarProps) {
           Settings
         </Link>
 
-        <form action={credentialsSignOut}>
+        <form action={handleSignOut}>
           <button
             type='submit'
             className='label text-gray-2 hover:bg-gray-5 hover:text-inverse flex w-full cursor-pointer items-center gap-2.5 rounded-[var(--radius-6)] px-3 py-2 transition-colors'

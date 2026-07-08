@@ -1,8 +1,5 @@
-export default async function ChapterPage({
-  params,
-}: {
-  params: Promise<{ id: string }>
-}) {
-  const { id } = await params
-  return <div>TODO: Chapter {id}</div>
+type Props = { params: Promise<{ id: string }> }
+
+export default async function ChapterPage(_props: Props) {
+  return <main />
 }

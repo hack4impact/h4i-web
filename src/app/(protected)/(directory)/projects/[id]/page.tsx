@@ -1,8 +1,5 @@
-export default async function ProjectPage({
-  params,
-}: {
-  params: Promise<{ id: string }>
-}) {
-  const { id } = await params
-  return <div>TODO: Project {id}</div>
+type Props = { params: Promise<{ id: string }> }
+
+export default async function ProjectPage(_props: Props) {
+  return <main />
 }

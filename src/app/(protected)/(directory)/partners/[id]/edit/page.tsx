@@ -1,8 +1,5 @@
-export default async function EditPartnerPage({
-  params,
-}: {
-  params: Promise<{ id: string }>
-}) {
-  const { id } = await params
-  return <div>TODO: Edit Partner {id}</div>
+type Props = { params: Promise<{ id: string }> }
+
+export default async function EditPartnerPage(_props: Props) {
+  return <main />
 }

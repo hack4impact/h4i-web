@@ -7,19 +7,28 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "lint:fix": "eslint --fix",
-    "format": "prettier --write .",
-    "format:check": "prettier --check .",
+    "lint:fix": "eslint src --fix",
+    "format": "prettier --write src",
+    "format:check": "prettier --check src",
     "typecheck": "tsc --noEmit",
+    "db:generate": "prisma generate",
     "db:dev:up": "docker-compose --env-file .env.local up -d dev-db",
     "db:dev:down": "docker-compose --env-file .env.local down dev-db",
-    "db:generate": "prisma generate",
-    "db:migrate": "prisma migrate dev",
-    "db:deploy": "prisma migrate deploy",
-    "db:seed": "prisma db seed",
     "db:studio": "prisma studio",
+    "db:migrate": "prisma migrate dev",
+    "db:seed": "prisma db seed",
+    "db:deploy": "prisma migrate deploy",
     "db:reset": "prisma migrate reset",
     "prepare": "husky"
+  },
+  "lint-staged": {
+    "*.{ts,tsx,js,jsx,json,css,md}": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "*.json": [
+      "prettier --write"
+    ]
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.11.2",
@@ -44,9 +53,6 @@
     "react-dom": "19.2.7",
     "tailwind-merge": "^3.6.0",
     "zod": "^4.4.3"
-  },
-  "lint-staged": {
-    "*.{ts,tsx,js,jsx,json,css,md}": "prettier --write"
   },
   "devDependencies": {
     "@ianvs/prettier-plugin-sort-imports": "^4.7.1",

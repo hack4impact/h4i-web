@@ -6,7 +6,7 @@ import Link from 'next/link'
 
 import { Form } from '@base-ui/react/form'
 
-import { credentialsSignUp } from '@/actions/auth'
+import { signUpAndSendMagicLink } from '@/actions/auth'
 import { Button } from '@/components/ui/Button'
 import { type SelectOption } from '@/components/ui/Select'
 import { cn } from '@/lib/utils'
@@ -38,11 +38,10 @@ const STEPS = [
   { label: 'Review' },
 ]
 
-async function action(
-  _: { error: string } | null,
-  fd: FormData,
-): Promise<{ error: string } | null> {
-  return (await credentialsSignUp(fd)) ?? null
+type ActionState = { error: string } | { success: true } | null
+
+async function action(_: ActionState, fd: FormData): Promise<ActionState> {
+  return (await signUpAndSendMagicLink(fd)) ?? null
 }
 
 function WizardProgress({
@@ -118,6 +117,18 @@ export default function SignUpForm({
   }
 
   const isLastStep = currentStep === STEPS.length - 1
+
+  if (state && 'success' in state) {
+    return (
+      <div className='w-full max-w-[460px] px-4 text-center'>
+        <p className='label text-inverse'>Check your email</p>
+        <p className='label-xs text-gray-3 mt-1'>
+          We sent a sign-in link to your inbox. Click it to complete your
+          registration.
+        </p>
+      </div>
+    )
+  }
 
   return (
     <div className='w-full max-w-[460px] px-4'>

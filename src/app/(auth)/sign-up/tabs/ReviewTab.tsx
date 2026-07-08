@@ -26,7 +26,6 @@ export function ReviewTab({ data, chapterOptions }: ReviewTabProps) {
       rows: [
         ['Name', `${get('firstName') ?? ''} ${get('lastName') ?? ''}`.trim()],
         ['Email', get('email') ?? ''],
-        ['Password', '••••••••'],
       ].filter(([, v]) => v) as [string, string][],
     },
     {

@@ -15,12 +15,6 @@ function validateEmail(value: unknown): string | null {
   return null
 }
 
-function validatePassword(value: unknown): string | null {
-  const pw = String(value ?? '')
-  if (pw.length > 0 && pw.length < 8) return 'Must be at least 8 characters'
-  return null
-}
-
 export function AccountTab() {
   return (
     <>
@@ -51,16 +45,6 @@ export function AccountTab() {
         placeholder='you@example.com'
         required
         validate={validateEmail}
-      />
-
-      <TextField
-        label='Password'
-        name='password'
-        type='password'
-        autoComplete='new-password'
-        placeholder='Min. 8 characters'
-        required
-        validate={validatePassword}
       />
     </>
   )

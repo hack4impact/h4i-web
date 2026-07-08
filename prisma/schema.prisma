@@ -24,7 +24,6 @@ model User {
   email         String         @unique
   emailVerified DateTime?
   image         String?
-  password      String?
   role          Role           @default(VOLUNTEER)
   chapterId     String?
 

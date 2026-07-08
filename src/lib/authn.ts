@@ -1,10 +1,8 @@
 import NextAuth from 'next-auth'
-import Credentials from 'next-auth/providers/credentials'
+import Email from 'next-auth/providers/email'
 import Google from 'next-auth/providers/google'
 
 import { PrismaAdapter } from '@auth/prisma-adapter'
-import bcrypt from 'bcryptjs'
-import { z } from 'zod'
 
 import { authConfig } from '@/lib/authn.config'
 import { db } from '@/lib/db'
@@ -15,35 +13,9 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   adapter: PrismaAdapter(db as any),
   providers: [
-    Credentials({
-      credentials: {
-        email: { label: 'Email', type: 'email' },
-        password: { label: 'Password', type: 'password' },
-      },
-      async authorize(credentials) {
-        const parsed = z
-          .object({ email: z.email(), password: z.string().min(1) })
-          .safeParse(credentials)
-
-        if (!parsed.success) return null
-
-        const user = await db.user.findUnique({
-          where: { email: parsed.data.email },
-        })
-
-        if (!user?.password) return null
-
-        const valid = await bcrypt.compare(parsed.data.password, user.password)
-        if (!valid) return null
-
-        return {
-          id: user.id,
-          name: user.name,
-          email: user.email,
-          role: user.role as AppRole,
-          chapterId: user.chapterId,
-        }
-      },
+    Email({
+      server: process.env.EMAIL_SERVER,
+      from: process.env.EMAIL_FROM ?? 'no-reply@hack4impact.org',
     }),
     ...(process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET
       ? [
@@ -65,8 +37,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         token.role = user.role
         token.chapterId = user.chapterId
 
-        // OAuth sign-ins: role/chapterId may not be on the user object —
-        // fetch from DB to pick up the persisted defaults.
+        // Magic link / OAuth sign-ins: role/chapterId may not be on the user
+        // object — fetch from DB to pick up the persisted defaults.
         if (!token.role && user.id) {
           const dbUser = await db.user.findUnique({
             where: { id: user.id },

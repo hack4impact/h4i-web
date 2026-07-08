@@ -2,7 +2,6 @@
 
 import { AuthError } from 'next-auth'
 
-import bcrypt from 'bcryptjs'
 import { z } from 'zod'
 
 import { signIn, signOut } from '@/lib/authn'
@@ -28,7 +27,6 @@ const signUpSchema = z.object({
       (e) => !e.toLowerCase().endsWith('.edu'),
       'Please use a personal email address, not a .edu address.',
     ),
-  password: z.string().min(8, 'Password must be at least 8 characters.'),
   chapterId: z
     .string()
     .optional()
@@ -43,27 +41,30 @@ const signUpSchema = z.object({
   major: optionalString,
 })
 
-export async function credentialsSignIn(formData: FormData) {
+type ActionResult = { error: string } | { success: true } | null
+
+export async function sendMagicLink(formData: FormData): Promise<ActionResult> {
+  const email = (formData.get('email') as string)?.trim().toLowerCase()
+  const parsed = z.email('Enter a valid email address.').safeParse(email)
+  if (!parsed.success) return { error: parsed.error.issues[0].message }
+
   try {
-    await signIn('credentials', {
-      email: formData.get('email') as string,
-      password: formData.get('password') as string,
-      redirectTo: '/dashboard',
-    })
+    await signIn('email', { email: parsed.data, redirect: false })
+    return { success: true }
   } catch (error) {
-    if (error instanceof AuthError) {
-      return { error: 'Invalid email or password.' }
-    }
-    throw error // re-throw redirect
+    if (error instanceof AuthError)
+      return { error: 'Failed to send sign-in link.' }
+    throw error
   }
 }
 
-export async function credentialsSignUp(formData: FormData) {
+export async function signUpAndSendMagicLink(
+  formData: FormData,
+): Promise<ActionResult> {
   const parsed = signUpSchema.safeParse({
     firstName: (formData.get('firstName') as string)?.trim(),
     lastName: (formData.get('lastName') as string)?.trim(),
     email: (formData.get('email') as string)?.trim().toLowerCase(),
-    password: formData.get('password'),
     chapterId: (formData.get('chapterId') ?? '') as string,
     volunteerType: formData.get('volunteerType') as string,
     startYear: formData.get('startYear') as string,
@@ -83,7 +84,6 @@ export async function credentialsSignUp(formData: FormData) {
     firstName,
     lastName,
     email,
-    password,
     chapterId,
     volunteerType,
     startYear,
@@ -98,12 +98,10 @@ export async function credentialsSignUp(formData: FormData) {
   const existing = await db.user.findUnique({ where: { email } })
   if (existing) return { error: 'An account with that email already exists.' }
 
-  const hashed = await bcrypt.hash(password, 12)
   await db.user.create({
     data: {
       name: `${firstName} ${lastName}`,
       email,
-      password: hashed,
       chapterId,
       volunteerType,
       startYear,
@@ -117,15 +115,19 @@ export async function credentialsSignUp(formData: FormData) {
   })
 
   try {
-    await signIn('credentials', { email, password, redirectTo: '/dashboard' })
+    await signIn('email', { email, redirect: false })
+    return { success: true }
   } catch (error) {
     if (error instanceof AuthError) {
-      return { error: 'Account created but sign-in failed. Please sign in.' }
+      return {
+        error:
+          'Account created but we could not send a sign-in link. Try signing in.',
+      }
     }
     throw error
   }
 }
 
-export async function credentialsSignOut() {
+export async function handleSignOut() {
   await signOut({ redirectTo: '/sign-in' })
 }

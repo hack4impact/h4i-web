@@ -1,7 +1,5 @@
 @import 'tailwindcss';
 
-@custom-variant dark (&:where(.dark, .dark *));
-
 @theme {
   --font-sans: var(--font-inclusive-sans), system-ui, sans-serif;
   --font-serif: var(--font-newsreader), system-serif, serif;
@@ -80,20 +78,20 @@
   --radius-6: 6px;
 
   /* Surfaces */
-  --color-root: light-dark(#fff, #111111);
-  --color-panel: light-dark(#f7f9fc, #181818);
-  --color-panel-highlight-1: light-dark(#edf4fd, #191b25);
-  --color-panel-highlight-2: light-dark(#e5edf8, #202633);
-  --color-panel-header: light-dark(#f2f6fc, #13171f);
-  --color-canvas: light-dark(#eef2f8, #11141b);
+  --color-root: #fff;
+  --color-panel: #f7f9fc;
+  --color-panel-highlight-1: #edf4fd;
+  --color-panel-highlight-2: #e5edf8;
+  --color-panel-header: #f2f6fc;
+  --color-canvas: #eef2f8;
 
   /* Neutral grays */
-  --color-gray-1: light-dark(rgb(0 0 0 / 0.85), rgb(255 255 255 / 0.9));
-  --color-gray-2: light-dark(rgb(0 0 0 / 0.6), rgb(255 255 255 / 0.65));
-  --color-gray-3: light-dark(rgb(0 0 0 / 0.5), rgb(255 255 255 / 0.5));
-  --color-gray-4: light-dark(rgb(0 0 0 / 0.4), rgb(255 255 255 / 0.4));
-  --color-gray-5: light-dark(rgb(0 0 0 / 0.1), rgb(255 255 255 / 0.1));
-  --color-inverse: light-dark(#10100f, #f5f5f3);
+  --color-gray-1: rgb(0 0 0 / 0.85);
+  --color-gray-2: rgb(0 0 0 / 0.6);
+  --color-gray-3: rgb(0 0 0 / 0.5);
+  --color-gray-4: rgb(0 0 0 / 0.4);
+  --color-gray-5: rgb(0 0 0 / 0.1);
+  --color-inverse: #10100f;
 
   /* Type scale */
   --text-sm: 0.875rem;
@@ -117,9 +115,9 @@
   --leading-3xl: 1.3;
 
   /* Structural */
-  --color-separator: light-dark(#e8e8e4, #252525);
-  --color-drop-indicator: light-dark(#333, #eee);
-  --color-checkbox-outline: light-dark(#dddddd, #474747);
+  --color-separator: #e8e8e4;
+  --color-drop-indicator: #333;
+  --color-checkbox-outline: #dddddd;
 }
 
 @keyframes select-popup-in {
@@ -146,7 +144,6 @@
 
 @layer base {
   :root {
-    color-scheme: light;
     --header-height: 64px; /* py-4 (32px) + 32px logomark */
   }
 
@@ -154,10 +151,6 @@
     :root {
       --header-height: 72px; /* py-4 (32px) + 40px logo */
     }
-  }
-
-  html.dark {
-    color-scheme: dark;
   }
 
   *,
@@ -227,7 +220,7 @@
 
   /* Heading  */
 
-  /* h1 page titles (WorkHeader, GetInvolvedHeader, StepsList) */
+  /* h1 page titles */
   .heading-display {
     font-family: var(--font-serif);
     font-size: 40px;
@@ -237,7 +230,7 @@
     color: var(--color-inverse);
   }
 
-  /*  h2 section headings (TabbedCards) */
+  /* h2 section headings */
   .heading-section {
     font-family: var(--font-serif);
     font-size: 32px;
@@ -265,7 +258,7 @@
     color: var(--color-inverse);
   }
 
-  /* numeric stat values (StatBar) */
+  /* numeric stat values */
   .heading-stat {
     font-family: var(--font-serif);
     font-size: 32px;
@@ -305,7 +298,6 @@
     display: flex;
     cursor: pointer;
     align-items: center;
-    /* mx + border-radius give the pill shape on highlight */
     padding: 0.4375rem 0.625rem;
     margin: 2px 6px;
     border-radius: 5px;
@@ -358,12 +350,12 @@
     animation: select-popup-out 120ms ease-in both;
   }
 
-  /* Section header gradients — bottom-left origin (WorkHeader) */
+  /* Section header gradients — bottom-left origin */
   .gradient-bl-blue {
     background-color: var(--color-root);
     background-image: radial-gradient(
       circle farthest-corner at 0% 110% in oklab,
-      light-dark(var(--color-blue-50), oklch(22% 0.04 255)) 0%,
+      var(--color-blue-50) 0%,
       transparent 60%
     );
     background-origin: border-box;
@@ -373,7 +365,7 @@
     background-color: var(--color-root);
     background-image: radial-gradient(
       circle farthest-corner at 0% 110% in oklab,
-      light-dark(var(--color-green-50), oklch(22% 0.04 140)) 0%,
+      var(--color-green-50) 0%,
       transparent 60%
     );
     background-origin: border-box;
@@ -383,17 +375,17 @@
     background-color: var(--color-root);
     background-image: radial-gradient(
       circle farthest-corner at 0% 110% in oklab,
-      light-dark(var(--color-purple-50), oklch(22% 0.04 285)) 0%,
+      var(--color-purple-50) 0%,
       transparent 60%
     );
     background-origin: border-box;
   }
 
-  /* Section header gradients — top-right origin (GetInvolvedHeader) */
+  /* Section header gradients — top-right origin */
   .gradient-tr-blue {
     background-image: radial-gradient(
       circle farthest-corner at 100% 0% in oklab,
-      light-dark(var(--color-blue-50), oklch(22% 0.04 255)) 0%,
+      var(--color-blue-50) 0%,
       transparent 60%
     );
   }
@@ -401,7 +393,7 @@
   .gradient-tr-green {
     background-image: radial-gradient(
       circle farthest-corner at 100% 0% in oklab,
-      light-dark(var(--color-green-50), oklch(22% 0.04 140)) 0%,
+      var(--color-green-50) 0%,
       transparent 60%
     );
   }
@@ -409,7 +401,7 @@
   .gradient-tr-purple {
     background-image: radial-gradient(
       circle farthest-corner at 100% 0% in oklab,
-      light-dark(var(--color-purple-50), oklch(22% 0.04 285)) 0%,
+      var(--color-purple-50) 0%,
       transparent 60%
     );
   }
@@ -417,7 +409,7 @@
   .gradient-tr-orange {
     background-image: radial-gradient(
       circle farthest-corner at 100% 0% in oklab,
-      light-dark(var(--color-orange-50), oklch(22% 0.04 50)) 0%,
+      var(--color-orange-50) 0%,
       transparent 60%
     );
   }
@@ -426,7 +418,7 @@
   .gradient-b-green {
     background-image: linear-gradient(
       to top,
-      light-dark(var(--color-green-50), oklch(22% 0.04 140)) 0%,
+      var(--color-green-50) 0%,
       transparent 100%
     );
   }
@@ -435,18 +427,18 @@
   .gradient-hero {
     background-image: linear-gradient(
       in oklab 180deg,
-      light-dark(oklab(100% 0 0), transparent) 25%,
-      light-dark(var(--color-blue-50), oklch(22% 0.04 255)) 60%,
-      light-dark(var(--color-blue-100), oklch(25% 0.05 255)) 100%
+      oklab(100% 0 0) 25%,
+      var(--color-blue-50) 60%,
+      var(--color-blue-100) 100%
     );
   }
 
-  /* Quote callout fade (home page) */
+  /* Quote callout fade */
   .gradient-quote-fade {
     background-image: linear-gradient(
       in oklab 180deg,
       transparent 0%,
-      light-dark(var(--color-blue-100), oklch(22% 0.04 255)) 100%
+      var(--color-blue-100) 100%
     );
   }
 }
@@ -466,42 +458,25 @@
 }
 
 @utility shadow-popup {
-  box-shadow: 0 8px 24px light-dark(rgb(0 0 0 / 0.12), rgb(0 0 0 / 0.5));
+  box-shadow: 0 8px 24px rgb(0 0 0 / 0.12);
 }
 
 @utility shadow-soft {
-  box-shadow: 0 4px 18px light-dark(rgb(0 0 0 / 0.07), rgb(0 0 0 / 0.28));
+  box-shadow: 0 4px 18px rgb(0 0 0 / 0.07);
 }
 
 @utility badge-active {
   background-color: var(--color-green-50);
   color: var(--color-green-600);
-  .dark & {
-    background-color: var(--color-green-800);
-    color: var(--color-green-300);
-  }
 }
 
 @utility badge-founding {
   background-color: var(--color-orange-50);
   color: var(--color-orange-600);
-  .dark & {
-    background-color: var(--color-orange-800);
-    color: var(--color-orange-300);
-  }
 }
 
 @utility logo-adaptive {
   filter: brightness(0);
-  .dark & {
-    filter: brightness(0) invert(1);
-  }
-}
-
-@utility logo-invert-dark {
-  .dark & {
-    filter: brightness(0) invert(1);
-  }
 }
 
 @layer components {

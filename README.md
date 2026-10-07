@@ -4,116 +4,38 @@ Internal operations platform for managing chapters, projects, volunteers, and pa
 
 ## Architecture
 
-This app is the **frontend + auth layer**. Domain data (chapters, projects, volunteers, partners) lives in the **operations-api** — a separate GraphQL/REST service. This app stores only auth state (users, sessions, OAuth accounts) in its own database.
+This Next.js app uses Auth.js for authentication. Existing chapter, partner, and volunteer directories read from Notion. Project Directory records live in this app's PostgreSQL database alongside users.
 
-```
-volunteer-platform (this repo)
-  ├── Auth database (PostgreSQL) — users, sessions, OAuth accounts
-  └── operations-api             — all domain data via GraphQL
-```
-
-User roles (`ADMIN`, `CHAPTER_LEADER`, `VOLUNTEER`) are resolved at sign-in by querying the operations-api for the user's active officer assignments. They are cached in the JWT and refreshed on session update.
-
-## Prerequisites
-
-- Node.js 18+
-- pnpm
-- PostgreSQL database (auth only)
-- [operations-api](../operations-api) running locally
+Chapter and partner IDs on projects reference external directory records; they are not local foreign keys. Development seeds use three clearly prefixed chapter fixture IDs, rather than creating canonical chapters. Team membership references local users. Connecting the member selector to the canonical Volunteer Directory is a later milestone.
 
 ## Setup
 
-**1. Install dependencies**
+Requires Node.js 22.6+ (for the TypeScript seed runner), pnpm, and PostgreSQL.
+Set `DATABASE_URL` to the PostgreSQL connection string and `AUTH_SECRET` to a random secret. Existing Notion directories also need the environment variables listed in `src/lib/notion/client.ts`.
 
 ```bash
 pnpm install
-```
-
-**2. Configure environment variables**
-
-```bash
-cp .env.local.example .env.local
-```
-
-Fill in `.env.local`:
-
-| Variable             | Description                                                       |
-| -------------------- | ----------------------------------------------------------------- |
-| `DATABASE_URL`       | PostgreSQL connection string for the auth database                |
-| `AUTH_SECRET`        | Random secret — run `openssl rand -base64 32`                     |
-| `AUTH_URL`           | App base URL (default: `http://localhost:3000`)                   |
-| `AUTH_GOOGLE_ID`     | Google OAuth client ID                                            |
-| `AUTH_GOOGLE_SECRET` | Google OAuth client secret                                        |
-| `OPERATIONS_API_URL` | Base URL of the operations-api (default: `http://localhost:3001`) |
-
-**3. Set up the auth database**
-
-```bash
-pnpm prisma migrate dev --name init
-```
-
-**4. Seed an admin user (optional)**
-
-```bash
-pnpm tsx prisma/seed.ts
-```
-
-Default credentials: `admin@hack4impact.org` / `password`
-
-**5. Start the operations-api**
-
-Follow setup instructions in the operations-api repo. It must be running before starting this app so that roles can be resolved on sign-in.
-
-**6. Run the development server**
-
-```bash
+pnpm db:generate
+pnpm db:migrate
+pnpm db:seed
 pnpm dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000).
+The development sign-in is currently `admin@hack4impact.org` / `password`, implemented in the existing auth provider. Seeding also creates a matching local user; it does not change authentication.
 
-## Google OAuth setup
+The repeatable development seed loads 15 projects with three chapter fixture IDs, all four lifecycle stages, three drafts, twelve published records, and team/resource rows. It updates only its own project fixture IDs and should be used on development databases.
 
-1. Go to [Google Cloud Console](https://console.cloud.google.com)
-2. Create an OAuth 2.0 client (Web application)
-3. Add `http://localhost:3000/api/auth/callback/google` as an authorized redirect URI
-4. Copy the client ID and secret into `.env.local`
+Migrations include an auth baseline because the repository previously had no migration history. For an existing database that already contains the original `User` table and `Role` enum, baseline it **before** applying the project migration:
 
-## Refreshing a user's role
-
-If a user's officer assignment changes, their role in the JWT will be stale until they sign out and back in. To force an immediate refresh, call `update()` from the client after making the assignment change:
-
-```ts
-import { useSession } from "next-auth/react";
-
-const { update } = useSession();
-await update(); // re-triggers jwt callback with trigger === "update"
+```bash
+pnpm prisma migrate resolve --applied 20261006000100_auth_baseline
+pnpm db:migrate
 ```
 
-## Project structure
+## Project Directory foundations
 
-```
-src/
-├── app/
-│   ├── (auth)/sign-in/         # Public sign-in page
-│   ├── (dashboard)/            # Protected app shell (sidebar + topbar)
-│   │   ├── dashboard/
-│   │   ├── chapters/
-│   │   ├── projects/
-│   │   ├── volunteers/
-│   │   └── partners/
-│   └── api/auth/[...nextauth]/ # Auth.js API route
-├── actions/                    # Next.js Server Actions
-├── components/
-│   ├── layout/                 # Sidebar, TopBar
-│   └── ui/                     # Shared UI primitives
-├── lib/
-│   ├── auth.ts                 # Auth.js config
-│   ├── db.ts                   # Prisma client
-│   └── operations-api.ts       # GraphQL client for operations-api
-├── middleware.ts                # Route protection
-└── types/                      # Shared TypeScript types
-prisma/
-├── schema.prisma               # Auth-only schema
-└── seed.ts                     # Dev seed data
-```
+The sidebar opens `/projects`, an empty page protected by the existing auth proxy. Existing new/detail/edit page stubs remain available for future milestones.
+
+Authenticated read routes are `GET /api/projects` (published projects) and `GET /api/projects/:projectId` (published detail; admins can also retrieve drafts). Both return JSON 401 responses when signed out. Draft access for chapter leads awaits chapter claims in auth; drafts are hidden from non-admin detail requests for now. Create, update, publish, delete, filtering, and the directory dashboard are later milestones.
+
+`src/lib/projects/client.ts` provides typed browser methods `projectsClient.list()` and `projectsClient.get(id)`, using same-origin session cookies. The response includes team members and resource links, and selects only user IDs and names.

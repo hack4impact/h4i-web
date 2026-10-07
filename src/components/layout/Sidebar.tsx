@@ -111,7 +111,7 @@ export function Sidebar() {
           />
           <NavItem
             href="/projects"
-            label="Projects"
+            label="Project Directory"
             icon={<FolderOpen size={15} strokeWidth={1.5} />}
           />
           <NavItem

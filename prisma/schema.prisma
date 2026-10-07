@@ -13,11 +13,82 @@ enum Role {
 }
 
 model User {
-  id        String   @id @default(cuid())
-  name      String?
-  email     String   @unique
-  password  String?
-  role      Role     @default(ADMIN)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id                 String              @id @default(cuid())
+  name               String?
+  email              String              @unique
+  password           String?
+  role               Role                @default(ADMIN)
+  createdAt          DateTime            @default(now())
+  updatedAt          DateTime            @updatedAt
+  projects           Project[]
+  projectMemberships ProjectTeamMember[]
+}
+
+// Chapter and partner IDs reference the external directories (currently Notion).
+enum ProjectStage {
+  design
+  development
+  launched
+  maintenance
+}
+
+enum ProjectResourceType {
+  Slack
+  GitHub
+  GoogleDrive
+  Other
+}
+
+model Project {
+  id                    String                @id @default(cuid())
+  name                  String
+  tagline               String?               @db.VarChar(180)
+  chapterId             String                @map("chapter_id")
+  stage                 ProjectStage          @default(design)
+  techStack             String[]              @default([]) @map("tech_stack")
+  causeAreas            String[]              @default([]) @map("cause_areas")
+  nonprofitPartnerId    String?               @map("nonprofit_partner_id")
+  nonprofitPartnerName  String?               @map("nonprofit_partner_name")
+  nonprofitPartnerPhoto String?               @map("nonprofit_partner_photo")
+  startDate             DateTime?             @map("start_date") @db.Date
+  endDate               DateTime?             @map("end_date") @db.Date
+  lastUpdated           DateTime?             @map("last_updated")
+  problemStatement      String?               @map("problem_statement")
+  goalStatement         String?               @map("goal_statement")
+  solutionDescription   String?               @map("solution_description")
+  demoMedia             String[]              @default([]) @map("demo_media")
+  isDraft               Boolean               @default(true) @map("is_draft")
+  createdBy             String                @map("created_by")
+  creator               User                  @relation(fields: [createdBy], references: [id], onDelete: Restrict)
+  createdAt             DateTime              @default(now()) @map("created_at")
+  updatedAt             DateTime              @updatedAt @map("updated_at")
+  teamMembers           ProjectTeamMember[]
+  resourceLinks         ProjectResourceLink[]
+
+  @@index([isDraft, chapterId, stage])
+  @@map("projects")
+}
+
+model ProjectTeamMember {
+  id        String  @id @default(cuid())
+  projectId String  @map("project_id")
+  userId    String  @map("user_id")
+  role      String
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  user      User    @relation(fields: [userId], references: [id], onDelete: Restrict)
+
+  @@unique([projectId, userId, role])
+  @@index([userId])
+  @@map("project_team_members")
+}
+
+model ProjectResourceLink {
+  id        String              @id @default(cuid())
+  projectId String              @map("project_id")
+  type      ProjectResourceType
+  url       String
+  project   Project             @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId])
+  @@map("project_resource_links")
 }

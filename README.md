@@ -85,6 +85,23 @@ pnpm dev
 
 Open [http://localhost:3000](http://localhost:3000).
 
+## Sourced Project Exchange API
+
+Listings are served over GraphQL at `/api/graphql` (GraphiQL is enabled outside production). Requests use the Auth.js session cookie; unauthenticated requests get an `UNAUTHENTICATED` error.
+
+- `listings(first, after, filter)` returns paginated, non-withdrawn listings from every chapter, newest first.
+- `listing(id)` returns one listing.
+
+Client contact fields and partner notes are exposed under `contact`. For anyone who isn't a `CHAPTER_LEADER` or `ADMIN`, they are never selected from the database and `contact` is `null` (see `src/lib/sourced-projects/contact-gating.ts`).
+
+## Tests
+
+```bash
+pnpm test
+```
+
+The API tests run against the seeded dev database, so run `docker compose up -d` and `pnpm prisma db seed` first.
+
 ## Google OAuth setup
 
 1. Go to [Google Cloud Console](https://console.cloud.google.com)

@@ -19,3 +19,17 @@ export type ProjectResponse = Omit<
   })[];
   resourceLinks: ProjectResourceLink[];
 };
+
+export type ProjectListResponse = {
+  projects: ProjectResponse[];
+  pagination: {
+    page: number;
+    pageSize: number;
+    total: number;
+    totalPages: number;
+  };
+  filters: {
+    chapters: { id: string; name: string }[];
+    impactAreas: string[];
+  };
+};

@@ -71,14 +71,14 @@ function NavItem({ href, label, icon, count }: NavItemProps) {
     <Link
       href={href}
       className={cn(
-        "rounded-4 flex h-32 w-full cursor-default items-center gap-8 px-8 text-lg outline-none focus-visible:outline-2 focus-visible:outline-[var(--color-focus)]",
+        "rounded-4 flex h-32 w-auto shrink-0 cursor-default items-center gap-8 px-8 text-lg outline-none focus-visible:outline-2 focus-visible:outline-[var(--color-focus)] sm:w-full",
         isActive
           ? "bg-ghost-hover text-gray-1"
           : "text-gray-2 hover:bg-ghost-hover"
       )}
     >
       <span className="shrink-0">{icon}</span>
-      <span className="flex-1">{label}</span>
+      <span className="flex-1 whitespace-nowrap">{label}</span>
       {count !== undefined && (
         <span className="text-gray-3 tabular-nums">
           {count.toLocaleString()}
@@ -90,10 +90,13 @@ function NavItem({ href, label, icon, count }: NavItemProps) {
 
 export function Sidebar() {
   return (
-    <aside className="border-separator bg-panel flex h-full w-240 flex-none flex-col border-r">
-      <div className="flex flex-1 flex-col gap-24 p-12">
+    <aside className="border-separator bg-panel flex w-full flex-none flex-col border-b sm:h-full sm:w-240 sm:border-r sm:border-b-0">
+      <div className="flex flex-1 flex-col gap-8 p-12 sm:gap-24">
         <UserMenu />
-        <nav aria-label="Main" className="space-y-2">
+        <nav
+          aria-label="Main"
+          className="flex overflow-x-auto sm:block sm:space-y-2"
+        >
           <NavItem
             href="/dashboard"
             label="Dashboard"

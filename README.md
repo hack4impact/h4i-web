@@ -32,10 +32,22 @@ pnpm prisma migrate resolve --applied 20261006000100_auth_baseline
 pnpm db:migrate
 ```
 
-## Project Directory foundations
+## Project Directory
 
-The sidebar opens `/projects`, an empty page protected by the existing auth proxy. Existing new/detail/edit page stubs remain available for future milestones.
+The sidebar opens `/projects`, a responsive project card grid protected by the existing auth proxy. Combine chapter, stage, project length, and impact area dropdown filters; remove individual filter chips or clear all filters. The grid includes pagination (nine cards per page), loading skeletons, retryable errors, and empty states. Cards link to the existing detail stub; the full detail view and edit forms are future milestones.
 
-Authenticated read routes are `GET /api/projects` (published projects) and `GET /api/projects/:projectId` (published detail; admins can also retrieve drafts). Both return JSON 401 responses when signed out. Draft access for chapter leads awaits chapter claims in auth; drafts are hidden from non-admin detail requests for now. Create, update, publish, delete, filtering, and the directory dashboard are later milestones.
+Authenticated read routes are `GET /api/projects` (published projects) and `GET /api/projects/:projectId` (published detail; admins can also retrieve drafts). Both return JSON 401 responses when signed out. Draft access for chapter leads awaits chapter claims in auth; drafts are hidden from non-admin detail requests for now. Create, update, publish, and delete are later milestones.
 
 `src/lib/projects/client.ts` provides typed browser methods `projectsClient.list()` and `projectsClient.get(id)`, using same-origin session cookies. The response includes team members and resource links, and selects only user IDs and names.
+
+### List API
+
+`GET /api/projects` accepts `chapter_id`, `stage` (`design`, `development`, `launched`, `maintenance`), `project_length` (`short`, `medium`, `long`, `ongoing`), `impact_area`, `page` (default 1), and `page_size` (default 9, maximum 100). All filters combine with AND and always exclude drafts, including for admins. Invalid filter values return 400. Pages beyond the last page clamp to the last available page.
+
+Project length uses calendar months between start and end dates: `short` is under three months, `medium` is three through six months inclusive, `long` is over six months, and `ongoing` has no end date. Missing start dates do not match finite duration buckets. Duration filters do not infer lifecycle stage.
+
+The list response is now an object: `{ projects, pagination: { page, pageSize, total, totalPages }, filters: { chapters, impactAreas } }`. Filter choices come from all published projects, so they remain available when a combination has no matches. Chapter names resolve through the existing Notion directory when configured, with seeded chapter labels and ID fallbacks when unavailable. Media-free or broken-image cards show a placeholder.
+
+Example: `/api/projects?chapter_id=seed-chapter-chicago&stage=development&project_length=ongoing&impact_area=Volunteer%20Ops&page_size=3`.
+
+With a running development server and the standard seed data, run `npm run test:projects` for the authenticated API integration checks. Set `PROJECT_TEST_URL` to override `http://127.0.0.1:3000`. These checks read the seed fixtures and do not modify project records.

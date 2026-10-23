@@ -89,8 +89,9 @@ Open [http://localhost:3000](http://localhost:3000).
 
 Listings are served over GraphQL at `/api/graphql` (GraphiQL is enabled outside production). Requests use the Auth.js session cookie; unauthenticated requests get an `UNAUTHENTICATED` error.
 
-- `listings(first, after, filter)` returns paginated, non-withdrawn listings from every chapter, newest first.
+- `listings(first, after, filter, search)` returns paginated, non-withdrawn listings from every chapter, newest first. `filter` narrows by `status`, `causeArea`, and `sourcingChapterId`; `search` does a case-insensitive match on title, description, and scope.
 - `listing(id)` returns one listing.
+- `createListing(input)`, `updateListing(id, input)`, and `withdrawListing(id)` are limited to chapter leaders of the sourcing chapter and admins (`FORBIDDEN` otherwise). Input is validated with zod (`src/lib/sourced-projects/listing-input.ts`); failures return `BAD_USER_INPUT` with per-field `issues`. Withdrawing sets `withdrawnAt`, and listings are never hard-deleted.
 
 Client contact fields and partner notes are exposed under `contact`. For anyone who isn't a `CHAPTER_LEADER` or `ADMIN`, they are never selected from the database and `contact` is `null` (see `src/lib/sourced-projects/contact-gating.ts`).
 

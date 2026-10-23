@@ -11,5 +11,7 @@ export default defineConfig({
   },
   test: {
     environment: "node",
+    // Test files share the seeded dev database and some of them write to it.
+    fileParallelism: false,
   },
 });

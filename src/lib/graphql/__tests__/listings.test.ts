@@ -1,24 +1,12 @@
 // Runs against the seeded dev database (`pnpm prisma db seed`).
 import { afterAll, describe, expect, it } from "vitest";
 import { db } from "@/lib/db";
-import { createGraphQLHandler } from "@/lib/graphql/yoga";
 import {
   GATED_FIELDS,
   toListingView,
   type Viewer,
 } from "@/lib/sourced-projects/contact-gating";
-
-const VOLUNTEER: Viewer = {
-  id: "seed-user-volunteer-uiuc",
-  role: "VOLUNTEER",
-  chapterId: "seed-chapter-uiuc",
-};
-const LEAD: Viewer = {
-  id: "seed-user-lead-berkeley",
-  role: "CHAPTER_LEADER",
-  chapterId: "seed-chapter-berkeley",
-};
-const ADMIN: Viewer = { id: "seed-user-admin", role: "ADMIN", chapterId: null };
+import { ADMIN, LEAD, run, VOLUNTEER } from "./helpers";
 
 const LISTING_FIELDS = /* GraphQL */ `
   id
@@ -54,27 +42,6 @@ type ListingNode = {
   sourcingChapter: { id: string };
   contact: Record<string, string | null> | null;
 };
-
-type GraphQLResult = {
-  data?: Record<string, unknown>;
-  errors?: { message: string; extensions: Record<string, unknown> }[];
-};
-
-// Goes through the real HTTP handler so assertions see the exact response body.
-async function run(
-  query: string,
-  viewer: Viewer | null,
-  variables?: Record<string, unknown>
-): Promise<GraphQLResult & { raw: string }> {
-  const yoga = createGraphQLHandler(async () => viewer);
-  const response = await yoga.fetch("http://localhost/api/graphql", {
-    method: "POST",
-    headers: { "content-type": "application/json" },
-    body: JSON.stringify({ query, variables }),
-  });
-  const raw = await response.text();
-  return { ...JSON.parse(raw), raw };
-}
 
 // Walks every page in small steps so pagination is exercised too.
 async function fetchAllListings(viewer: Viewer) {

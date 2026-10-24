@@ -24,9 +24,7 @@ export async function POST(request: NextRequest) {
   try {
     const token = crypto.randomBytes(32).toString("hex");
     const expiresAt = new Date(Date.now() + 60 * 15 * 1000);
-    const email = body.email;
-
-    const plunk = new Plunk(process.env.PLUNK_API_KEY!);
+    const email = magicLinkRequestSchema.parse(body).email;
 
     const user = await db.user.findUnique({
       where: { email: email },
@@ -43,6 +41,11 @@ export async function POST(request: NextRequest) {
     });
 
     const magicLink = `${process.env.PUBLIC_URL}/api/auth/magic-link/verify?token=${token}`;
+
+    // Constructed after the token row exists, so a missing PLUNK_API_KEY
+    // cannot stop the token being issued — it can still be verified manually
+    // in development where no mail provider is configured.
+    const plunk = new Plunk(process.env.PLUNK_API_KEY!);
 
     // send email to the user
     await plunk.emails.send({

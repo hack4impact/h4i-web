@@ -11,6 +11,9 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "typecheck": "tsc --noEmit",
+    "test": "vitest",
+    "test:run": "vitest run",
+    "db:seed": "tsx prisma/seed.ts",
     "prepare": "husky"
   },
   "dependencies": {
@@ -63,6 +66,7 @@
     "prettier": "^3.8.1",
     "prettier-plugin-tailwindcss": "^0.7.2",
     "tailwindcss": "^4.2.2",
+    "tsx": "^4.23.15",
     "typescript": "^5.9.3"
   }
 }

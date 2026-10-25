@@ -15,8 +15,12 @@ const COST = 12;
 // and the old Auth.js dev constant. 8 chars = the minimum loginRequestSchema allows.
 const DEV_PASSWORD = "password";
 
+// Explicit role assignment for local seed only — not a production ADMIN remap.
+// admin@ → NATIONALS (Nationals powers per PRD; former generic ADMIN label retired).
+// cod@ → COD (distinct admin type; no Nationals permissions implied).
 const users = [
-  { email: "admin@hack4impact.org", role: "ADMIN" as const },
+  { email: "admin@hack4impact.org", role: "NATIONALS" as const },
+  { email: "cod@hack4impact.org", role: "COD" as const },
   { email: "lead@hack4impact.org", role: "PROJECT_LEAD" as const },
   { email: "volunteer@hack4impact.org", role: "VOLUNTEER" as const },
 ];
@@ -32,7 +36,6 @@ async function main() {
         email: user.email,
         passwordHash,
         role: user.role,
-        directoryOptIn: true,
       },
     });
     console.log(`  ${user.role.padEnd(12)} ${user.email}`);

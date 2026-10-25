@@ -30,5 +30,10 @@
     ".next/dev/types/**/*.ts",
     "**/*.mts"
   ],
-  "exclude": ["node_modules", "prisma/seed.ts"]
+  "exclude": [
+    "node_modules",
+    "prisma/seed.ts",
+    "prisma/verify-directory-schema.ts",
+    "prisma/manual-directory-fixtures.ts"
+  ]
 }

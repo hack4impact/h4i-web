@@ -1,1 +1,6 @@
-export type AppRole = "ADMIN" | "CHAPTER_LEAD" | "PROJECT_LEAD" | "VOLUNTEER";
+export type AppRole =
+  | "COD"
+  | "NATIONALS"
+  | "CHAPTER_LEAD"
+  | "PROJECT_LEAD"
+  | "VOLUNTEER";

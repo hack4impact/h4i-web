@@ -1,0 +1,72 @@
+-- Explicit legacy ADMIN → COD | NATIONALS mapping.
+--
+-- Why a map table?
+--   COD/NATIONALS are not on the old Role enum yet, so you cannot
+--   UPDATE ... SET role = 'NATIONALS' until the migration rewrites the enum.
+--   Migration 20261024191503_directory_consent_and_admin_types reads
+--   public._legacy_admin_map during that rewrite, then drops the table.
+--
+-- IMPORTANT — prisma migrate resolve --rolled-back:
+--   Updates _prisma_migrations history only. It does NOT undo SQL.
+--   For this fail-closed migration, the RAISE happens before destructive
+--   changes, so inspecting usually shows ADMIN still present and User.directoryOptIn
+--   still present. Always inspect before retrying. Never use --applied unless
+--   the migration SQL actually completed successfully.
+--
+-- Export DATABASE_URL into your shell before psql (Prisma .env is not auto-exported):
+--   export DATABASE_URL='postgresql://USER@127.0.0.1:5432/volunteer_platform_week1_test'
+--
+-- =============================================================================
+-- Happy path (ADMIN rows exist, migration not yet applied)
+-- =============================================================================
+--   1) psql "$DATABASE_URL" -c "SELECT id, email, role FROM \"User\" WHERE role::text = 'ADMIN';"
+--   2) Create + fill map (edit ids below)
+--   3) Confirm unmapped count is 0
+--   4) pnpm exec prisma migrate deploy
+--
+-- =============================================================================
+-- Recovery after migrate FAILS with LEGACY_ADMIN_MAPPING_REQUIRED
+-- =============================================================================
+--   A) Inspect whether SQL rolled back (expect ADMIN still there; migration unfinished)
+--        psql "$DATABASE_URL" -c "SELECT migration_name, finished_at, rolled_back_at, logs
+--          FROM _prisma_migrations WHERE migration_name LIKE '%directory_consent%';"
+--        psql "$DATABASE_URL" -c "SELECT role::text, COUNT(*) FROM \"User\" GROUP BY 1;"
+--        psql "$DATABASE_URL" -c "SELECT column_name FROM information_schema.columns
+--          WHERE table_name = 'User' AND column_name = 'directoryOptIn';"
+--
+--   B) Mark failed attempt rolled back in Prisma history (does not undo SQL)
+--        pnpm exec prisma migrate resolve --rolled-back \
+--          20261024191503_directory_consent_and_admin_types
+--
+--   C) Populate the explicit map (CREATE/INSERT in this file)
+--
+--   D) Retry — SQL runs only if mapping is complete
+--        pnpm exec prisma migrate deploy
+--
+--   E) Confirm success (finished_at set on a successful apply row; map table gone)
+--        psql "$DATABASE_URL" -c "SELECT migration_name, finished_at, rolled_back_at
+--          FROM _prisma_migrations WHERE migration_name LIKE '%directory_consent%';"
+--        psql "$DATABASE_URL" -c "SELECT id, role::text FROM \"User\" ORDER BY id;"
+--        psql "$DATABASE_URL" -c "SELECT to_regclass('public._legacy_admin_map');"
+--
+-- If an older draft already demoted ADMIN → VOLUNTEER:
+--   Do NOT infer former admins from role = VOLUNTEER. Remap from a roster only.
+
+CREATE TABLE IF NOT EXISTS "_legacy_admin_map" (
+    "user_id" TEXT PRIMARY KEY,
+    "new_role" TEXT NOT NULL CHECK ("new_role" IN ('COD', 'NATIONALS'))
+);
+
+-- Replace with real User.id values from the inventory:
+-- INSERT INTO "_legacy_admin_map" ("user_id", "new_role") VALUES
+--   ('REPLACE_ADMIN_USER_ID_1', 'NATIONALS'),
+--   ('REPLACE_ADMIN_USER_ID_2', 'COD')
+-- ON CONFLICT ("user_id") DO UPDATE SET "new_role" = EXCLUDED."new_role";
+
+-- Sanity check before migrate (expect 0 rows):
+-- SELECT u.id, u.email
+-- FROM "User" u
+-- WHERE u.role::text = 'ADMIN'
+--   AND NOT EXISTS (
+--     SELECT 1 FROM "_legacy_admin_map" m WHERE m."user_id" = u.id
+--   );

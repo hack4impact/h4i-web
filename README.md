@@ -46,19 +46,32 @@ Fill in `.env.local`:
 | `AUTH_GOOGLE_SECRET` | Google OAuth client secret                                        |
 | `OPERATIONS_API_URL` | Base URL of the operations-api (default: `http://localhost:3001`) |
 
-**3. Set up the auth database**
+**3. Start Postgres and apply migrations**
 
 ```bash
-pnpm prisma migrate dev --name init
+docker compose up -d
+pnpm prisma migrate deploy
 ```
 
-**4. Seed an admin user (optional)**
+The one-active-claim rule for the Sourced Project Exchange is a partial unique index written by hand in `prisma/migrations/*_sourced_project_exchange`. Prisma can't express it in `schema.prisma`, so always apply schema changes through migrations, never `prisma db push`.
+
+**4. Seed dev data**
 
 ```bash
-pnpm tsx prisma/seed.ts
+pnpm prisma db seed
 ```
 
-Default credentials: `admin@hack4impact.org` / `password`
+This creates 4 chapters, 15 Sourced Project Exchange listings with claims and links, and these accounts. All of them use the password `password`:
+
+| Email                                                    | Role             | Chapter     |
+| -------------------------------------------------------- | ---------------- | ----------- |
+| `admin@hack4impact.org`                                  | `ADMIN`          | none        |
+| `lead.uiuc@hack4impact.org`                              | `CHAPTER_LEADER` | UIUC        |
+| `lead.berkeley@hack4impact.org`                          | `CHAPTER_LEADER` | UC Berkeley |
+| `lead.gt@hack4impact.org`, `lead.bu@hack4impact.org`     | `CHAPTER_LEADER` | GT, BU      |
+| `volunteer.uiuc@hack4impact.org`, `volunteer.berkeley@…` | `VOLUNTEER`      | UIUC, UCB   |
+
+Re-running the seed is safe; it upserts by fixed ids.
 
 **5. Start the operations-api**
 
@@ -71,6 +84,24 @@ pnpm dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000).
+
+## Sourced Project Exchange API
+
+Listings are served over GraphQL at `/api/graphql` (GraphiQL is enabled outside production). Requests use the Auth.js session cookie; unauthenticated requests get an `UNAUTHENTICATED` error.
+
+- `listings(first, after, filter, search)` returns paginated, non-withdrawn listings from every chapter, newest first. `filter` narrows by `status`, `causeArea`, and `sourcingChapterId`; `search` does a case-insensitive match on title, description, and scope.
+- `listing(id)` returns one listing.
+- `createListing(input)`, `updateListing(id, input)`, and `withdrawListing(id)` are limited to chapter leaders of the sourcing chapter and admins (`FORBIDDEN` otherwise). Input is validated with zod (`src/lib/sourced-projects/listing-input.ts`); failures return `BAD_USER_INPUT` with per-field `issues`. Withdrawing sets `withdrawnAt`, and listings are never hard-deleted.
+
+Client contact fields and partner notes are exposed under `contact`. For anyone who isn't a `CHAPTER_LEADER` or `ADMIN`, they are never selected from the database and `contact` is `null` (see `src/lib/sourced-projects/contact-gating.ts`).
+
+## Tests
+
+```bash
+pnpm test
+```
+
+The API tests run against the seeded dev database, so run `docker compose up -d` and `pnpm prisma db seed` first.
 
 ## Google OAuth setup
 
@@ -114,6 +145,7 @@ src/
 ├── middleware.ts                # Route protection
 └── types/                      # Shared TypeScript types
 prisma/
-├── schema.prisma               # Auth-only schema
+├── schema.prisma               # Auth + Sourced Project Exchange schema
+├── migrations/
 └── seed.ts                     # Dev seed data
 ```

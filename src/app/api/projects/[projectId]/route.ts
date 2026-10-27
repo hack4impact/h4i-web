@@ -1,5 +1,5 @@
 import { auth } from "@/lib/auth";
-import { db } from "@/lib/db";
+import { getProjectDetail } from "@/lib/projects/detail";
 
 export async function GET(
   _request: Request,
@@ -9,16 +9,15 @@ export async function GET(
   if (!session?.user)
     return Response.json({ error: "Unauthorized" }, { status: 401 });
   const { projectId } = await params;
-  const project = await db.project.findFirst({
-    where: {
-      id: projectId,
-      ...(session.user.role === "ADMIN" ? {} : { isDraft: false }),
-    },
-    include: {
-      teamMembers: { include: { user: { select: { id: true, name: true } } } },
-      resourceLinks: true,
-    },
-  });
-  if (!project) return Response.json({ error: "Not found" }, { status: 404 });
-  return Response.json(project);
+  try {
+    const project = await getProjectDetail(projectId, session.user);
+    if (!project) return Response.json({ error: "Not found" }, { status: 404 });
+    return Response.json(project);
+  } catch (error) {
+    console.error("Failed to load project detail", error);
+    return Response.json(
+      { error: "Project could not be loaded. Please try again." },
+      { status: 500 }
+    );
+  }
 }

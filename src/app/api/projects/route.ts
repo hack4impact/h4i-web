@@ -2,8 +2,10 @@ import { Prisma } from "@prisma/client";
 import { z } from "zod";
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
+import { chapterLabels } from "@/lib/projects/chapters";
 
 const querySchema = z.object({
+  q: z.string().trim().max(200).optional(),
   chapter_id: z.string().trim().min(1).max(200).optional(),
   stage: z
     .enum(["design", "development", "launched", "maintenance"])
@@ -13,29 +15,6 @@ const querySchema = z.object({
   page: z.coerce.number().int().min(1).max(1000000).default(1),
   page_size: z.coerce.number().int().min(1).max(100).default(9),
 });
-
-async function chapterLabels(ids: string[]) {
-  const names = new Map([
-    ["seed-chapter-boston", "Boston"],
-    ["seed-chapter-chicago", "Chicago"],
-    ["seed-chapter-atlanta", "Atlanta"],
-  ]);
-  if (process.env.NOTION_API_KEY) {
-    try {
-      const { getChapters } = await import("@/lib/notion/api");
-      const { rows } = await getChapters();
-      for (const row of rows) {
-        const name = row.Name || row.name || row["Chapter Name"];
-        if (name) names.set(row.id, name);
-      }
-    } catch {
-      // Browsing projects remains available when the external directory is down.
-    }
-  }
-  return ids
-    .map((id) => ({ id, name: names.get(id) || `Chapter ${id}` }))
-    .sort((a, b) => a.name.localeCompare(b.name));
-}
 
 export async function GET(request: Request) {
   const session = await auth();
@@ -51,29 +30,51 @@ export async function GET(request: Request) {
       { status: 400 }
     );
   const query = parsed.data;
-  const clauses = [Prisma.sql`is_draft = false`];
-  if (query.chapter_id)
-    clauses.push(Prisma.sql`chapter_id = ${query.chapter_id}`);
-  if (query.stage)
-    clauses.push(Prisma.sql`stage = ${query.stage}::"ProjectStage"`);
-  if (query.impact_area)
-    clauses.push(Prisma.sql`${query.impact_area} = ANY(cause_areas)`);
-  // Calendar-month boundaries: exactly 3 and exactly 6 months are medium.
-  if (query.project_length === "ongoing")
-    clauses.push(Prisma.sql`end_date IS NULL`);
-  if (query.project_length === "short")
-    clauses.push(
-      Prisma.sql`end_date >= start_date AND end_date < start_date + INTERVAL '3 months'`
-    );
-  if (query.project_length === "medium")
-    clauses.push(
-      Prisma.sql`end_date >= start_date + INTERVAL '3 months' AND end_date <= start_date + INTERVAL '6 months'`
-    );
-  if (query.project_length === "long")
-    clauses.push(Prisma.sql`end_date > start_date + INTERVAL '6 months'`);
-  const where = Prisma.join(clauses, " AND ");
-
   try {
+    const clauses = [Prisma.sql`is_draft = false`];
+    if (query.chapter_id)
+      clauses.push(Prisma.sql`chapter_id = ${query.chapter_id}`);
+    if (query.stage)
+      clauses.push(Prisma.sql`stage = ${query.stage}::"ProjectStage"`);
+    if (query.impact_area)
+      clauses.push(Prisma.sql`${query.impact_area} = ANY(cause_areas)`);
+    // Calendar-month boundaries: exactly 3 and exactly 6 months are medium.
+    if (query.project_length === "ongoing")
+      clauses.push(Prisma.sql`end_date IS NULL`);
+    if (query.project_length === "short")
+      clauses.push(
+        Prisma.sql`end_date >= start_date AND end_date < start_date + INTERVAL '3 months'`
+      );
+    if (query.project_length === "medium")
+      clauses.push(
+        Prisma.sql`end_date >= start_date + INTERVAL '3 months' AND end_date <= start_date + INTERVAL '6 months'`
+      );
+    if (query.project_length === "long")
+      clauses.push(Prisma.sql`end_date > start_date + INTERVAL '6 months'`);
+    if (query.q) {
+      const search = `%${query.q.replace(/[\\%_]/g, "\\$&")}%`;
+      const chapterIds = await db.project.findMany({
+        where: { isDraft: false },
+        distinct: ["chapterId"],
+        select: { chapterId: true },
+      });
+      const chapters = await chapterLabels(chapterIds.map((p) => p.chapterId));
+      const matchingChapters = chapters
+        .filter((chapter) =>
+          chapter.name
+            .toLocaleLowerCase()
+            .includes(query.q!.toLocaleLowerCase())
+        )
+        .map((chapter) => chapter.id);
+      const chapterMatch = matchingChapters.length
+        ? Prisma.sql`chapter_id IN (${Prisma.join(matchingChapters)})`
+        : Prisma.sql`false`;
+      clauses.push(
+        Prisma.sql`(concat_ws(' ', name, tagline, nonprofit_partner_name, problem_statement, goal_statement, solution_description, array_to_string(tech_stack, ' '), array_to_string(cause_areas, ' ')) ILIKE ${search} OR ${chapterMatch})`
+      );
+    }
+    const where = Prisma.join(clauses, " AND ");
+
     const result = await db.$transaction(
       async (tx) => {
         const [count] = await tx.$queryRaw<{ total: bigint }[]>(

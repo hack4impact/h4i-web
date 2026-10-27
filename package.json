@@ -38,16 +38,6 @@
   "lint-staged": {
     "*.{ts,tsx,js,jsx,json,css,md}": "prettier --write"
   },
-  "pnpm": {
-    "onlyBuiltDependencies": [
-      "@prisma/engines",
-      "prisma"
-    ],
-    "ignoredBuiltDependencies": [
-      "sharp",
-      "unrs-resolver"
-    ]
-  },
   "devDependencies": {
     "@tailwindcss/postcss": "^4.3.3",
     "@types/node": "^26.6.5",

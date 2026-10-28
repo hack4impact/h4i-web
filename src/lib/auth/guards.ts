@@ -3,18 +3,7 @@ import { redirect } from "next/navigation";
 import { getCurrentSession } from "@/lib/auth/session";
 import type { AppRole } from "@/types";
 
-/**
- * Roles allowed to create or edit records.
- *
- * From the PRD: Members are read-only, Project Leads can upload for their
- * chapter, National Admins can change anything. Chapter Lead comes from the
- * operations-api role hierarchy and is treated as a lead here.
- */
-export const EDITOR_ROLES = [
-  "ADMIN",
-  "CHAPTER_LEAD",
-  "PROJECT_LEAD",
-] as const satisfies readonly AppRole[];
+export { COD_ROLES, EDITOR_ROLES, NATIONALS_ROLES } from "@/lib/auth/roles";
 
 /**
  * For server components (pages and layouts). Returns the session, or sends an

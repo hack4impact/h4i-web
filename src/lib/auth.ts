@@ -30,7 +30,9 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           id: "dev-admin",
           name: "Admin",
           email: DEV_EMAIL,
-          role: "ADMIN",
+          // Dev placeholder maps the former generic admin login to NATIONALS
+          // (explicit seed choice — not an automatic ADMIN→NATIONALS remap).
+          role: "NATIONALS",
         };
       },
     }),
@@ -38,7 +40,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   callbacks: {
     jwt({ token, user }) {
       if (user) {
-        token.role = (user as { role?: AppRole }).role ?? "ADMIN";
+        // Default to VOLUNTEER — never silently grant an administrator type.
+        token.role = (user as { role?: AppRole }).role ?? "VOLUNTEER";
       }
       return token;
     },

@@ -6,34 +6,84 @@ datasource db {
   provider = "postgresql"
 }
 
-// Mirrors the role hierarchy in the operations-api.
+// =============================================================================
+// Administrative permission roles (auth / authorization).
+// Distinct from DirectoryPosition (organizational project roles in the directory).
+//
+// Two administrator types (not a hierarchy — labels, not ranked powers):
+//   COD        — admin type 1; permissions unspecified; do not inherit Nationals powers
+//   NATIONALS  — admin type 2; PRD assigns approval/rejection, manual profile creation,
+//                moderation, and chapter management (workflows are later milestones)
+//
+// Former generic ADMIN was removed. Existing ADMIN rows are NOT auto-mapped to COD or
+// NATIONALS (see correction migration). Non-admin roles unchanged.
+// =============================================================================
 // Temporarily stored here until ops-api exposes role assignment endpoints.
 // TODO: once GET /volunteers?email= and GET /volunteers/:id/roles exist,
 // remove role + operationsChapterId and resolve dynamically at sign-in.
 enum Role {
-  ADMIN
+  COD
+  NATIONALS
   CHAPTER_LEAD
   PROJECT_LEAD
   VOLUNTEER
 }
 
+// =============================================================================
+// Directory organizational positions (PRD: PM, TL, DEVELOPER, DESIGNER, Business).
+// Casing follows existing SCREAMING_SNAKE enum convention (Role).
+// Mapping from PRD labels:
+//   PM        → PM
+//   TL        → TL
+//   DEVELOPER → DEVELOPER
+//   DESIGNER  → DESIGNER
+//   Business  → BUSINESS
+// AlumniHackInvolvement.roleLabel preserves raw historical labels; `position`
+// is set only when the mapping is unambiguous (see src/lib/directory/role-mappings.ts).
+// =============================================================================
+enum DirectoryPosition {
+  PM
+  TL
+  DEVELOPER
+  DESIGNER
+  BUSINESS
+}
+
+// Profile moderation state — distinct from Role (admin privileges) and from
+// ownership / DirectoryPosition. New self-created profiles default to PENDING.
+// Backfill decision for any future import of legacy rows: leave as PENDING
+// (do not silently approve). Nationals approve via a later workflow.
+enum DirectoryApprovalStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
 model User {
-  id                   String   @id @default(cuid())
-  email                String   @unique
-  passwordHash         String?
-  role                 Role     @default(VOLUNTEER)
+  id           String  @id @default(cuid())
+  email        String  @unique
+  passwordHash String?
+  role         Role    @default(VOLUNTEER)
   // Links this auth record to the volunteer record in the operations-api
-  operationsId         String?  @unique
+  operationsId String? @unique
   // Cached from ops-api — the chapter this user belongs to
   // TODO: remove once ops-api exposes role/assignment endpoints
-  operationsChapterId  String?
-  // User preference — controls whether they appear in the national directory
-  directoryOptIn       Boolean  @default(false)
-  createdAt            DateTime @default(now())
-  updatedAt            DateTime @updatedAt
+  operationsChapterId String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   sessions        Session[]
   magicLinkTokens MagicLinkToken[]
+
+  // Optional ownership of directory profiles (nullable on the profile side for
+  // unclaimed legacy/admin-created rows). Uniqueness is per profile table.
+  // Cross-table: a User may own both Member and Alumni during a future
+  // member→alumni transition; schema allows both. Application invariant for
+  // later directory reads: at most ONE of those profiles may be
+  // member-facing-visible at a time (see src/lib/directory/visibility.ts).
+  // Do not auto-claim by name or unverified email match.
+  memberProfile Member?
+  alumniProfile Alumni?
 }
 
 // Stores active login sessions — one row per logged-in device/browser
@@ -56,4 +106,167 @@ model MagicLinkToken {
   createdAt DateTime  @default(now())
 
   user User? @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// =============================================================================
+// Shared chapter registry for directory profiles.
+// Canonical unique name; cuid IDs match User/Session. No fabricated chapter list
+// is seeded — chapters are created when known. Legacy profiles may omit chapterId.
+// =============================================================================
+model Chapter {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  members          Member[]
+  alumni           Alumni[]
+  hackInvolvements AlumniHackInvolvement[]
+}
+
+// =============================================================================
+// Member directory profile (current / active members).
+// Kept separate from Alumni — do not merge into a single profile table.
+//
+// Authoritative directory consent lives ONLY here (directoryOptIn). User has no
+// directory opt-in field.
+//
+// Member-facing visibility (authenticated directory — not public web):
+//   userId IS NOT NULL
+//   AND approvalStatus = APPROVED
+//   AND directoryOptIn = true
+//   AND adminHidden = false
+// Claiming/owning does not approve or opt in. Owner and authorized NATIONALS
+// unpublished access is separate (later authz); do not assume COD has it.
+// Unresolved PRD question: may admins edit another person’s profile?
+// =============================================================================
+model Member {
+  id     String  @id @default(cuid())
+  // Nullable: unclaimed legacy / admin-created profiles have no owner yet.
+  // onDelete SetNull keeps directory history. DB trigger clears directoryOptIn on
+  // ANY ownership change (A→B or A→null); same-statement opt-in is overwritten.
+  userId String? @unique
+  user   User?   @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  chapterId String?
+  chapter   Chapter? @relation(fields: [chapterId], references: [id], onDelete: SetNull)
+
+  displayName String?
+  // Directory-shared contact — distinct from User.email (private account email).
+  contactEmail  String?
+  linkedInUrl   String?
+  githubUrl     String?
+  websiteUrl    String?
+  instagramUrl  String?
+
+  graduationYear Int?
+  major          String?
+  location       String?
+  skills         String[] @default([])
+  interests      String[] @default([])
+  bio            String?
+
+  // Organizational directory position — not an admin permission (see Role).
+  position DirectoryPosition?
+
+  approvalStatus DirectoryApprovalStatus @default(PENDING)
+  directoryOptIn Boolean                 @default(false)
+  adminHidden    Boolean                 @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([chapterId])
+  @@index([approvalStatus, directoryOptIn, adminHidden, userId])
+  @@index([graduationYear])
+}
+
+// =============================================================================
+// Alumni directory profile — separate storage from Member.
+// Job experience and Hack involvement history hang off this model.
+// =============================================================================
+model Alumni {
+  id     String  @id @default(cuid())
+  userId String? @unique
+  user   User?   @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  chapterId String?
+  chapter   Chapter? @relation(fields: [chapterId], references: [id], onDelete: SetNull)
+
+  displayName   String?
+  contactEmail  String?
+  linkedInUrl   String?
+  githubUrl     String?
+  websiteUrl    String?
+  // PRD: alumni Instagram links supported as shared directory contact.
+  instagramUrl  String?
+
+  graduationYear Int?
+  major          String?
+  location       String?
+  skills         String[] @default([])
+  interests      String[] @default([])
+  bio            String?
+
+  // Primary / current directory position when known; historical roles live on
+  // AlumniHackInvolvement.
+  position DirectoryPosition?
+
+  approvalStatus DirectoryApprovalStatus @default(PENDING)
+  directoryOptIn Boolean                 @default(false)
+  adminHidden    Boolean                 @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  jobExperiences   AlumniJobExperience[]
+  hackInvolvements AlumniHackInvolvement[]
+
+  @@index([chapterId])
+  @@index([approvalStatus, directoryOptIn, adminHidden, userId])
+  @@index([graduationYear])
+}
+
+model AlumniJobExperience {
+  id       String @id @default(cuid())
+  alumniId String
+  alumni   Alumni @relation(fields: [alumniId], references: [id], onDelete: Cascade)
+
+  company   String?
+  title     String?
+  location  String?
+  startYear Int?
+  endYear   Int? // null = current
+  isCurrent Boolean @default(false)
+  notes     String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([alumniId])
+}
+
+// Historical Hack for Impact involvement. roleLabel preserves raw/historical
+// wording; position is the canonical DirectoryPosition when mapping is unambiguous.
+// Year range fields preserve existing representation (semester labels not stored).
+model AlumniHackInvolvement {
+  id       String @id @default(cuid())
+  alumniId String
+  alumni   Alumni @relation(fields: [alumniId], references: [id], onDelete: Cascade)
+
+  chapterId String?
+  chapter   Chapter? @relation(fields: [chapterId], references: [id], onDelete: SetNull)
+
+  roleLabel   String?
+  position    DirectoryPosition?
+  projectName String?
+  startYear   Int?
+  endYear     Int?
+  notes       String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([alumniId])
+  @@index([chapterId])
 }

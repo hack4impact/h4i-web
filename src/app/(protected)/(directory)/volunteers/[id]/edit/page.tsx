@@ -7,6 +7,8 @@ export default async function EditVolunteerPage({
 }: {
   params: Promise<{ id: string }>;
 }) {
+  // Same allow-list as base branch volunteer UI (leads + Nationals).
+  // Not a decision on future Member/Alumni admin-edit policy.
   await requireRole(EDITOR_ROLES);
   await params;
   return (

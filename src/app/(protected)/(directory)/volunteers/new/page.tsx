@@ -3,6 +3,8 @@ import { PageHeader } from "@/components/ui/PageHeader";
 import { Button } from "@/components/ui/Button";
 
 export default async function NewVolunteerPage() {
+  // Same allow-list as base branch volunteer UI (leads + Nationals).
+  // Not a decision on future Member/Alumni admin-edit policy.
   await requireRole(EDITOR_ROLES);
   return (
     <div>

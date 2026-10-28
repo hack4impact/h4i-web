@@ -4,18 +4,22 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "prisma generate && next build",
     "start": "next start",
     "lint": "eslint",
     "lint:fix": "eslint --fix",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "typecheck": "tsc --noEmit",
+    "test": "vitest",
+    "test:run": "vitest run",
+    "db:seed": "tsx prisma/seed.ts",
     "prepare": "husky"
   },
   "dependencies": {
     "@base-ui/react": "^1.3.0",
     "@notionhq/client": "^5.13.0",
+    "@plunk/node": "^3.0.3",
     "@prisma/adapter-pg": "^7.5.0",
     "@prisma/client": "^7.5.0",
     "bcryptjs": "^3.0.3",
@@ -25,6 +29,7 @@
     "next": "16.1.6",
     "next-auth": "5.0.0-beta.30",
     "pg": "^8.20.0",
+    "pnpm": "^10.33.0",
     "prisma": "^7.5.0",
     "react": "19.2.3",
     "react-dom": "19.2.3",
@@ -40,6 +45,10 @@
     "onlyBuiltDependencies": [
       "@prisma/engines",
       "prisma"
+    ],
+    "ignoredBuiltDependencies": [
+      "sharp",
+      "unrs-resolver"
     ]
   },
   "devDependencies": {
@@ -48,6 +57,7 @@
     "@types/pg": "^8.18.0",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
+    "dotenv": "^17.4.2",
     "eslint": "^9.39.4",
     "eslint-config-next": "16.1.6",
     "eslint-config-prettier": "^10.1.8",
@@ -56,6 +66,7 @@
     "prettier": "^3.8.1",
     "prettier-plugin-tailwindcss": "^0.7.2",
     "tailwindcss": "^4.2.2",
+    "tsx": "^4.23.15",
     "typescript": "^5.9.3"
   }
 }

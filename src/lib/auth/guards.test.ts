@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { COD_ROLES, EDITOR_ROLES, NATIONALS_ROLES } from "./guards";
+import { COD_ROLES, EDITOR_ROLES, NATIONALS_ROLES } from "./roles";
 
 describe("role allow-lists", () => {
   it("preserves base-branch editor shape with NATIONALS instead of ADMIN", () => {

@@ -1,6 +1,0 @@
-# pnpm 12+ build permissions (replaces package.json pnpm.onlyBuiltDependencies).
-# Keep minimal — only what this repo needs for Prisma engines.
-allowBuilds:
-  "@prisma/engines": true
-  esbuild: true
-  prisma: true

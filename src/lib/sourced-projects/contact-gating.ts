@@ -1,4 +1,8 @@
 import type { Prisma } from "@prisma/client";
+import {
+  ACTIVE_CLAIM_STATUSES,
+  claimSelect,
+} from "@/lib/sourced-projects/claims";
 import type { AppRole } from "@/types";
 
 export type Viewer = {
@@ -38,6 +42,12 @@ const publicListingSelect = {
   links: {
     select: { id: true, label: true, url: true, linkType: true },
     orderBy: { createdAt: "asc" },
+  },
+  // At most one, enforced by the one-active-claim index.
+  claims: {
+    where: { status: { in: [...ACTIVE_CLAIM_STATUSES] } },
+    select: claimSelect,
+    take: 1,
   },
 } satisfies Prisma.SourcedProjectSelect;
 

@@ -95,6 +95,23 @@ Listings are served over GraphQL at `/api/graphql` (GraphiQL is enabled outside 
 
 Client contact fields and partner notes are exposed under `contact`. For anyone who isn't a `CHAPTER_LEADER` or `ADMIN`, they are never selected from the database and `contact` is `null` (see `src/lib/sourced-projects/contact-gating.ts`).
 
+### Claims
+
+Every claim status change goes through `src/lib/sourced-projects/claims.ts`, which also sets the matching listing status. Nothing else writes either.
+
+| Mutation        | Who                       | Claim                    | Listing                       |
+| --------------- | ------------------------- | ------------------------ | ----------------------------- |
+| `requestClaim`  | Leader of another chapter | → `PENDING`              | `AVAILABLE` → `CLAIM_PENDING` |
+| `approveClaim`  | Sourcing chapter or admin | `PENDING` → `APPROVED`   | → `CLAIMED`                   |
+| `rejectClaim`   | Sourcing chapter or admin | `PENDING` → `REJECTED`   | → `AVAILABLE`                 |
+| `withdrawClaim` | Claiming chapter or admin | `PENDING` → `WITHDRAWN`  | → `AVAILABLE`                 |
+| `abandonClaim`  | Either chapter or admin   | `APPROVED` → `ABANDONED` | → `AVAILABLE`                 |
+
+- A transition that no longer applies (for example, approving a claim that was just rejected) returns `CONFLICT`. When two chapters claim the same listing at once, one gets `CONFLICT`. The one-active-claim index in the migration is a second guard.
+- Pending claims expire after 14 days (`CLAIM_TIMEOUT_DAYS`) and the listing returns to `AVAILABLE`. Schedule `pnpm claims:expire` to run daily. A stale claim is also expired when another chapter requests the same listing.
+- Withdrawing a listing rejects its pending claim. A listing with an approved claim can't be withdrawn until the claim is abandoned.
+- New claims emit `claimRequested` on `claimEvents` (`src/lib/sourced-projects/claim-events.ts`) for notifications to subscribe to.
+
 ## Tests
 
 ```bash

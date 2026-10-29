@@ -20,6 +20,7 @@
     "db:deploy": "tsx prisma/deploy.ts",
     "db:seed": "prisma db seed",
     "db:reset": "prisma migrate reset",
+    "claims:expire": "tsx scripts/expire-claims.ts",
     "prepare": "husky"
   },
   "dependencies": {

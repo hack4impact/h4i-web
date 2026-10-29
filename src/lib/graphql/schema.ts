@@ -14,6 +14,13 @@ import {
   type CreateListingInput,
 } from "@/lib/sourced-projects/listing-input";
 import { canManageListing } from "@/lib/sourced-projects/permissions";
+import {
+  ClaimError,
+  closeClaimsForWithdrawal,
+  requestClaim,
+  resolveClaim,
+  type ClaimAction,
+} from "@/lib/sourced-projects/claims";
 
 export type GraphQLContext = { viewer: Viewer | null };
 
@@ -40,6 +47,15 @@ const typeDefs = /* GraphQL */ `
     ARTS_AND_CULTURE
     CIVIC_ENGAGEMENT
     OTHER
+  }
+
+  enum ClaimStatus {
+    PENDING
+    APPROVED
+    REJECTED
+    WITHDRAWN
+    EXPIRED
+    ABANDONED
   }
 
   enum LinkType {
@@ -72,6 +88,17 @@ const typeDefs = /* GraphQL */ `
     partnerNotes: String
   }
 
+  type Claim {
+    id: ID!
+    status: ClaimStatus!
+    message: String
+    requestedAt: String!
+    resolvedAt: String
+    claimingChapter: Chapter!
+    "Null once the listing is withdrawn."
+    listing: Listing
+  }
+
   type Listing {
     id: ID!
     title: String!
@@ -87,6 +114,8 @@ const typeDefs = /* GraphQL */ `
     sourcingChapter: Chapter!
     links: [ListingLink!]!
     contact: ListingContact
+    "The pending or approved claim, if any."
+    activeClaim: Claim
   }
 
   type PageInfo {
@@ -164,8 +193,23 @@ const typeDefs = /* GraphQL */ `
   type Mutation {
     createListing(input: CreateListingInput!): Listing!
     updateListing(id: ID!, input: UpdateListingInput!): Listing!
-    "Hides the listing from every query. Listings are never hard-deleted."
+    """
+    Hides the listing from every query. Listings are never hard-deleted. A
+    pending claim is rejected; a listing with an approved claim can't be
+    withdrawn until that claim is abandoned.
+    """
     withdrawListing(id: ID!): Listing!
+
+    "Chapter leaders only, for another chapter's AVAILABLE listing."
+    requestClaim(listingId: ID!, message: String): Claim!
+    "Sourcing chapter or admin. PENDING -> APPROVED; the listing becomes CLAIMED."
+    approveClaim(id: ID!): Claim!
+    "Sourcing chapter or admin. PENDING -> REJECTED; the listing becomes AVAILABLE."
+    rejectClaim(id: ID!): Claim!
+    "Claiming chapter or admin. PENDING -> WITHDRAWN; the listing becomes AVAILABLE."
+    withdrawClaim(id: ID!): Claim!
+    "Either chapter or admin. APPROVED -> ABANDONED; the listing becomes AVAILABLE."
+    abandonClaim(id: ID!): Claim!
   }
 `;
 
@@ -190,7 +234,7 @@ function requireViewer(ctx: GraphQLContext): Viewer {
 }
 
 function userError(
-  code: "BAD_USER_INPUT" | "FORBIDDEN" | "NOT_FOUND",
+  code: "BAD_USER_INPUT" | "CONFLICT" | "FORBIDDEN" | "NOT_FOUND",
   message: string,
   extensions: Record<string, unknown> = {}
 ) {
@@ -225,6 +269,21 @@ async function requireManageableListing(viewer: Viewer, id: string) {
   }
   return listing;
 }
+
+// Turns claim service errors into GraphQL errors with the same code.
+async function claimAction<T>(run: () => Promise<T>) {
+  try {
+    return await run();
+  } catch (error) {
+    if (error instanceof ClaimError) throw userError(error.code, error.message);
+    throw error;
+  }
+}
+
+const resolveClaimMutation =
+  (action: ClaimAction) =>
+  (_: unknown, args: { id: string }, ctx: GraphQLContext) =>
+    claimAction(() => resolveClaim(requireViewer(ctx), args.id, action));
 
 const createLinks = (
   links: NonNullable<CreateListingInput["links"]>,
@@ -360,19 +419,56 @@ export const schema = createSchema<GraphQLContext>({
       async withdrawListing(_, args: { id: string }, ctx) {
         const viewer = requireViewer(ctx);
         await requireManageableListing(viewer, args.id);
-        const row = await db.sourcedProject.update({
-          where: { id: args.id, withdrawnAt: null },
-          data: { withdrawnAt: new Date() },
-          select: listingSelect(viewer),
-        });
+        const row = await claimAction(() =>
+          db.$transaction(async (tx) => {
+            // Withdraw first so the row lock blocks a claim arriving mid-way.
+            await tx.sourcedProject.update({
+              where: { id: args.id, withdrawnAt: null },
+              data: { withdrawnAt: new Date() },
+            });
+            await closeClaimsForWithdrawal(tx, args.id, viewer);
+            return tx.sourcedProject.findUniqueOrThrow({
+              where: { id: args.id },
+              select: listingSelect(viewer),
+            });
+          })
+        );
         return toListingView(row, viewer);
       },
+
+      requestClaim: (
+        _,
+        args: { listingId: string; message?: string | null },
+        ctx
+      ) =>
+        claimAction(() =>
+          requestClaim(requireViewer(ctx), args.listingId, args.message)
+        ),
+      approveClaim: resolveClaimMutation("approve"),
+      rejectClaim: resolveClaimMutation("reject"),
+      withdrawClaim: resolveClaimMutation("withdraw"),
+      abandonClaim: resolveClaimMutation("abandon"),
     },
 
     Listing: {
       postedAt: (parent) => toIso(parent, "postedAt"),
       lastVerifiedAt: (parent) => toIso(parent, "lastVerifiedAt"),
       updatedAt: (parent) => toIso(parent, "updatedAt"),
+      activeClaim: (parent: { claims: unknown[] }) => parent.claims[0] ?? null,
+    },
+
+    Claim: {
+      requestedAt: (parent) => toIso(parent, "requestedAt"),
+      resolvedAt: (parent) =>
+        parent.resolvedAt ? toIso(parent, "resolvedAt") : null,
+      async listing(parent: { sourcedProjectId: string }, _, ctx) {
+        const viewer = requireViewer(ctx);
+        const row = await db.sourcedProject.findFirst({
+          where: { id: parent.sourcedProjectId, withdrawnAt: null },
+          select: listingSelect(viewer),
+        });
+        return row ? toListingView(row, viewer) : null;
+      },
     },
   },
 });

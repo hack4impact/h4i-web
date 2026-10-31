@@ -10,15 +10,7 @@ import { NATIONALS_ROLES } from "@/lib/auth/roles";
  * Enforcement:
  * - Database: ownership change (A→B or A→null) → directoryOptIn forced false
  *   (trigger, null-safe); per-table userId uniqueness; approval/opt-in/hidden defaults.
- * - Application (this module): the where-builders below. Every directory read
- *   MUST obtain its where clause from here. Do not hand-roll the predicate at a
- *   call site, and do not fetch a row and filter it in JavaScript afterwards —
- *   a row that reaches the server has already left the database.
- *
- * Three access tiers:
- *   1. Any signed-in viewer  → member-facing rows only.
- *   2. Owner                 → additionally their own row, whatever its state.
- *   3. NATIONALS             → any row. COD is NOT included (see roles.ts).
+ * - Application (this module): pure helpers for future reads — call sites must use them.
  *
  * UNFINISHED — duplicate active Member+Alumni identities:
  * - hasDuplicateActiveDirectoryIdentities only detects; it does NOT enforce.
@@ -38,12 +30,6 @@ export type DirectoryVisibilityFields = {
   adminHidden: boolean;
 };
 
-/** Who is asking. userId is the User.id on the session, never a profile id. */
-export type DirectoryViewer = {
-  userId: string;
-  role: AppRole;
-};
-
 /**
  * Member-facing visibility for a single Member or Alumni row:
  *   userId IS NOT NULL
@@ -58,9 +44,9 @@ export function isMemberFacingDirectoryVisible(
 ): boolean {
   return (
     profile.userId != null &&
-    profile.approvalStatus === "APPROVED" &&
-    profile.directoryOptIn === true &&
-    profile.adminHidden === false
+    profile.approvalStatus === MEMBER_FACING_VISIBILITY.approvalStatus &&
+    profile.directoryOptIn === MEMBER_FACING_VISIBILITY.directoryOptIn &&
+    profile.adminHidden === MEMBER_FACING_VISIBILITY.adminHidden
   );
 }
 
@@ -80,9 +66,9 @@ export function hasDuplicateActiveDirectoryIdentities(
 /** Prisma where-input matching isMemberFacingDirectoryVisible. */
 export const memberFacingDirectoryWhere = {
   userId: { not: null },
-  approvalStatus: "APPROVED" as const,
-  directoryOptIn: true,
-  adminHidden: false,
+  approvalStatus: MEMBER_FACING_VISIBILITY.approvalStatus,
+  directoryOptIn: MEMBER_FACING_VISIBILITY.directoryOptIn,
+  adminHidden: MEMBER_FACING_VISIBILITY.adminHidden,
 };
 
 /**

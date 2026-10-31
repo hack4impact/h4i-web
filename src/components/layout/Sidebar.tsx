@@ -9,6 +9,7 @@ import {
   Handshake,
   FolderOpen,
   Users,
+  Contact,
   ChevronDown,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -146,6 +147,11 @@ export function Sidebar({ user }: { user: SidebarUser }) {
             href="/projects"
             label="Projects"
             icon={<FolderOpen size={15} strokeWidth={1.5} />}
+          />
+          <NavItem
+            href="/members"
+            label="Members"
+            icon={<Contact size={15} strokeWidth={1.5} />}
           />
           <NavItem
             href="/volunteers"

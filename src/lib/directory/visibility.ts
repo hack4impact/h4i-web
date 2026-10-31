@@ -6,11 +6,14 @@
  * Enforcement today:
  * - Database: ownership change (A→B or A→null) → directoryOptIn forced false
  *   (trigger, null-safe); per-table userId uniqueness; approval/opt-in/hidden defaults.
- * - Application (this module): pure helpers for future reads — call sites must use them.
+ * - Application (this module): pure helpers — call sites must use them.
+ *
+ * List/search reads: `src/lib/directory/search.ts` builds SQL from
+ * `MEMBER_FACING_VISIBILITY` / `memberFacingDirectoryWhere` (same constants as
+ * `isMemberFacingDirectoryVisible`). Do not hand-roll a parallel predicate.
+ * Notion `/volunteers` is a separate legacy surface.
  *
  * UNFINISHED — duplicate active Member+Alumni identities:
- * - No Prisma Member/Alumni directory list/detail/count API exists yet (volunteers UI
- *   still reads Notion via getVolunteers).
  * - hasDuplicateActiveDirectoryIdentities only detects; it does NOT enforce.
  * - Later reads must exclude or surface conflicts consistently across lists, details,
  *   and counts without deleting profiles or picking an arbitrary winner.
@@ -28,6 +31,16 @@ export type DirectoryVisibilityFields = {
 };
 
 /**
+ * Single source of truth for member-facing visibility scalars.
+ * Used by the JS predicate, Prisma where-input, and directory search SQL.
+ */
+export const MEMBER_FACING_VISIBILITY = {
+  approvalStatus: "APPROVED" as const satisfies DirectoryApprovalStatusName,
+  directoryOptIn: true,
+  adminHidden: false,
+};
+
+/**
  * Member-facing visibility for a single Member or Alumni row:
  *   userId IS NOT NULL
  *   AND approvalStatus === APPROVED
@@ -41,9 +54,9 @@ export function isMemberFacingDirectoryVisible(
 ): boolean {
   return (
     profile.userId != null &&
-    profile.approvalStatus === "APPROVED" &&
-    profile.directoryOptIn === true &&
-    profile.adminHidden === false
+    profile.approvalStatus === MEMBER_FACING_VISIBILITY.approvalStatus &&
+    profile.directoryOptIn === MEMBER_FACING_VISIBILITY.directoryOptIn &&
+    profile.adminHidden === MEMBER_FACING_VISIBILITY.adminHidden
   );
 }
 
@@ -60,10 +73,10 @@ export function hasDuplicateActiveDirectoryIdentities(
   return memberVisible && alumniVisible;
 }
 
-/** Prisma where-input matching isMemberFacingDirectoryVisible (for future APIs). */
+/** Prisma where-input matching isMemberFacingDirectoryVisible. */
 export const memberFacingDirectoryWhere = {
   userId: { not: null },
-  approvalStatus: "APPROVED" as const,
-  directoryOptIn: true,
-  adminHidden: false,
+  approvalStatus: MEMBER_FACING_VISIBILITY.approvalStatus,
+  directoryOptIn: MEMBER_FACING_VISIBILITY.directoryOptIn,
+  adminHidden: MEMBER_FACING_VISIBILITY.adminHidden,
 };

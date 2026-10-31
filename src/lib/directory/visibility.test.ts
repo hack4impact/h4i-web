@@ -1,6 +1,9 @@
 import { describe, expect, it } from "vitest";
 import {
   MEMBER_FACING_VISIBILITY,
+  canViewUnpublishedDirectoryProfiles,
+  directoryDetailWhere,
+  directoryListWhere,
   hasDuplicateActiveDirectoryIdentities,
   isMemberFacingDirectoryVisible,
   memberFacingDirectoryWhere,
@@ -85,5 +88,67 @@ describe("hasDuplicateActiveDirectoryIdentities", () => {
     expect(
       hasDuplicateActiveDirectoryIdentities(visibleBase, visibleBase)
     ).toBe(true);
+  });
+});
+
+describe("canViewUnpublishedDirectoryProfiles", () => {
+  it("grants NATIONALS and nobody else", () => {
+    expect(canViewUnpublishedDirectoryProfiles("NATIONALS")).toBe(true);
+  });
+
+  it("does not leak to the other admin type or to editors", () => {
+    for (const role of [
+      "COD",
+      "CHAPTER_LEAD",
+      "PROJECT_LEAD",
+      "VOLUNTEER",
+    ] as const) {
+      expect(canViewUnpublishedDirectoryProfiles(role)).toBe(false);
+    }
+  });
+});
+
+describe("directoryListWhere", () => {
+  it("is the member-facing clause", () => {
+    expect(directoryListWhere()).toEqual(memberFacingDirectoryWhere);
+  });
+
+  it("returns a fresh object so a caller cannot mutate the shared rule", () => {
+    const first = directoryListWhere();
+    (first as Record<string, unknown>).adminHidden = true;
+    expect(directoryListWhere().adminHidden).toBe(false);
+    expect(memberFacingDirectoryWhere.adminHidden).toBe(false);
+  });
+});
+
+describe("directoryDetailWhere", () => {
+  it("places no restriction on NATIONALS", () => {
+    expect(
+      directoryDetailWhere({ userId: "user_1", role: "NATIONALS" })
+    ).toEqual({});
+  });
+
+  it("gives everyone else member-facing rows or their own row", () => {
+    expect(
+      directoryDetailWhere({ userId: "user_1", role: "VOLUNTEER" })
+    ).toEqual({
+      OR: [memberFacingDirectoryWhere, { userId: "user_1" }],
+    });
+  });
+
+  it("treats COD, CHAPTER_LEAD and PROJECT_LEAD as ordinary viewers", () => {
+    for (const role of ["COD", "CHAPTER_LEAD", "PROJECT_LEAD"] as const) {
+      const where = directoryDetailWhere({ userId: "user_1", role });
+      expect(where).not.toEqual({});
+      expect(where).toEqual({
+        OR: [memberFacingDirectoryWhere, { userId: "user_1" }],
+      });
+    }
+  });
+
+  it("omits the owner branch when there is no viewer id, so unclaimed rows stay hidden", () => {
+    expect(directoryDetailWhere({ userId: "", role: "VOLUNTEER" })).toEqual({
+      OR: [memberFacingDirectoryWhere],
+    });
   });
 });

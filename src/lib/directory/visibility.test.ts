@@ -1,7 +1,9 @@
 import { describe, expect, it } from "vitest";
 import {
+  MEMBER_FACING_VISIBILITY,
   hasDuplicateActiveDirectoryIdentities,
   isMemberFacingDirectoryVisible,
+  memberFacingDirectoryWhere,
 } from "./visibility";
 
 const visibleBase = {
@@ -44,6 +46,28 @@ describe("isMemberFacingDirectoryVisible", () => {
     expect(
       isMemberFacingDirectoryVisible({ ...visibleBase, adminHidden: true })
     ).toBe(false);
+  });
+});
+
+describe("MEMBER_FACING_VISIBILITY single source of truth", () => {
+  it("keeps the JS predicate, Prisma where, and search SQL constants aligned", () => {
+    expect(memberFacingDirectoryWhere).toEqual({
+      userId: { not: null },
+      approvalStatus: MEMBER_FACING_VISIBILITY.approvalStatus,
+      directoryOptIn: MEMBER_FACING_VISIBILITY.directoryOptIn,
+      adminHidden: MEMBER_FACING_VISIBILITY.adminHidden,
+    });
+    expect(MEMBER_FACING_VISIBILITY).toEqual({
+      approvalStatus: "APPROVED",
+      directoryOptIn: true,
+      adminHidden: false,
+    });
+    expect(
+      isMemberFacingDirectoryVisible({
+        userId: "u",
+        ...MEMBER_FACING_VISIBILITY,
+      })
+    ).toBe(true);
   });
 });
 

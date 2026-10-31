@@ -10,7 +10,20 @@ import { NATIONALS_ROLES } from "@/lib/auth/roles";
  * Enforcement:
  * - Database: ownership change (A→B or A→null) → directoryOptIn forced false
  *   (trigger, null-safe); per-table userId uniqueness; approval/opt-in/hidden defaults.
- * - Application (this module): pure helpers for future reads — call sites must use them.
+ * - Application (this module): the where-builders below. Every directory read
+ *   MUST obtain its where clause from here. Do not hand-roll the predicate at a
+ *   call site, and do not fetch a row and filter it in JavaScript afterwards —
+ *   a row that reaches the server has already left the database.
+ *
+ * List/search reads: `src/lib/directory/search.ts` builds SQL from
+ * `MEMBER_FACING_VISIBILITY` / `memberFacingDirectoryWhere` (same constants as
+ * `isMemberFacingDirectoryVisible`). Do not hand-roll a parallel predicate.
+ * Notion `/volunteers` is a separate legacy surface.
+ *
+ * Three access tiers:
+ *   1. Any signed-in viewer  → member-facing rows only.
+ *   2. Owner                 → additionally their own row, whatever its state.
+ *   3. NATIONALS             → any row. COD is NOT included (see roles.ts).
  *
  * UNFINISHED — duplicate active Member+Alumni identities:
  * - hasDuplicateActiveDirectoryIdentities only detects; it does NOT enforce.
@@ -28,6 +41,22 @@ export type DirectoryVisibilityFields = {
   approvalStatus: DirectoryApprovalStatusName;
   directoryOptIn: boolean;
   adminHidden: boolean;
+};
+
+/**
+ * Single source of truth for member-facing visibility scalars.
+ * Used by the JS predicate, Prisma where-input, and directory search SQL.
+ */
+export const MEMBER_FACING_VISIBILITY = {
+  approvalStatus: "APPROVED" as const satisfies DirectoryApprovalStatusName,
+  directoryOptIn: true,
+  adminHidden: false,
+};
+
+/** Who is asking. userId is the User.id on the session, never a profile id. */
+export type DirectoryViewer = {
+  userId: string;
+  role: AppRole;
 };
 
 /**

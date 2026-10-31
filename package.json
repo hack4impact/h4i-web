@@ -10,10 +10,12 @@
     "lint:fix": "eslint --fix",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "typecheck": "tsc --noEmit",
+    "typecheck": "tsc --noEmit && tsc -p tsconfig.seed.json --noEmit",
+    "typecheck:seed": "tsc -p tsconfig.seed.json --noEmit",
     "test": "vitest",
     "test:run": "vitest run",
     "db:seed": "tsx prisma/seed.ts",
+    "db:seed:directory": "tsx prisma/seed-directory.ts",
     "prepare": "husky"
   },
   "dependencies": {

@@ -32,7 +32,10 @@
   ],
   "exclude": [
     "node_modules",
+    // Prisma scripts stay out of the Next app graph (dotenv / Node entrypoints).
+    // They are typechecked via `pnpm typecheck:seed` → tsconfig.seed.json.
     "prisma/seed.ts",
+    "prisma/seed-directory.ts",
     "prisma/verify-directory-schema.ts",
     "prisma/manual-directory-fixtures.ts"
   ]

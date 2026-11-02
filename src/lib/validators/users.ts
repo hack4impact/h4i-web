@@ -1,10 +1,9 @@
 import { z } from "zod";
-
-const roleEnum = z.enum(["ADMIN", "CHAPTER_LEAD", "PROJECT_LEAD", "VOLUNTEER"]);
+import { APP_ROLES } from "@/lib/auth/roles";
 
 export const userPatchSchema = z.object({
-  role: roleEnum.optional(),
-  operationsChapterId: z.string().optional(),
+  role: z.enum(APP_ROLES).optional(),
+  chapterId: z.string().cuid().nullable().optional(),
 });
 
 export type UserPatch = z.infer<typeof userPatchSchema>;

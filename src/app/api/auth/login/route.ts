@@ -2,41 +2,38 @@ import { randomBytes } from "crypto";
 import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { loginRequestSchema } from "@/lib/validators/auth";
-import { verifyPassword } from "@/lib/auth/password";
+import { hashPassword, verifyPassword } from "@/lib/auth/password";
 import {
   SESSION_COOKIE,
   SESSION_MAX_AGE_SECONDS,
   sessionCookieOptions,
 } from "@/lib/auth/cookies";
 
-export async function POST(request: Request) {
-  // One generic response for every failure. Telling an unknown email apart
-  // from a wrong password would let someone enumerate who has an account.
-  const errorResponse = NextResponse.json(
-    { error: "Invalid email or password" },
-    { status: 401 }
-  );
+// Compared against when the email is unknown, so a failed login takes the same
+// time either way and does not reveal whether the account exists.
+let dummyHash: Promise<string> | undefined;
+function getDummyHash() {
+  dummyHash ??= hashPassword(randomBytes(16).toString("hex"));
+  return dummyHash;
+}
 
+// One response for every failure so accounts cannot be enumerated.
+const invalid = () =>
+  NextResponse.json({ error: "Invalid email or password" }, { status: 401 });
+
+export async function POST(request: Request) {
   try {
-    const body = await request.json();
-    const login = loginRequestSchema.parse(body);
+    const login = loginRequestSchema.parse(await request.json());
 
     const user = await db.user.findUnique({ where: { email: login.email } });
 
-    // passwordHash is null for accounts created via magic link.
-    if (user == null || user.passwordHash == null) {
-      return errorResponse;
+    const hash = user?.passwordHash ?? (await getDummyHash());
+    const verified = await verifyPassword(login.password, hash);
+    if (!user?.passwordHash || !verified) {
+      return invalid();
     }
 
-    const verified = await verifyPassword(login.password, user.passwordHash);
-    if (!verified) {
-      return errorResponse;
-    }
-
-    // The session id IS the bearer token in the cookie, so it must be
-    // unguessable. Generated explicitly rather than relying on the schema's
-    // @default(cuid()) — cuid is collision-resistant, not cryptographically
-    // random, and a predictable token means a forgeable login.
+    // The session id is the bearer token in the cookie, so it must be random.
     const session = await db.session.create({
       data: {
         id: randomBytes(32).toString("hex"),
@@ -57,6 +54,6 @@ export async function POST(request: Request) {
     return response;
   } catch (error) {
     console.error("Login error:", error);
-    return errorResponse;
+    return invalid();
   }
 }

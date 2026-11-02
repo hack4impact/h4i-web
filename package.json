@@ -10,7 +10,16 @@
     "lint:fix": "eslint --fix",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "typecheck": "tsc --noEmit",
+    "typecheck": "tsc --noEmit && tsc -p tsconfig.seed.json --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:int": "vitest run --config vitest.int.config.mts --passWithNoTests",
+    "db:up": "docker compose up -d",
+    "db:generate": "prisma generate",
+    "db:migrate": "prisma migrate dev",
+    "db:deploy": "tsx prisma/deploy.ts",
+    "db:seed": "prisma db seed",
+    "db:reset": "prisma migrate reset",
     "prepare": "husky"
   },
   "dependencies": {
@@ -24,10 +33,9 @@
     "clsx": "^2.1.1",
     "lucide-react": "^1.61.0",
     "next": "16.4.3",
-    "next-auth": "5.0.0-beta.30",
     "pg": "^8.23.1",
     "pnpm": "^12.15.0",
-    "prisma": "8.0.0-rc.27",
+    "prisma": "^7.10.1",
     "react": "19.3.1",
     "react-dom": "19.3.1",
     "shadcn": "^4.22.1",
@@ -53,6 +61,8 @@
     "prettier": "^3.9.10",
     "prettier-plugin-tailwindcss": "^0.8.1",
     "tailwindcss": "^4.3.3",
-    "typescript": "^7.0.2"
+    "tsx": "^4.23.15",
+    "typescript": "^5.9.3",
+    "vitest": "^5.0.5"
   }
 }

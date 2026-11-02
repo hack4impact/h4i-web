@@ -1,36 +1,26 @@
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { getCurrentSession } from "@/lib/auth/session";
+import { hasRole } from "@/lib/auth/roles";
 import type { AppRole } from "@/types";
 
-/**
- * Roles allowed to create or edit records.
- *
- * From the PRD: Members are read-only, Project Leads can upload for their
- * chapter, National Admins can change anything. Chapter Lead comes from the
- * operations-api role hierarchy and is treated as a lead here.
- */
-export const EDITOR_ROLES = [
-  "ADMIN",
-  "CHAPTER_LEAD",
-  "PROJECT_LEAD",
-] as const satisfies readonly AppRole[];
+export {
+  ADMIN_ROLES,
+  CHAPTER_LEADERSHIP_ROLES,
+  EDITOR_ROLES,
+  canActForChapter,
+  hasRole,
+} from "@/lib/auth/roles";
 
 /**
- * For server components (pages and layouts). Returns the session, or sends an
- * unauthenticated visitor to sign-in and never returns.
- *
- * This is the authoritative check: unlike proxy.ts it runs on the Node runtime,
- * so it really does look the session up in the database and verify it has not
- * expired.
+ * For pages and layouts. Redirects to sign-in when there is no valid session.
+ * Unlike proxy.ts this runs on Node and checks the Session row in the database.
  */
 export async function requireSession() {
   const session = await getCurrentSession();
 
   if (!session) {
-    // proxy.ts set x-pathname on the forwarded request. Carry it over so the
-    // visitor returns to where they were after signing in, instead of being
-    // dumped on the dashboard when a session quietly expires.
+    // Set by proxy.ts so the visitor can be sent back after signing in.
     const pathname = (await headers()).get("x-pathname");
     redirect(
       pathname
@@ -42,14 +32,11 @@ export async function requireSession() {
   return session;
 }
 
-/**
- * For server components that only certain roles may see. Signed-out visitors
- * go to sign-in; signed-in visitors without a listed role go to the dashboard.
- */
+/** For pages only certain roles may see. Wrong role goes to the dashboard. */
 export async function requireRole(allowed: readonly AppRole[]) {
   const session = await requireSession();
 
-  if (!allowed.includes(session.user.role as AppRole)) {
+  if (!hasRole(session.user.role, allowed)) {
     redirect("/dashboard");
   }
 
@@ -57,18 +44,24 @@ export async function requireRole(allowed: readonly AppRole[]) {
 }
 
 /**
- * For server actions and route handlers, which are called programmatically
- * rather than navigated to — redirecting them makes no sense, so this throws.
- *
- * Server actions are POST endpoints. A client can invoke one directly without
- * ever rendering the page it lives on, so layout protection does nothing for
- * them and each one needs its own check.
+ * For server actions and route handlers, which can be called without rendering
+ * a page, so layout protection does not cover them. Throws instead of redirecting.
  */
 export async function assertSession() {
   const session = await getCurrentSession();
 
   if (!session) {
     throw new Error("Unauthorized");
+  }
+
+  return session;
+}
+
+export async function assertRole(allowed: readonly AppRole[]) {
+  const session = await assertSession();
+
+  if (!hasRole(session.user.role, allowed)) {
+    throw new Error("Forbidden");
   }
 
   return session;

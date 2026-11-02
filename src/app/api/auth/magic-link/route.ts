@@ -1,50 +1,54 @@
 import { NextRequest, NextResponse } from "next/server";
-import { magicLinkRequestSchema } from "@/lib/validators/auth";
-import { db } from "@/lib/db";
-import crypto from "crypto";
+import { randomBytes } from "crypto";
 import Plunk from "@plunk/node";
+import { db } from "@/lib/db";
+import { magicLinkRequestSchema } from "@/lib/validators/auth";
 
-/**
- * Given an email, we create a magic link using tokens for user to then explore the website. This is for first-time users and returning users. If user email does not exist, we do nothing.
- *
- * @param request body that has the user email.
- * @returns 200 request no matter the outcome.
- */
+const MAGIC_LINK_TTL_MS = 15 * 60 * 1000;
+
+// Same response whether or not the address has an account.
+const accepted = () =>
+  NextResponse.json(
+    { message: "If the email exists, then a link has been sent" },
+    { status: 200 }
+  );
+
 export async function POST(request: NextRequest) {
-  const body = await request.json();
-
-  // invalid email provided
-  if (!magicLinkRequestSchema.safeParse(body).success) {
-    return NextResponse.json(
-      { message: "If the email exists, then a link has been sent" },
-      { status: 200 }
-    );
+  let email: string;
+  try {
+    const parsed = magicLinkRequestSchema.safeParse(await request.json());
+    if (!parsed.success) return accepted();
+    email = parsed.data.email;
+  } catch {
+    return accepted();
   }
 
   try {
-    const token = crypto.randomBytes(32).toString("hex");
-    const expiresAt = new Date(Date.now() + 60 * 15 * 1000);
-    const email = body.email;
+    const token = randomBytes(32).toString("hex");
+    const user = await db.user.findUnique({ where: { email } });
 
-    const plunk = new Plunk(process.env.PLUNK_API_KEY!);
-
-    const user = await db.user.findUnique({
-      where: { email: email },
-    });
-
-    // create magic token with user id or without it
     await db.magicLinkToken.create({
       data: {
         id: token,
-        email: email,
-        userId: user?.id || null,
-        expiresAt: expiresAt,
+        email,
+        userId: user?.id ?? null,
+        expiresAt: new Date(Date.now() + MAGIC_LINK_TTL_MS),
       },
     });
 
     const magicLink = `${process.env.PUBLIC_URL}/api/auth/magic-link/verify?token=${token}`;
 
-    // send email to the user
+    // No mail provider configured: print the link in development.
+    if (!process.env.PLUNK_API_KEY) {
+      if (process.env.NODE_ENV === "production") {
+        console.error("PLUNK_API_KEY is not set; magic link not sent");
+      } else {
+        console.log(`[dev] Magic link for ${email}: ${magicLink}`);
+      }
+      return accepted();
+    }
+
+    const plunk = new Plunk(process.env.PLUNK_API_KEY);
     await plunk.emails.send({
       to: email,
       subject: "Your Magic Link",
@@ -58,8 +62,5 @@ export async function POST(request: NextRequest) {
     console.error("Magic link error:", err);
   }
 
-  return NextResponse.json(
-    { message: "If the email exists, then a link has been sent" },
-    { status: 200 }
-  );
+  return accepted();
 }

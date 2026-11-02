@@ -1,3 +1,4 @@
+import { requireRole, EDITOR_ROLES } from "@/lib/auth/guards";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { Button } from "@/components/ui/Button";
 
@@ -6,6 +7,7 @@ export default async function EditPartnerPage({
 }: {
   params: Promise<{ id: string }>;
 }) {
+  await requireRole(EDITOR_ROLES);
   await params;
   return (
     <div>

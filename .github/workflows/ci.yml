@@ -19,13 +19,16 @@ jobs:
       DATABASE_URL: postgresql://unused:unused@localhost:5432/unused
     steps:
       - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-        with:
-          version: 10
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: pnpm
+      # Org policy allows only GitHub-owned actions, so pnpm is installed with npm.
+      - run: npm install -g pnpm@10
+      - uses: actions/cache@v4
+        with:
+          path: ~/.local/share/pnpm/store
+          key: pnpm-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}
+          restore-keys: pnpm-${{ runner.os }}-
       - run: pnpm install --frozen-lockfile
       - run: pnpm prisma generate
       - run: pnpm typecheck
@@ -53,13 +56,16 @@ jobs:
       DATABASE_URL: postgresql://postgres:postgres@localhost:5432/volunteer_platform
     steps:
       - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-        with:
-          version: 10
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: pnpm
+      # Org policy allows only GitHub-owned actions, so pnpm is installed with npm.
+      - run: npm install -g pnpm@10
+      - uses: actions/cache@v4
+        with:
+          path: ~/.local/share/pnpm/store
+          key: pnpm-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}
+          restore-keys: pnpm-${{ runner.os }}-
       - run: pnpm install --frozen-lockfile
       - run: pnpm prisma generate
       - run: pnpm db:deploy

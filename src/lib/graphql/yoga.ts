@@ -3,7 +3,7 @@ import type { Viewer } from "@/lib/sourced-projects/contact-gating";
 import { schema, type GraphQLContext } from "@/lib/graphql/schema";
 
 // The viewer resolver is injected so tests can drive the real handler without
-// an Auth.js session.
+// a session cookie.
 export function createGraphQLHandler(
   getViewer: (request: Request) => Promise<Viewer | null>
 ) {

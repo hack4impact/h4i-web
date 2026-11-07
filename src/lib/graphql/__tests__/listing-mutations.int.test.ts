@@ -1,4 +1,4 @@
-// Runs against the seeded dev database (`pnpm prisma db seed`). Listings
+// Runs against the seeded dev database (`pnpm db:seed`). Listings
 // created here are deleted again in afterAll.
 import { randomUUID } from "node:crypto";
 import { afterAll, describe, expect, it } from "vitest";
@@ -10,13 +10,13 @@ import { ADMIN, LEAD, run, VOLUNTEER, type GraphQLResult } from "./helpers";
 // the same chapter respectively.
 const OTHER_LEAD: Viewer = {
   id: "seed-user-lead-uiuc",
-  role: "CHAPTER_LEADER",
-  chapterId: "seed-chapter-uiuc",
+  role: "CHAPTER_LEAD",
+  chapterId: "chapter-uiuc",
 };
 const SAME_CHAPTER_VOLUNTEER: Viewer = {
   id: "seed-user-volunteer-berkeley",
-  role: "VOLUNTEER",
-  chapterId: "seed-chapter-berkeley",
+  role: "MEMBER",
+  chapterId: "chapter-berkeley",
 };
 
 const LISTING_FIELDS = /* GraphQL */ `
@@ -183,9 +183,9 @@ describe("createListing", () => {
 
   it("lets an admin post for any chapter", async () => {
     const listing = await create(ADMIN, {
-      sourcingChapterId: "seed-chapter-gt",
+      sourcingChapterId: "chapter-gt",
     });
-    expect(listing.sourcingChapter.id).toBe("seed-chapter-gt");
+    expect(listing.sourcingChapter.id).toBe("chapter-gt");
   });
 
   it("requires an admin without a chapter to name one", async () => {
@@ -202,7 +202,7 @@ describe("createListing", () => {
 
   it.each([
     ["a volunteer", VOLUNTEER, undefined],
-    ["a leader posting for another chapter", LEAD, "seed-chapter-uiuc"],
+    ["a leader posting for another chapter", LEAD, "chapter-uiuc"],
   ])("forbids %s", async (_, viewer, sourcingChapterId) => {
     const result = await run(CREATE, viewer, {
       input: validInput({ sourcingChapterId }),
@@ -349,7 +349,7 @@ describe("listings search and filters", () => {
     await create(ADMIN, {
       title: `Clinic ${token}`,
       causeArea: "HEALTH",
-      sourcingChapterId: "seed-chapter-gt",
+      sourcingChapterId: "chapter-gt",
     });
 
     const { nodes } = await search(VOLUNTEER, {
@@ -371,7 +371,7 @@ describe("listings search and filters", () => {
     ["cause area", { causeArea: "EDUCATION" }, (n: SearchNode) => n.causeArea],
     [
       "chapter",
-      { sourcingChapterId: "seed-chapter-bu" },
+      { sourcingChapterId: "chapter-bu" },
       (n: SearchNode) => n.sourcingChapter.id,
     ],
   ])("filters by %s", async (_, filter, pick) => {

@@ -49,8 +49,8 @@ Fill in `.env.local`:
 **3. Start Postgres and apply migrations**
 
 ```bash
-docker compose up -d
-pnpm prisma migrate deploy
+pnpm db:up
+pnpm db:deploy
 ```
 
 The one-active-claim rule for the Sourced Project Exchange is a partial unique index written by hand in `prisma/migrations/*_sourced_project_exchange`. Prisma can't express it in `schema.prisma`, so always apply schema changes through migrations, never `prisma db push`.
@@ -58,20 +58,20 @@ The one-active-claim rule for the Sourced Project Exchange is a partial unique i
 **4. Seed dev data**
 
 ```bash
-pnpm prisma db seed
+pnpm db:seed
 ```
 
-This creates 4 chapters, 15 Sourced Project Exchange listings with claims and links, and these accounts. All of them use the password `password`:
+This creates 7 chapters, 15 Sourced Project Exchange listings with claims and links, and these accounts. All of them use the password `password`:
 
-| Email                                                    | Role             | Chapter     |
-| -------------------------------------------------------- | ---------------- | ----------- |
-| `admin@hack4impact.org`                                  | `ADMIN`          | none        |
-| `lead.uiuc@hack4impact.org`                              | `CHAPTER_LEADER` | UIUC        |
-| `lead.berkeley@hack4impact.org`                          | `CHAPTER_LEADER` | UC Berkeley |
-| `lead.gt@hack4impact.org`, `lead.bu@hack4impact.org`     | `CHAPTER_LEADER` | GT, BU      |
-| `volunteer.uiuc@hack4impact.org`, `volunteer.berkeley@…` | `VOLUNTEER`      | UIUC, UCB   |
+| Email                                                                | Role             | Chapter                    |
+| -------------------------------------------------------------------- | ---------------- | -------------------------- |
+| `admin@hack4impact.org`                                              | `NATIONAL_ADMIN` | none                       |
+| `lead@hack4impact.org`, `lead.uiuc@…`, `lead.berkeley@…`             | `CHAPTER_LEAD`   | Cornell, UIUC, UC Berkeley |
+| `lead.gt@hack4impact.org`, `lead.bu@hack4impact.org`                 | `CHAPTER_LEAD`   | GT, BU                     |
+| `projectlead@hack4impact.org`                                        | `PROJECT_LEAD`   | Cornell                    |
+| `member@hack4impact.org`, `volunteer.uiuc@…`, `volunteer.berkeley@…` | `MEMBER`         | Cornell, UIUC, UC Berkeley |
 
-Re-running the seed is safe; it upserts by fixed ids.
+Re-running the seed is safe; it upserts by fixed ids. If your database was seeded before the ids were fixed, run `pnpm db:reset` once.
 
 **5. Start the operations-api**
 
@@ -87,21 +87,22 @@ Open [http://localhost:3000](http://localhost:3000).
 
 ## Sourced Project Exchange API
 
-Listings are served over GraphQL at `/api/graphql` (GraphiQL is enabled outside production). Requests use the Auth.js session cookie; unauthenticated requests get an `UNAUTHENTICATED` error.
+Listings are served over GraphQL at `/api/graphql` (GraphiQL is enabled outside production). Requests use the session cookie; unauthenticated requests get an `UNAUTHENTICATED` error.
 
 - `listings(first, after, filter, search)` returns paginated, non-withdrawn listings from every chapter, newest first. `filter` narrows by `status`, `causeArea`, and `sourcingChapterId`; `search` does a case-insensitive match on title, description, and scope.
 - `listing(id)` returns one listing.
 - `createListing(input)`, `updateListing(id, input)`, and `withdrawListing(id)` are limited to chapter leaders of the sourcing chapter and admins (`FORBIDDEN` otherwise). Input is validated with zod (`src/lib/sourced-projects/listing-input.ts`); failures return `BAD_USER_INPUT` with per-field `issues`. Withdrawing sets `withdrawnAt`, and listings are never hard-deleted.
 
-Client contact fields and partner notes are exposed under `contact`. For anyone who isn't a `CHAPTER_LEADER` or `ADMIN`, they are never selected from the database and `contact` is `null` (see `src/lib/sourced-projects/contact-gating.ts`).
+Client contact fields and partner notes are exposed under `contact`. For anyone who isn't a `CHAPTER_LEAD` or `NATIONAL_ADMIN`, they are never selected from the database and `contact` is `null` (see `src/lib/sourced-projects/contact-gating.ts`).
 
 ## Tests
 
 ```bash
-pnpm test
+pnpm test        # unit tests
+pnpm test:int    # integration tests, including the GraphQL API
 ```
 
-The API tests run against the seeded dev database, so run `docker compose up -d` and `pnpm prisma db seed` first.
+The integration tests run against the seeded dev database, so run `pnpm db:up`, `pnpm db:deploy` and `pnpm db:seed` first.
 
 ## Google OAuth setup
 

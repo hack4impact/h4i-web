@@ -1,4 +1,5 @@
 import type { Prisma } from "@prisma/client";
+import { CHAPTER_LEADERSHIP_ROLES, hasRole } from "@/lib/auth/roles";
 import type { AppRole } from "@/types";
 
 export type Viewer = {
@@ -19,7 +20,7 @@ export const GATED_FIELDS = [
 ] as const;
 
 export function canViewContact(viewer: Viewer): boolean {
-  return viewer.role === "ADMIN" || viewer.role === "CHAPTER_LEADER";
+  return hasRole(viewer.role, CHAPTER_LEADERSHIP_ROLES);
 }
 
 const publicListingSelect = {

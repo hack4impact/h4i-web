@@ -1,4 +1,4 @@
-// Runs against the seeded dev database (`pnpm prisma db seed`).
+// Runs against the seeded dev database (`pnpm db:seed`).
 import { afterAll, describe, expect, it } from "vitest";
 import { db } from "@/lib/db";
 import {
@@ -105,7 +105,10 @@ describe("listings query", () => {
     const expected = await db.sourcedProject.count({
       where: { withdrawnAt: null },
     });
-    const chapterCount = await db.chapter.count();
+    // Only chapters that have posted a listing; not every seeded chapter has.
+    const chapterCount = await db.chapter.count({
+      where: { sourcedProjects: { some: { withdrawnAt: null } } },
+    });
 
     expect(totalCount).toBe(expected);
     expect(nodes).toHaveLength(expected);

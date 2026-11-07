@@ -1,8 +1,8 @@
-import { auth } from "@/lib/auth";
+import { getSessionFromRequest } from "@/lib/auth/session";
 import { createGraphQLHandler } from "@/lib/graphql/yoga";
 
-const yoga = createGraphQLHandler(async () => {
-  const user = (await auth())?.user;
+const yoga = createGraphQLHandler(async (request) => {
+  const user = (await getSessionFromRequest(request))?.user;
   return user
     ? { id: user.id, role: user.role, chapterId: user.chapterId }
     : null;

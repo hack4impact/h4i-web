@@ -3,17 +3,17 @@ import type { Viewer } from "@/lib/sourced-projects/contact-gating";
 
 export const VOLUNTEER: Viewer = {
   id: "seed-user-volunteer-uiuc",
-  role: "VOLUNTEER",
-  chapterId: "seed-chapter-uiuc",
+  role: "MEMBER",
+  chapterId: "chapter-uiuc",
 };
 export const LEAD: Viewer = {
   id: "seed-user-lead-berkeley",
-  role: "CHAPTER_LEADER",
-  chapterId: "seed-chapter-berkeley",
+  role: "CHAPTER_LEAD",
+  chapterId: "chapter-berkeley",
 };
 export const ADMIN: Viewer = {
   id: "seed-user-admin",
-  role: "ADMIN",
+  role: "NATIONAL_ADMIN",
   chapterId: null,
 };
 

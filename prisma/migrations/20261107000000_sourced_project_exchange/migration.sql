@@ -1,3 +1,5 @@
+-- Chapter and User.chapterId come from 20261031120000_platform_foundations.
+
 -- CreateEnum
 CREATE TYPE "SourcedProjectStatus" AS ENUM ('AVAILABLE', 'CLAIM_PENDING', 'CLAIMED', 'IN_PROGRESS', 'COMPLETED', 'ARCHIVED');
 
@@ -9,20 +11,6 @@ CREATE TYPE "ClaimStatus" AS ENUM ('PENDING', 'APPROVED', 'REJECTED', 'WITHDRAWN
 
 -- CreateEnum
 CREATE TYPE "LinkType" AS ENUM ('REPO', 'SCOPING_DOC', 'DESIGN_FILE', 'DELIVERABLE', 'OTHER');
-
--- AlterTable
-ALTER TABLE "User" ADD COLUMN     "chapterId" TEXT;
-
--- CreateTable
-CREATE TABLE "Chapter" (
-    "id" TEXT NOT NULL,
-    "name" TEXT NOT NULL,
-    "region" TEXT,
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" TIMESTAMP(3) NOT NULL,
-
-    CONSTRAINT "Chapter_pkey" PRIMARY KEY ("id")
-);
 
 -- CreateTable
 CREATE TABLE "sourced_project" (
@@ -79,9 +67,6 @@ CREATE TABLE "sourced_project_link" (
 );
 
 -- CreateIndex
-CREATE UNIQUE INDEX "Chapter_name_key" ON "Chapter"("name");
-
--- CreateIndex
 CREATE INDEX "sourced_project_status_idx" ON "sourced_project"("status");
 
 -- CreateIndex
@@ -101,12 +86,6 @@ CREATE INDEX "project_claim_status_idx" ON "project_claim"("status");
 
 -- CreateIndex
 CREATE INDEX "sourced_project_link_sourcedProjectId_idx" ON "sourced_project_link"("sourcedProjectId");
-
--- CreateIndex
-CREATE INDEX "User_chapterId_idx" ON "User"("chapterId");
-
--- AddForeignKey
-ALTER TABLE "User" ADD CONSTRAINT "User_chapterId_fkey" FOREIGN KEY ("chapterId") REFERENCES "Chapter"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "sourced_project" ADD CONSTRAINT "sourced_project_sourcingChapterId_fkey" FOREIGN KEY ("sourcingChapterId") REFERENCES "Chapter"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

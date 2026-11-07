@@ -10,7 +10,11 @@
     "esModuleInterop": true,
     "resolveJsonModule": true,
     "isolatedModules": true,
-    "types": ["node"]
+    "types": ["node"],
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./src/*"]
+    }
   },
   "include": ["prisma/*.ts", "prisma/seed/**/*.ts", "src/lib/auth/password.ts"]
 }

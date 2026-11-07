@@ -19,6 +19,8 @@
     "db:migrate": "prisma migrate dev",
     "db:deploy": "tsx prisma/deploy.ts",
     "db:seed": "prisma db seed",
+    "db:seed:directory": "tsx prisma/seed-directory.ts",
+    "db:verify:directory-workflows": "tsx prisma/verify-directory-workflows.ts",
     "db:reset": "prisma migrate reset",
     "claims:expire": "tsx scripts/expire-claims.ts",
     "prepare": "husky"

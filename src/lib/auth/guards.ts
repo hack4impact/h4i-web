@@ -6,10 +6,12 @@ import type { AppRole } from "@/types";
 
 export {
   ADMIN_ROLES,
+  DIRECTORY_ADMIN_ROLES,
   CHAPTER_LEADERSHIP_ROLES,
   EDITOR_ROLES,
   canActForChapter,
   hasRole,
+  isDirectoryAdmin,
 } from "@/lib/auth/roles";
 
 /**

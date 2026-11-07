@@ -1,0 +1,147 @@
+import { describe, expect, it } from "vitest";
+import {
+  MEMBER_FACING_VISIBILITY,
+  canViewUnpublishedDirectoryProfiles,
+  directoryDetailWhere,
+  directoryListWhere,
+  hasDuplicateActiveDirectoryIdentities,
+  isMemberFacingDirectoryVisible,
+  memberFacingDirectoryWhere,
+} from "./visibility";
+
+const visibleBase = {
+  userId: "user_1",
+  approvalStatus: "APPROVED" as const,
+  directoryOptIn: true,
+  adminHidden: false,
+};
+
+describe("isMemberFacingDirectoryVisible", () => {
+  it("requires owner, approved, opted in, and not admin-hidden", () => {
+    expect(isMemberFacingDirectoryVisible(visibleBase)).toBe(true);
+  });
+
+  it("hides unclaimed profiles even if otherwise publishable", () => {
+    expect(
+      isMemberFacingDirectoryVisible({ ...visibleBase, userId: null })
+    ).toBe(false);
+  });
+
+  it("hides pending, rejected, opted-out, or admin-hidden profiles", () => {
+    expect(
+      isMemberFacingDirectoryVisible({
+        ...visibleBase,
+        approvalStatus: "PENDING",
+      })
+    ).toBe(false);
+    expect(
+      isMemberFacingDirectoryVisible({
+        ...visibleBase,
+        approvalStatus: "REJECTED",
+      })
+    ).toBe(false);
+    expect(
+      isMemberFacingDirectoryVisible({
+        ...visibleBase,
+        directoryOptIn: false,
+      })
+    ).toBe(false);
+    expect(
+      isMemberFacingDirectoryVisible({ ...visibleBase, adminHidden: true })
+    ).toBe(false);
+  });
+});
+
+describe("MEMBER_FACING_VISIBILITY single source of truth", () => {
+  it("keeps the JS predicate, Prisma where, and search SQL constants aligned", () => {
+    expect(memberFacingDirectoryWhere).toEqual({
+      userId: { not: null },
+      approvalStatus: MEMBER_FACING_VISIBILITY.approvalStatus,
+      directoryOptIn: MEMBER_FACING_VISIBILITY.directoryOptIn,
+      adminHidden: MEMBER_FACING_VISIBILITY.adminHidden,
+    });
+    expect(MEMBER_FACING_VISIBILITY).toEqual({
+      approvalStatus: "APPROVED",
+      directoryOptIn: true,
+      adminHidden: false,
+    });
+    expect(
+      isMemberFacingDirectoryVisible({
+        userId: "u",
+        ...MEMBER_FACING_VISIBILITY,
+      })
+    ).toBe(true);
+  });
+});
+
+describe("hasDuplicateActiveDirectoryIdentities", () => {
+  it("is false when only one side is visible", () => {
+    expect(
+      hasDuplicateActiveDirectoryIdentities(visibleBase, {
+        ...visibleBase,
+        directoryOptIn: false,
+      })
+    ).toBe(false);
+  });
+
+  it("detects duplicate active identities without deleting either profile", () => {
+    expect(
+      hasDuplicateActiveDirectoryIdentities(visibleBase, visibleBase)
+    ).toBe(true);
+  });
+});
+
+describe("canViewUnpublishedDirectoryProfiles", () => {
+  it("grants directory admins (NATIONAL_ADMIN)", () => {
+    expect(canViewUnpublishedDirectoryProfiles("NATIONAL_ADMIN")).toBe(true);
+  });
+
+  it("does not leak to Notion editors or volunteers", () => {
+    for (const role of ["CHAPTER_LEAD", "PROJECT_LEAD", "MEMBER"] as const) {
+      expect(canViewUnpublishedDirectoryProfiles(role)).toBe(false);
+    }
+  });
+});
+
+describe("directoryListWhere", () => {
+  it("is the member-facing clause", () => {
+    expect(directoryListWhere()).toEqual(memberFacingDirectoryWhere);
+  });
+
+  it("returns a fresh object so a caller cannot mutate the shared rule", () => {
+    const first = directoryListWhere();
+    (first as Record<string, unknown>).adminHidden = true;
+    expect(directoryListWhere().adminHidden).toBe(false);
+    expect(memberFacingDirectoryWhere.adminHidden).toBe(false);
+  });
+});
+
+describe("directoryDetailWhere", () => {
+  it("places no restriction on directory admins", () => {
+    expect(
+      directoryDetailWhere({ userId: "user_1", role: "NATIONAL_ADMIN" })
+    ).toEqual({});
+  });
+
+  it("gives everyone else member-facing rows or their own row", () => {
+    expect(directoryDetailWhere({ userId: "user_1", role: "MEMBER" })).toEqual({
+      OR: [memberFacingDirectoryWhere, { userId: "user_1" }],
+    });
+  });
+
+  it("treats CHAPTER_LEAD and PROJECT_LEAD as ordinary viewers", () => {
+    for (const role of ["CHAPTER_LEAD", "PROJECT_LEAD"] as const) {
+      const where = directoryDetailWhere({ userId: "user_1", role });
+      expect(where).not.toEqual({});
+      expect(where).toEqual({
+        OR: [memberFacingDirectoryWhere, { userId: "user_1" }],
+      });
+    }
+  });
+
+  it("omits the owner branch when there is no viewer id, so unclaimed rows stay hidden", () => {
+    expect(directoryDetailWhere({ userId: "", role: "MEMBER" })).toEqual({
+      OR: [memberFacingDirectoryWhere],
+    });
+  });
+});

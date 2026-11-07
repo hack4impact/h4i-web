@@ -9,8 +9,11 @@ import {
   Handshake,
   FolderOpen,
   Users,
+  Contact,
+  ScrollText,
   ChevronDown,
 } from "lucide-react";
+import { isDirectoryAdmin } from "@/lib/auth/roles";
 import { cn } from "@/lib/utils";
 
 export type SidebarUser = {
@@ -122,6 +125,8 @@ function NavItem({ href, label, icon, count }: NavItemProps) {
 }
 
 export function Sidebar({ user }: { user: SidebarUser }) {
+  const showDirectoryAudit = isDirectoryAdmin(user.role);
+
   return (
     <aside className="border-separator bg-panel flex h-full w-240 flex-none flex-col border-r">
       <div className="flex flex-1 flex-col gap-24 p-12">
@@ -147,6 +152,18 @@ export function Sidebar({ user }: { user: SidebarUser }) {
             label="Projects"
             icon={<FolderOpen size={15} strokeWidth={1.5} />}
           />
+          <NavItem
+            href="/members"
+            label="Members"
+            icon={<Contact size={15} strokeWidth={1.5} />}
+          />
+          {showDirectoryAudit ? (
+            <NavItem
+              href="/admin/directory-audit"
+              label="Directory audit"
+              icon={<ScrollText size={15} strokeWidth={1.5} />}
+            />
+          ) : null}
           <NavItem
             href="/volunteers"
             label="Volunteers"

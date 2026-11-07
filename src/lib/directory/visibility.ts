@@ -1,5 +1,5 @@
 import type { AppRole } from "@/types";
-import { NATIONALS_ROLES } from "@/lib/auth/roles";
+import { DIRECTORY_ADMIN_ROLES } from "@/lib/auth/roles";
 
 /**
  * Member-facing directory visibility — the single source of truth for which
@@ -23,7 +23,7 @@ import { NATIONALS_ROLES } from "@/lib/auth/roles";
  * Three access tiers:
  *   1. Any signed-in viewer  → member-facing rows only.
  *   2. Owner                 → additionally their own row, whatever its state.
- *   3. NATIONALS             → any row. COD is NOT included (see roles.ts).
+ *   3. Directory admins (COD + NATIONALS) → any row on detail paths.
  *
  * UNFINISHED — duplicate active Member+Alumni identities:
  * - hasDuplicateActiveDirectoryIdentities only detects; it does NOT enforce.
@@ -66,7 +66,7 @@ export type DirectoryViewer = {
  *   AND directoryOptIn === true
  *   AND adminHidden === false
  *
- * Claiming/owning alone does not satisfy this. COD is not granted unpublished access.
+ * Claiming/owning alone does not satisfy this.
  */
 export function isMemberFacingDirectoryVisible(
   profile: DirectoryVisibilityFields
@@ -104,21 +104,19 @@ export const memberFacingDirectoryWhere = {
  * May this role read profiles that are not member-facing (pending, rejected,
  * opted out, admin-hidden, or unclaimed)?
  *
- * NATIONALS only. COD is a distinct administrator type and inherits nothing
- * here; CHAPTER_LEAD and PROJECT_LEAD are editors of other records, which is
- * not the same entitlement.
+ * Directory admins (COD + NATIONALS). CHAPTER_LEAD / PROJECT_LEAD are Notion
+ * editors, not Member/Alumni moderators.
  */
 export function canViewUnpublishedDirectoryProfiles(role: AppRole): boolean {
-  return (NATIONALS_ROLES as readonly AppRole[]).includes(role);
+  return (DIRECTORY_ADMIN_ROLES as readonly AppRole[]).includes(role);
 }
 
 /**
  * Where clause for directory LIST reads.
  *
  * Deliberately takes no viewer: lists are member-facing for everyone, including
- * NATIONALS. Unpublished rows reach an admin through the detail path or through
- * a future moderation queue that is explicitly scoped to that purpose — never by
- * silently widening the directory everyone else browses.
+ * directory admins. Unpublished rows reach an admin through the detail path or
+ * a moderation queue — never by silently widening the public directory list.
  */
 export function directoryListWhere() {
   return { ...memberFacingDirectoryWhere };
@@ -135,7 +133,7 @@ export function directoryListWhere() {
  * id not existing. That is the point: 404, never 403, so a hidden profile's
  * existence is not confirmed.
  *
- * Returns {} for NATIONALS — no visibility restriction, id alone decides.
+ * Returns {} for COD/NATIONALS — no visibility restriction, id alone decides.
  */
 export function directoryDetailWhere(viewer: DirectoryViewer) {
   if (canViewUnpublishedDirectoryProfiles(viewer.role)) {

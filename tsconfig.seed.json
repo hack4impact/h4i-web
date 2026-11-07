@@ -10,12 +10,17 @@
     "esModuleInterop": true,
     "resolveJsonModule": true,
     "isolatedModules": true,
-    "types": ["node"]
+    "types": ["node"],
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./src/*"]
+    }
   },
   "include": [
     "prisma/seed.ts",
     "prisma/seed-directory.ts",
     "prisma/verify-directory-schema.ts",
+    "prisma/verify-directory-workflows.ts",
     "prisma/manual-directory-fixtures.ts"
   ]
 }

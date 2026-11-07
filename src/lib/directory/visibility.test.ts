@@ -92,17 +92,13 @@ describe("hasDuplicateActiveDirectoryIdentities", () => {
 });
 
 describe("canViewUnpublishedDirectoryProfiles", () => {
-  it("grants NATIONALS and nobody else", () => {
+  it("grants directory admins (COD + NATIONALS)", () => {
     expect(canViewUnpublishedDirectoryProfiles("NATIONALS")).toBe(true);
+    expect(canViewUnpublishedDirectoryProfiles("COD")).toBe(true);
   });
 
-  it("does not leak to the other admin type or to editors", () => {
-    for (const role of [
-      "COD",
-      "CHAPTER_LEAD",
-      "PROJECT_LEAD",
-      "VOLUNTEER",
-    ] as const) {
+  it("does not leak to Notion editors or volunteers", () => {
+    for (const role of ["CHAPTER_LEAD", "PROJECT_LEAD", "VOLUNTEER"] as const) {
       expect(canViewUnpublishedDirectoryProfiles(role)).toBe(false);
     }
   });
@@ -122,10 +118,11 @@ describe("directoryListWhere", () => {
 });
 
 describe("directoryDetailWhere", () => {
-  it("places no restriction on NATIONALS", () => {
+  it("places no restriction on COD or NATIONALS", () => {
     expect(
       directoryDetailWhere({ userId: "user_1", role: "NATIONALS" })
     ).toEqual({});
+    expect(directoryDetailWhere({ userId: "user_1", role: "COD" })).toEqual({});
   });
 
   it("gives everyone else member-facing rows or their own row", () => {
@@ -136,8 +133,8 @@ describe("directoryDetailWhere", () => {
     });
   });
 
-  it("treats COD, CHAPTER_LEAD and PROJECT_LEAD as ordinary viewers", () => {
-    for (const role of ["COD", "CHAPTER_LEAD", "PROJECT_LEAD"] as const) {
+  it("treats CHAPTER_LEAD and PROJECT_LEAD as ordinary viewers", () => {
+    for (const role of ["CHAPTER_LEAD", "PROJECT_LEAD"] as const) {
       const where = directoryDetailWhere({ userId: "user_1", role });
       expect(where).not.toEqual({});
       expect(where).toEqual({

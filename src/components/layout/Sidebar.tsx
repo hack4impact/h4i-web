@@ -10,6 +10,7 @@ import {
   FolderOpen,
   Users,
   Contact,
+  ScrollText,
   ChevronDown,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -123,6 +124,8 @@ function NavItem({ href, label, icon, count }: NavItemProps) {
 }
 
 export function Sidebar({ user }: { user: SidebarUser }) {
+  const isDirectoryAdmin = user.role === "COD" || user.role === "NATIONALS";
+
   return (
     <aside className="border-separator bg-panel flex h-full w-240 flex-none flex-col border-r">
       <div className="flex flex-1 flex-col gap-24 p-12">
@@ -153,6 +156,13 @@ export function Sidebar({ user }: { user: SidebarUser }) {
             label="Members"
             icon={<Contact size={15} strokeWidth={1.5} />}
           />
+          {isDirectoryAdmin ? (
+            <NavItem
+              href="/admin/directory-audit"
+              label="Directory audit"
+              icon={<ScrollText size={15} strokeWidth={1.5} />}
+            />
+          ) : null}
           <NavItem
             href="/volunteers"
             label="Volunteers"

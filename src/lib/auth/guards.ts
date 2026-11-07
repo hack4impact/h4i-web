@@ -3,7 +3,13 @@ import { redirect } from "next/navigation";
 import { getCurrentSession } from "@/lib/auth/session";
 import type { AppRole } from "@/types";
 
-export { COD_ROLES, EDITOR_ROLES, NATIONALS_ROLES } from "@/lib/auth/roles";
+export {
+  COD_ROLES,
+  DIRECTORY_ADMIN_ROLES,
+  EDITOR_ROLES,
+  NATIONALS_ROLES,
+  isDirectoryAdmin,
+} from "@/lib/auth/roles";
 
 /**
  * For server components (pages and layouts). Returns the session, or sends an
@@ -58,6 +64,19 @@ export async function assertSession() {
 
   if (!session) {
     throw new Error("Unauthorized");
+  }
+
+  return session;
+}
+
+/**
+ * For server actions: signed-in and role-allowed, or throw (never redirect).
+ */
+export async function assertRole(allowed: readonly AppRole[]) {
+  const session = await assertSession();
+
+  if (!allowed.includes(session.user.role as AppRole)) {
+    throw new Error("Forbidden");
   }
 
   return session;

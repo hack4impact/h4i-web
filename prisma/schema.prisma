@@ -10,10 +10,10 @@ datasource db {
 // Administrative permission roles (auth / authorization).
 // Distinct from DirectoryPosition (organizational project roles in the directory).
 //
-// Two administrator types (not a hierarchy — labels, not ranked powers):
-//   COD        — admin type 1; permissions unspecified; do not inherit Nationals powers
-//   NATIONALS  — admin type 2; PRD assigns approval/rejection, manual profile creation,
-//                moderation, and chapter management (workflows are later milestones)
+// Two administrator types (not a hierarchy — peer directory admins for Member/Alumni):
+//   COD / NATIONALS — same directory powers (approve, reject, manual create, claim
+//                     issuance, audit read, admin-driven transitions).
+//   Asymmetry: only NATIONALS may set a user's role TO COD or demote someone FROM COD.
 //
 // Former generic ADMIN was removed. Existing ADMIN rows are NOT auto-mapped to COD or
 // NATIONALS (see correction migration). Non-admin roles unchanged.
@@ -27,6 +27,27 @@ enum Role {
   CHAPTER_LEAD
   PROJECT_LEAD
   VOLUNTEER
+}
+
+enum DirectoryAuditAction {
+  PROFILE_APPROVED
+  PROFILE_REJECTED
+  PROFILE_MANUAL_CREATED
+  PROFILE_CLAIMED
+  PROFILE_CONSENTED
+  MEMBER_TO_ALUMNI_TRANSITIONED
+  USER_ROLE_CHANGED
+}
+
+enum DirectoryAuditTargetKind {
+  MEMBER
+  ALUMNI
+  USER
+}
+
+enum DirectoryClaimProfileKind {
+  MEMBER
+  ALUMNI
 }
 
 // =============================================================================
@@ -74,13 +95,13 @@ model User {
 
   sessions        Session[]
   magicLinkTokens MagicLinkToken[]
+  adminAuditLogs  AdminAuditLog[]       @relation("AuditActor")
+  claimTokensCreated DirectoryClaimToken[] @relation("ClaimTokenCreator")
 
   // Optional ownership of directory profiles (nullable on the profile side for
   // unclaimed legacy/admin-created rows). Uniqueness is per profile table.
-  // Cross-table: a User may own both Member and Alumni during a future
-  // member→alumni transition; schema allows both. Application invariant for
-  // later directory reads: at most ONE of those profiles may be
-  // member-facing-visible at a time (see src/lib/directory/visibility.ts).
+  // Cross-table: a User may own both Member and Alumni during a transition;
+  // application invariant: at most ONE may be member-facing-visible at a time.
   // Do not auto-claim by name or unverified email match.
   memberProfile Member?
   alumniProfile Alumni?
@@ -269,4 +290,36 @@ model AlumniHackInvolvement {
 
   @@index([alumniId])
   @@index([chapterId])
+}
+
+// Append-only admin audit trail for directory moderation and role changes.
+model AdminAuditLog {
+  id          String                   @id @default(cuid())
+  actorUserId String
+  actor       User                     @relation("AuditActor", fields: [actorUserId], references: [id], onDelete: Restrict)
+  action      DirectoryAuditAction
+  targetKind  DirectoryAuditTargetKind
+  targetId    String
+  metadata    Json?
+  createdAt   DateTime                 @default(now())
+
+  @@index([createdAt])
+  @@index([actorUserId, createdAt])
+  @@index([action, createdAt])
+}
+
+// One-time tokens for verified profile claiming (no auto-claim by email/name).
+model DirectoryClaimToken {
+  id              String                   @id @default(cuid())
+  token           String                   @unique
+  profileKind     DirectoryClaimProfileKind
+  profileId       String
+  createdByUserId String
+  createdBy       User                     @relation("ClaimTokenCreator", fields: [createdByUserId], references: [id], onDelete: Cascade)
+  expiresAt       DateTime
+  usedAt          DateTime?
+  createdAt       DateTime                 @default(now())
+
+  @@index([profileKind, profileId])
+  @@index([expiresAt])
 }

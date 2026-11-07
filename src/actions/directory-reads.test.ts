@@ -99,17 +99,20 @@ describe("detail reads cannot bypass visibility", () => {
     });
   });
 
-  it("let NATIONALS reach any row, with moderation state attached", async () => {
-    signedInAs("NATIONALS");
-    await getMember("member_1");
+  it("let NATIONALS and COD reach any row, with moderation state attached", async () => {
+    for (const role of ["NATIONALS", "COD"] as const) {
+      vi.clearAllMocks();
+      signedInAs(role);
+      await getMember("member_1");
 
-    const args = mocks.member.findFirst.mock.calls[0][0];
-    expect(args.where).toEqual({ id: "member_1" });
-    expect(args.select).toBe(directoryProfileModerationSelect);
+      const args = mocks.member.findFirst.mock.calls[0][0];
+      expect(args.where).toEqual({ id: "member_1" });
+      expect(args.select).toBe(directoryProfileModerationSelect);
+    }
   });
 
-  it("treat COD, CHAPTER_LEAD and PROJECT_LEAD as ordinary viewers", async () => {
-    for (const role of ["COD", "CHAPTER_LEAD", "PROJECT_LEAD"] as const) {
+  it("treat CHAPTER_LEAD and PROJECT_LEAD as ordinary viewers", async () => {
+    for (const role of ["CHAPTER_LEAD", "PROJECT_LEAD"] as const) {
       vi.clearAllMocks();
       signedInAs(role);
       await getMember("member_1");

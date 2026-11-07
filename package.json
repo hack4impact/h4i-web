@@ -16,6 +16,7 @@
     "test:run": "vitest run",
     "db:seed": "tsx prisma/seed.ts",
     "db:seed:directory": "tsx prisma/seed-directory.ts",
+    "db:verify:directory-workflows": "tsx prisma/verify-directory-workflows.ts",
     "prepare": "husky"
   },
   "dependencies": {
@@ -54,6 +55,7 @@
       "unrs-resolver"
     ]
   },
+  "packageManager": "pnpm@10.33.0",
   "devDependencies": {
     "@tailwindcss/postcss": "^4.2.2",
     "@types/node": "^24.12.0",

@@ -64,12 +64,18 @@ async function main() {
   const admin2Actor = { userId: admin2.id, role: "NATIONAL_ADMIN" as const };
   const ownerActor = { userId: owner.id, role: "MEMBER" as const };
 
+  // Everything this run creates, so cleanup deletes only these rows.
+  const userIds = [nationals.id, admin2.id, owner.id, other.id];
+  const memberIds: string[] = [];
+  const alumniIds: string[] = [];
+
   try {
     // Manual create — any directory admin can do it; stays invisible
     const pendingish = await createManualProfile(db, admin2Actor, "MEMBER", {
       displayName: "Manual Pat",
       contactEmail: `manual-${t}@example.com`,
     });
+    memberIds.push(pendingish.id);
     assert(pendingish.userId == null, "manual create unclaimed");
     assert(pendingish.directoryOptIn === false, "manual create opted out");
     assert(pendingish.approvalStatus === "APPROVED", "manual create approved");
@@ -86,6 +92,7 @@ async function main() {
         directoryOptIn: false,
       },
     });
+    memberIds.push(pending.id);
     await approveProfile(db, natActor, "MEMBER", pending.id);
     const approved = await db.member.findUniqueOrThrow({
       where: { id: pending.id },
@@ -128,6 +135,7 @@ async function main() {
       ownerActor,
       pendingish.id
     );
+    alumniIds.push(alumni.id);
     assert(
       retired.directoryOptIn === false,
       "member opted out after transition"
@@ -181,29 +189,14 @@ async function main() {
     console.log("PASS: directory workflows verification");
   } finally {
     await db.directoryClaimToken.deleteMany({
-      where: { createdByUserId: { in: [nationals.id, admin2.id] } },
+      where: { createdByUserId: { in: userIds } },
     });
     await db.adminAuditLog.deleteMany({
-      where: { actorUserId: { in: [nationals.id, admin2.id, owner.id] } },
+      where: { actorUserId: { in: userIds } },
     });
-    await db.alumni.deleteMany({
-      where: { userId: { in: [owner.id] } },
-    });
-    await db.member.deleteMany({
-      where: {
-        OR: [
-          { userId: { in: [owner.id] } },
-          { contactEmail: { endsWith: `@example.com` } },
-        ],
-      },
-    });
-    // Catch leftover pending fixture by displayName
-    await db.member.deleteMany({
-      where: { displayName: { in: ["Pending Pat", "Manual Pat"] } },
-    });
-    await db.user.deleteMany({
-      where: { id: { in: [nationals.id, admin2.id, owner.id, other.id] } },
-    });
+    await db.alumni.deleteMany({ where: { id: { in: alumniIds } } });
+    await db.member.deleteMany({ where: { id: { in: memberIds } } });
+    await db.user.deleteMany({ where: { id: { in: userIds } } });
     await db.$disconnect();
   }
 }

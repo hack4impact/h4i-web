@@ -352,72 +352,80 @@ export async function transitionMemberToAlumni(
   actor: DirectoryActor,
   memberId: string
 ) {
-  const member = await db.member.findUnique({ where: { id: memberId } });
-  if (!member) throw new Error("Not found");
-  if (!canRunMemberToAlumniTransition({ actor, memberUserId: member.userId })) {
-    throw new Error("Forbidden");
-  }
+  // One transaction: the alumni copy, the member opt-out, the duplicate check
+  // and the audit row all apply together, or none of them do.
+  const transition = async (tx: Prisma.TransactionClient) => {
+    const member = await tx.member.findUnique({ where: { id: memberId } });
+    if (!member) throw new Error("Not found");
+    if (
+      !canRunMemberToAlumniTransition({ actor, memberUserId: member.userId })
+    ) {
+      throw new Error("Forbidden");
+    }
 
-  const shared = {
-    chapterId: member.chapterId,
-    displayName: member.displayName,
-    contactEmail: member.contactEmail,
-    linkedInUrl: member.linkedInUrl,
-    githubUrl: member.githubUrl,
-    websiteUrl: member.websiteUrl,
-    instagramUrl: member.instagramUrl,
-    graduationYear: member.graduationYear,
-    major: member.major,
-    location: member.location,
-    skills: member.skills,
-    interests: member.interests,
-    bio: member.bio,
-    position: member.position,
-    approvalStatus: member.approvalStatus,
-    // Carry forward consent onto alumni, then clear member (below).
-    directoryOptIn: member.directoryOptIn,
-    adminHidden: member.adminHidden,
-  };
+    const shared = {
+      chapterId: member.chapterId,
+      displayName: member.displayName,
+      contactEmail: member.contactEmail,
+      linkedInUrl: member.linkedInUrl,
+      githubUrl: member.githubUrl,
+      websiteUrl: member.websiteUrl,
+      instagramUrl: member.instagramUrl,
+      graduationYear: member.graduationYear,
+      major: member.major,
+      location: member.location,
+      skills: member.skills,
+      interests: member.interests,
+      bio: member.bio,
+      position: member.position,
+      approvalStatus: member.approvalStatus,
+      // Carry forward consent onto alumni, then clear member (below).
+      directoryOptIn: member.directoryOptIn,
+      adminHidden: member.adminHidden,
+    };
 
-  let alumni;
-  if (member.userId) {
-    const existing = await db.alumni.findUnique({
-      where: { userId: member.userId },
-    });
-    if (existing) {
-      alumni = await db.alumni.update({
-        where: { id: existing.id },
-        data: shared,
+    let alumni;
+    if (member.userId) {
+      const existing = await tx.alumni.findUnique({
+        where: { userId: member.userId },
       });
+      if (existing) {
+        alumni = await tx.alumni.update({
+          where: { id: existing.id },
+          data: shared,
+        });
+      } else {
+        alumni = await tx.alumni.create({
+          data: { ...shared, userId: member.userId },
+        });
+      }
     } else {
-      alumni = await db.alumni.create({
-        data: { ...shared, userId: member.userId },
+      alumni = await tx.alumni.create({
+        data: { ...shared, userId: null },
       });
     }
-  } else {
-    alumni = await db.alumni.create({
-      data: { ...shared, userId: null },
+
+    const retiredMember = await tx.member.update({
+      where: { id: member.id },
+      data: { directoryOptIn: false },
     });
-  }
 
-  const retiredMember = await db.member.update({
-    where: { id: member.id },
-    data: { directoryOptIn: false },
-  });
+    if (hasDuplicateActiveDirectoryIdentities(retiredMember, alumni)) {
+      throw new Error("Duplicate visible Member and Alumni profiles");
+    }
 
-  if (hasDuplicateActiveDirectoryIdentities(retiredMember, alumni)) {
-    throw new Error("Duplicate visible Member and Alumni profiles");
-  }
+    await writeAudit(tx, {
+      actorUserId: actor.userId,
+      action: "MEMBER_TO_ALUMNI_TRANSITIONED",
+      targetKind: "MEMBER",
+      targetId: member.id,
+      metadata: { alumniId: alumni.id },
+    });
 
-  await writeAudit(db, {
-    actorUserId: actor.userId,
-    action: "MEMBER_TO_ALUMNI_TRANSITIONED",
-    targetKind: "MEMBER",
-    targetId: member.id,
-    metadata: { alumniId: alumni.id },
-  });
+    return { member: retiredMember, alumni };
+  };
 
-  return { member: retiredMember, alumni };
+  return "$transaction" in db ? db.$transaction(transition) : transition(db);
 }
 
 export async function assignUserRole(

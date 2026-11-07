@@ -13,6 +13,7 @@ import {
   ScrollText,
   ChevronDown,
 } from "lucide-react";
+import { isDirectoryAdmin } from "@/lib/auth/roles";
 import { cn } from "@/lib/utils";
 
 export type SidebarUser = {
@@ -124,7 +125,7 @@ function NavItem({ href, label, icon, count }: NavItemProps) {
 }
 
 export function Sidebar({ user }: { user: SidebarUser }) {
-  const isDirectoryAdmin = user.role === "COD" || user.role === "NATIONALS";
+  const showDirectoryAudit = isDirectoryAdmin(user.role);
 
   return (
     <aside className="border-separator bg-panel flex h-full w-240 flex-none flex-col border-r">
@@ -156,7 +157,7 @@ export function Sidebar({ user }: { user: SidebarUser }) {
             label="Members"
             icon={<Contact size={15} strokeWidth={1.5} />}
           />
-          {isDirectoryAdmin ? (
+          {showDirectoryAudit ? (
             <NavItem
               href="/admin/directory-audit"
               label="Directory audit"

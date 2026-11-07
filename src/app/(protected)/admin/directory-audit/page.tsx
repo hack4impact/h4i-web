@@ -5,7 +5,7 @@ import { adminListRecentAuditLogs } from "@/actions/directory-admin";
 
 /**
  * Minimal admin-only audit view for local/manual verification.
- * COD and NATIONALS (DIRECTORY_ADMIN_ROLES). Not a designed product surface.
+ * National admins (DIRECTORY_ADMIN_ROLES). Not a designed product surface.
  */
 export default async function DirectoryAuditPage() {
   await requireRole(DIRECTORY_ADMIN_ROLES);

@@ -14,12 +14,14 @@ import {
 
 export default function SignInForm({
   callbackUrl = "/dashboard",
+  initialError = null,
 }: {
   callbackUrl?: string;
+  initialError?: string | null;
 }) {
   const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(initialError);
   const [isPending, setIsPending] = useState(false);
   const [mode, setMode] = useState<"password" | "magic">("password");
   // Set once a link has been requested; switches the card to a confirmation.

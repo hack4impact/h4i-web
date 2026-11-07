@@ -228,31 +228,42 @@ export async function claimProfileWithToken(
     if (existing) throw new Error("Actor already owns an Alumni profile");
   }
 
-  // Ownership change trigger clears directoryOptIn automatically.
-  const updated =
-    kind === "MEMBER"
-      ? await db.member.update({
-          where: { id: row.profileId },
-          data: { userId: actor.userId },
-        })
-      : await db.alumni.update({
-          where: { id: row.profileId },
-          data: { userId: actor.userId },
-        });
+  // Use the token and take ownership in one transaction, each as a conditional
+  // write, so two concurrent claims with the same token can't both succeed.
+  // The ownership change trigger clears directoryOptIn automatically.
+  const claim = async (tx: Prisma.TransactionClient) => {
+    const used = await tx.directoryClaimToken.updateMany({
+      where: { id: row.id, usedAt: null, expiresAt: { gt: new Date() } },
+      data: { usedAt: new Date() },
+    });
+    if (used.count === 0) throw new Error("Claim token already used");
 
-  await db.directoryClaimToken.update({
-    where: { id: row.id },
-    data: { usedAt: new Date() },
-  });
+    const unowned = { id: row.profileId, userId: null };
+    const owned =
+      kind === "MEMBER"
+        ? await tx.member.updateMany({
+            where: unowned,
+            data: { userId: actor.userId },
+          })
+        : await tx.alumni.updateMany({
+            where: unowned,
+            data: { userId: actor.userId },
+          });
+    if (owned.count === 0) throw new Error("Profile already claimed");
 
-  await writeAudit(db, {
-    actorUserId: actor.userId,
-    action: "PROFILE_CLAIMED",
-    targetKind: kind,
-    targetId: row.profileId,
-  });
+    await writeAudit(tx, {
+      actorUserId: actor.userId,
+      action: "PROFILE_CLAIMED",
+      targetKind: kind,
+      targetId: row.profileId,
+    });
 
-  return updated;
+    return kind === "MEMBER"
+      ? tx.member.findUniqueOrThrow({ where: { id: row.profileId } })
+      : tx.alumni.findUniqueOrThrow({ where: { id: row.profileId } });
+  };
+
+  return "$transaction" in db ? db.$transaction(claim) : claim(db);
 }
 
 export async function setOwnDirectoryOptIn(

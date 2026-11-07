@@ -26,7 +26,7 @@ import {
 
 /**
  * Member-facing list. Approved, opted-in, claimed, not admin-hidden — for every
- * viewer including NATIONALS. Unpublished rows never appear in a list.
+ * viewer including NATIONAL_ADMIN. Unpublished rows never appear in a list.
  */
 export async function listMembers() {
   await assertSession();

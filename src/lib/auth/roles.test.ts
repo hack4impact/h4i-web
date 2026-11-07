@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import type { AppRole } from "@/types";
 import {
   DIRECTORY_ADMIN_ROLES,
   canAssignUserRole,
@@ -6,84 +7,39 @@ import {
 } from "./roles";
 
 describe("DIRECTORY_ADMIN_ROLES", () => {
-  it("treats COD and NATIONALS as peer directory admins", () => {
-    expect([...DIRECTORY_ADMIN_ROLES]).toEqual(["COD", "NATIONALS"]);
-    expect(isDirectoryAdmin("COD")).toBe(true);
-    expect(isDirectoryAdmin("NATIONALS")).toBe(true);
-    expect(isDirectoryAdmin("VOLUNTEER")).toBe(false);
+  it("is Nationals only", () => {
+    expect([...DIRECTORY_ADMIN_ROLES]).toEqual(["NATIONAL_ADMIN"]);
+    expect(isDirectoryAdmin("NATIONAL_ADMIN")).toBe(true);
+    expect(isDirectoryAdmin("MEMBER")).toBe(false);
     expect(isDirectoryAdmin("CHAPTER_LEAD")).toBe(false);
+    expect(isDirectoryAdmin("PROJECT_LEAD")).toBe(false);
   });
 });
 
 describe("canAssignUserRole", () => {
   const nationals = {
-    actorRole: "NATIONALS" as const,
+    actorRole: "NATIONAL_ADMIN" as const,
     actorUserId: "nat",
   };
-  const cod = {
-    actorRole: "COD" as const,
-    actorUserId: "cod",
-  };
 
-  it("lets Nationals promote a volunteer to COD", () => {
+  it("lets Nationals promote a member", () => {
     expect(
       canAssignUserRole({
         ...nationals,
         targetUserId: "u1",
-        targetCurrentRole: "VOLUNTEER",
-        nextRole: "COD",
-      })
-    ).toBe(true);
-  });
-
-  it("lets Nationals demote a COD to volunteer", () => {
-    expect(
-      canAssignUserRole({
-        ...nationals,
-        targetUserId: "u1",
-        targetCurrentRole: "COD",
-        nextRole: "VOLUNTEER",
-      })
-    ).toBe(true);
-  });
-
-  it("blocks COD from promoting anyone to COD", () => {
-    expect(
-      canAssignUserRole({
-        ...cod,
-        targetUserId: "u1",
-        targetCurrentRole: "VOLUNTEER",
-        nextRole: "COD",
-      })
-    ).toBe(false);
-  });
-
-  it("blocks COD from demoting or changing a COD", () => {
-    expect(
-      canAssignUserRole({
-        ...cod,
-        targetUserId: "u1",
-        targetCurrentRole: "COD",
-        nextRole: "VOLUNTEER",
-      })
-    ).toBe(false);
-    expect(
-      canAssignUserRole({
-        ...cod,
-        targetUserId: "u1",
-        targetCurrentRole: "COD",
-        nextRole: "NATIONALS",
-      })
-    ).toBe(false);
-  });
-
-  it("lets COD change non-COD roles (peer directory admin otherwise)", () => {
-    expect(
-      canAssignUserRole({
-        ...cod,
-        targetUserId: "u1",
-        targetCurrentRole: "VOLUNTEER",
+        targetCurrentRole: "MEMBER",
         nextRole: "CHAPTER_LEAD",
+      })
+    ).toBe(true);
+  });
+
+  it("lets Nationals demote another admin", () => {
+    expect(
+      canAssignUserRole({
+        ...nationals,
+        targetUserId: "u1",
+        targetCurrentRole: "NATIONAL_ADMIN",
+        nextRole: "MEMBER",
       })
     ).toBe(true);
   });
@@ -93,28 +49,45 @@ describe("canAssignUserRole", () => {
       canAssignUserRole({
         ...nationals,
         targetUserId: "nat",
-        targetCurrentRole: "NATIONALS",
-        nextRole: "VOLUNTEER",
+        targetCurrentRole: "NATIONAL_ADMIN",
+        nextRole: "MEMBER",
       })
     ).toBe(false);
     expect(
       canAssignUserRole({
         ...nationals,
         targetUserId: "u1",
-        targetCurrentRole: "VOLUNTEER",
-        nextRole: "VOLUNTEER",
+        targetCurrentRole: "MEMBER",
+        nextRole: "MEMBER",
       })
     ).toBe(false);
   });
 
   it("blocks non-directory-admins", () => {
+    for (const actorRole of [
+      "CHAPTER_LEAD",
+      "PROJECT_LEAD",
+      "MEMBER",
+    ] as const) {
+      expect(
+        canAssignUserRole({
+          actorRole,
+          actorUserId: "x",
+          targetUserId: "u1",
+          targetCurrentRole: "MEMBER",
+          nextRole: "CHAPTER_LEAD",
+        })
+      ).toBe(false);
+    }
+  });
+
+  it("rejects a role that does not exist", () => {
     expect(
       canAssignUserRole({
-        actorRole: "VOLUNTEER",
-        actorUserId: "v",
+        ...nationals,
         targetUserId: "u1",
-        targetCurrentRole: "VOLUNTEER",
-        nextRole: "CHAPTER_LEAD",
+        targetCurrentRole: "MEMBER",
+        nextRole: "COD" as AppRole,
       })
     ).toBe(false);
   });

@@ -1,13 +1,14 @@
-import { defineConfig } from "vitest/config";
 import path from "node:path";
-import { fileURLToPath } from "node:url";
+import { defineConfig } from "vitest/config";
 
-const root = path.dirname(fileURLToPath(import.meta.url));
-
+// Unit tests only. *.int.test.ts run via `pnpm test:int`.
 export default defineConfig({
+  resolve: {
+    alias: { "@": path.resolve(import.meta.dirname, "src") },
+  },
   test: {
-    alias: {
-      "@": path.resolve(root, "src"),
-    },
+    environment: "node",
+    include: ["src/**/*.test.ts", "src/**/*.test.tsx"],
+    exclude: ["**/*.int.test.ts", "node_modules/**"],
   },
 });

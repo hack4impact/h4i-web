@@ -53,7 +53,7 @@ export const directoryProfileSelect = {
 } as const;
 
 /**
- * Moderation state. Added for NATIONALS, and for an owner reading their OWN
+ * Moderation state. Added for NATIONAL_ADMIN, and for an owner reading their OWN
  * profile, who needs to know whether it is still pending.
  */
 export const directoryModerationFieldsSelect = {

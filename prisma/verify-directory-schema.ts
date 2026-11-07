@@ -87,27 +87,29 @@ async function main() {
   const nationals = await db.user.create({
     data: {
       email: `verify-nationals-${Date.now()}@example.com`,
-      role: "NATIONALS",
+      role: "NATIONAL_ADMIN",
     },
   });
-  const cod = await db.user.create({
-    data: { email: `verify-cod-${Date.now()}@example.com`, role: "COD" },
+  const admin2 = await db.user.create({
+    data: {
+      email: `verify-admin2-${Date.now()}@example.com`,
+      role: "NATIONAL_ADMIN",
+    },
   });
   const ownerA = await db.user.create({
     data: {
       email: `verify-owner-a-${Date.now()}@example.com`,
-      role: "VOLUNTEER",
+      role: "MEMBER",
     },
   });
   const ownerB = await db.user.create({
     data: {
       email: `verify-owner-b-${Date.now()}@example.com`,
-      role: "VOLUNTEER",
+      role: "MEMBER",
     },
   });
 
-  assert(nationals.role === "NATIONALS", "NATIONALS role assignable");
-  assert(cod.role === "COD", "COD role assignable");
+  assert(nationals.role === "NATIONAL_ADMIN", "NATIONAL_ADMIN role assignable");
   assert(
     !["PM", "TL", "DEVELOPER", "DESIGNER", "BUSINESS"].includes(nationals.role),
     "admin roles are not directory positions"
@@ -168,7 +170,7 @@ async function main() {
   });
   const rejected = await db.member.create({
     data: {
-      userId: cod.id,
+      userId: admin2.id,
       displayName: "Rejected",
       approvalStatus: "REJECTED",
       directoryOptIn: true,
@@ -177,7 +179,7 @@ async function main() {
   const ownerOptOut = await db.user.create({
     data: {
       email: `verify-owner-optout-${Date.now()}@example.com`,
-      role: "VOLUNTEER",
+      role: "MEMBER",
     },
   });
   const optedOut = await db.member.create({
@@ -191,7 +193,7 @@ async function main() {
   const ownerHidden = await db.user.create({
     data: {
       email: `verify-owner-hidden-${Date.now()}@example.com`,
-      role: "VOLUNTEER",
+      role: "MEMBER",
     },
   });
   const hidden = await db.member.create({
@@ -401,7 +403,13 @@ async function main() {
   await db.user.deleteMany({
     where: {
       id: {
-        in: [nationals.id, cod.id, ownerA.id, ownerOptOut.id, ownerHidden.id],
+        in: [
+          nationals.id,
+          admin2.id,
+          ownerA.id,
+          ownerOptOut.id,
+          ownerHidden.id,
+        ],
       },
     },
   });

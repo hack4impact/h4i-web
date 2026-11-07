@@ -1,6 +1,6 @@
-# Hack for Impact — Volunteer Platform
+# Hack4Impact — Volunteer Platform
 
-Internal operations platform for managing chapters, projects, volunteers, and partners across the Hack for Impact network.
+Internal operations platform for managing chapters, projects, volunteers, and partners across the Hack4Impact network.
 
 ## Architecture
 

@@ -1,5 +1,5 @@
 /**
- * Terminal check for approval / claim / transition / COD role rules.
+ * Terminal check for approval / claim / transition / role-change rules.
  *
  * Does NOT reset or wipe your database. It creates a few temporary rows,
  * asserts behavior, then deletes those rows.
@@ -48,25 +48,25 @@ const db = new PrismaClient({ adapter });
 async function main() {
   const t = Date.now();
   const nationals = await db.user.create({
-    data: { email: `wf-nat-${t}@example.com`, role: "NATIONALS" },
+    data: { email: `wf-nat-${t}@example.com`, role: "NATIONAL_ADMIN" },
   });
-  const cod = await db.user.create({
-    data: { email: `wf-cod-${t}@example.com`, role: "COD" },
+  const admin2 = await db.user.create({
+    data: { email: `wf-admin2-${t}@example.com`, role: "NATIONAL_ADMIN" },
   });
   const owner = await db.user.create({
-    data: { email: `wf-owner-${t}@example.com`, role: "VOLUNTEER" },
+    data: { email: `wf-owner-${t}@example.com`, role: "MEMBER" },
   });
   const other = await db.user.create({
-    data: { email: `wf-other-${t}@example.com`, role: "VOLUNTEER" },
+    data: { email: `wf-other-${t}@example.com`, role: "MEMBER" },
   });
 
-  const natActor = { userId: nationals.id, role: "NATIONALS" as const };
-  const codActor = { userId: cod.id, role: "COD" as const };
-  const ownerActor = { userId: owner.id, role: "VOLUNTEER" as const };
+  const natActor = { userId: nationals.id, role: "NATIONAL_ADMIN" as const };
+  const admin2Actor = { userId: admin2.id, role: "NATIONAL_ADMIN" as const };
+  const ownerActor = { userId: owner.id, role: "MEMBER" as const };
 
   try {
-    // Manual create — COD can do it; stays invisible
-    const pendingish = await createManualProfile(db, codActor, "MEMBER", {
+    // Manual create — any directory admin can do it; stays invisible
+    const pendingish = await createManualProfile(db, admin2Actor, "MEMBER", {
       displayName: "Manual Pat",
       contactEmail: `manual-${t}@example.com`,
     });
@@ -91,11 +91,14 @@ async function main() {
       where: { id: pending.id },
     });
     assert(approved.approvalStatus === "APPROVED", "approved");
-    await rejectProfile(db, codActor, "MEMBER", pending.id);
+    await rejectProfile(db, admin2Actor, "MEMBER", pending.id);
     const rejected = await db.member.findUniqueOrThrow({
       where: { id: pending.id },
     });
-    assert(rejected.approvalStatus === "REJECTED", "rejected by COD");
+    assert(
+      rejected.approvalStatus === "REJECTED",
+      "rejected by a second admin"
+    );
 
     // Claim + consent
     const tokenRow = await createClaimToken(
@@ -138,47 +141,50 @@ async function main() {
       "member and alumni must not both be visible"
     );
 
-    // Role asymmetry
-    let codBlocked = false;
+    // Role changes: directory admins only, never on their own account
+    let memberBlocked = false;
     try {
-      await assignUserRole(db, codActor, other.id, "COD");
+      await assignUserRole(db, ownerActor, other.id, "CHAPTER_LEAD");
     } catch {
-      codBlocked = true;
+      memberBlocked = true;
     }
-    assert(codBlocked, "COD cannot promote to COD");
+    assert(memberBlocked, "A member cannot change roles");
 
-    await assignUserRole(db, natActor, other.id, "COD");
+    let selfBlocked = false;
+    try {
+      await assignUserRole(db, natActor, nationals.id, "MEMBER");
+    } catch {
+      selfBlocked = true;
+    }
+    assert(selfBlocked, "An admin cannot change their own role");
+
+    await assignUserRole(db, natActor, other.id, "NATIONAL_ADMIN");
     const promoted = await db.user.findUniqueOrThrow({
       where: { id: other.id },
     });
-    assert(promoted.role === "COD", "Nationals can promote to COD");
+    assert(
+      promoted.role === "NATIONAL_ADMIN",
+      "Nationals can promote to admin"
+    );
 
-    let demoteBlocked = false;
-    try {
-      await assignUserRole(db, codActor, other.id, "VOLUNTEER");
-    } catch {
-      demoteBlocked = true;
-    }
-    assert(demoteBlocked, "COD cannot demote a COD");
-
-    await assignUserRole(db, natActor, other.id, "VOLUNTEER");
+    await assignUserRole(db, admin2Actor, other.id, "MEMBER");
     const demoted = await db.user.findUniqueOrThrow({
       where: { id: other.id },
     });
-    assert(demoted.role === "VOLUNTEER", "Nationals can demote COD");
+    assert(demoted.role === "MEMBER", "Another admin can demote an admin");
 
     const audits = await db.adminAuditLog.count({
-      where: { actorUserId: { in: [nationals.id, cod.id, owner.id] } },
+      where: { actorUserId: { in: [nationals.id, admin2.id, owner.id] } },
     });
     assert(audits >= 5, "audit rows written");
 
     console.log("PASS: directory workflows verification");
   } finally {
     await db.directoryClaimToken.deleteMany({
-      where: { createdByUserId: { in: [nationals.id, cod.id] } },
+      where: { createdByUserId: { in: [nationals.id, admin2.id] } },
     });
     await db.adminAuditLog.deleteMany({
-      where: { actorUserId: { in: [nationals.id, cod.id, owner.id] } },
+      where: { actorUserId: { in: [nationals.id, admin2.id, owner.id] } },
     });
     await db.alumni.deleteMany({
       where: { userId: { in: [owner.id] } },
@@ -196,7 +202,7 @@ async function main() {
       where: { displayName: { in: ["Pending Pat", "Manual Pat"] } },
     });
     await db.user.deleteMany({
-      where: { id: { in: [nationals.id, cod.id, owner.id, other.id] } },
+      where: { id: { in: [nationals.id, admin2.id, owner.id, other.id] } },
     });
     await db.$disconnect();
   }

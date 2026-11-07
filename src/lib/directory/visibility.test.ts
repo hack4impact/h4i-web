@@ -92,13 +92,12 @@ describe("hasDuplicateActiveDirectoryIdentities", () => {
 });
 
 describe("canViewUnpublishedDirectoryProfiles", () => {
-  it("grants directory admins (COD + NATIONALS)", () => {
-    expect(canViewUnpublishedDirectoryProfiles("NATIONALS")).toBe(true);
-    expect(canViewUnpublishedDirectoryProfiles("COD")).toBe(true);
+  it("grants directory admins (NATIONAL_ADMIN)", () => {
+    expect(canViewUnpublishedDirectoryProfiles("NATIONAL_ADMIN")).toBe(true);
   });
 
   it("does not leak to Notion editors or volunteers", () => {
-    for (const role of ["CHAPTER_LEAD", "PROJECT_LEAD", "VOLUNTEER"] as const) {
+    for (const role of ["CHAPTER_LEAD", "PROJECT_LEAD", "MEMBER"] as const) {
       expect(canViewUnpublishedDirectoryProfiles(role)).toBe(false);
     }
   });
@@ -118,17 +117,14 @@ describe("directoryListWhere", () => {
 });
 
 describe("directoryDetailWhere", () => {
-  it("places no restriction on COD or NATIONALS", () => {
+  it("places no restriction on directory admins", () => {
     expect(
-      directoryDetailWhere({ userId: "user_1", role: "NATIONALS" })
+      directoryDetailWhere({ userId: "user_1", role: "NATIONAL_ADMIN" })
     ).toEqual({});
-    expect(directoryDetailWhere({ userId: "user_1", role: "COD" })).toEqual({});
   });
 
   it("gives everyone else member-facing rows or their own row", () => {
-    expect(
-      directoryDetailWhere({ userId: "user_1", role: "VOLUNTEER" })
-    ).toEqual({
+    expect(directoryDetailWhere({ userId: "user_1", role: "MEMBER" })).toEqual({
       OR: [memberFacingDirectoryWhere, { userId: "user_1" }],
     });
   });
@@ -144,7 +140,7 @@ describe("directoryDetailWhere", () => {
   });
 
   it("omits the owner branch when there is no viewer id, so unclaimed rows stay hidden", () => {
-    expect(directoryDetailWhere({ userId: "", role: "VOLUNTEER" })).toEqual({
+    expect(directoryDetailWhere({ userId: "", role: "MEMBER" })).toEqual({
       OR: [memberFacingDirectoryWhere],
     });
   });

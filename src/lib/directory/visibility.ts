@@ -23,7 +23,7 @@ import { DIRECTORY_ADMIN_ROLES } from "@/lib/auth/roles";
  * Three access tiers:
  *   1. Any signed-in viewer  → member-facing rows only.
  *   2. Owner                 → additionally their own row, whatever its state.
- *   3. Directory admins (COD + NATIONALS) → any row on detail paths.
+ *   3. Directory admins (NATIONAL_ADMIN) → any row on detail paths.
  *
  * UNFINISHED — duplicate active Member+Alumni identities:
  * - hasDuplicateActiveDirectoryIdentities only detects; it does NOT enforce.
@@ -104,7 +104,7 @@ export const memberFacingDirectoryWhere = {
  * May this role read profiles that are not member-facing (pending, rejected,
  * opted out, admin-hidden, or unclaimed)?
  *
- * Directory admins (COD + NATIONALS). CHAPTER_LEAD / PROJECT_LEAD are Notion
+ * Directory admins (NATIONAL_ADMIN). CHAPTER_LEAD / PROJECT_LEAD are Notion
  * editors, not Member/Alumni moderators.
  */
 export function canViewUnpublishedDirectoryProfiles(role: AppRole): boolean {
@@ -133,7 +133,7 @@ export function directoryListWhere() {
  * id not existing. That is the point: 404, never 403, so a hidden profile's
  * existence is not confirmed.
  *
- * Returns {} for COD/NATIONALS — no visibility restriction, id alone decides.
+ * Returns {} for directory admins — no visibility restriction, id alone decides.
  */
 export function directoryDetailWhere(viewer: DirectoryViewer) {
   if (canViewUnpublishedDirectoryProfiles(viewer.role)) {

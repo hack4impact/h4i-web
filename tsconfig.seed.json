@@ -16,11 +16,5 @@
       "@/*": ["./src/*"]
     }
   },
-  "include": [
-    "prisma/seed.ts",
-    "prisma/seed-directory.ts",
-    "prisma/verify-directory-schema.ts",
-    "prisma/verify-directory-workflows.ts",
-    "prisma/manual-directory-fixtures.ts"
-  ]
+  "include": ["prisma/*.ts", "prisma/seed/**/*.ts", "src/lib/auth/password.ts"]
 }

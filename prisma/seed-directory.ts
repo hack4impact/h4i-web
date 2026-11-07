@@ -229,8 +229,8 @@ async function upsertChapter(name: string) {
 async function upsertSeedUser(email: string) {
   return db.user.upsert({
     where: { email },
-    update: { role: "VOLUNTEER" },
-    create: { email, role: "VOLUNTEER" },
+    update: { role: "MEMBER" },
+    create: { email, role: "MEMBER" },
   });
 }
 

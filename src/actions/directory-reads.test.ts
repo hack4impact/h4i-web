@@ -22,7 +22,7 @@ import {
   directoryProfileSelect,
 } from "@/lib/directory/select";
 
-type Role = "COD" | "NATIONALS" | "CHAPTER_LEAD" | "PROJECT_LEAD" | "VOLUNTEER";
+type Role = "NATIONAL_ADMIN" | "CHAPTER_LEAD" | "PROJECT_LEAD" | "MEMBER";
 
 function signedInAs(role: Role, userId = "user_1") {
   mocks.assertSession.mockResolvedValue({ user: { id: userId, role } });
@@ -51,7 +51,7 @@ describe("authentication", () => {
 
 describe("list reads", () => {
   it("filter to member-facing rows and withhold moderation state", async () => {
-    signedInAs("VOLUNTEER");
+    signedInAs("MEMBER");
     await listMembers();
 
     const args = mocks.member.findMany.mock.calls[0][0];
@@ -59,8 +59,8 @@ describe("list reads", () => {
     expect(args.select).toBe(directoryProfileSelect);
   });
 
-  it("stay member-facing for NATIONALS — a list never exposes unpublished rows", async () => {
-    signedInAs("NATIONALS");
+  it("stay member-facing for NATIONAL_ADMIN — a list never exposes unpublished rows", async () => {
+    signedInAs("NATIONAL_ADMIN");
     await listMembers();
     await listAlumni();
 
@@ -75,7 +75,7 @@ describe("list reads", () => {
 
 describe("detail reads cannot bypass visibility", () => {
   it("apply the visibility clause inside the query, not after it", async () => {
-    signedInAs("VOLUNTEER");
+    signedInAs("MEMBER");
     await getMember("member_1");
 
     // findFirst with the rule in `where` — never findUnique({ where: { id } }),
@@ -91,7 +91,7 @@ describe("detail reads cannot bypass visibility", () => {
   });
 
   it("let an owner reach their own row whatever its state", async () => {
-    signedInAs("VOLUNTEER", "owner_9");
+    signedInAs("MEMBER", "owner_9");
     await getMember("member_1");
 
     expect(mocks.member.findFirst.mock.calls[0][0].where.OR).toContainEqual({
@@ -99,8 +99,8 @@ describe("detail reads cannot bypass visibility", () => {
     });
   });
 
-  it("let NATIONALS and COD reach any row, with moderation state attached", async () => {
-    for (const role of ["NATIONALS", "COD"] as const) {
+  it("let NATIONAL_ADMIN reach any row, with moderation state attached", async () => {
+    for (const role of ["NATIONAL_ADMIN"] as const) {
       vi.clearAllMocks();
       signedInAs(role);
       await getMember("member_1");
@@ -127,7 +127,7 @@ describe("detail reads cannot bypass visibility", () => {
   });
 
   it("apply the same rule to alumni detail", async () => {
-    signedInAs("VOLUNTEER");
+    signedInAs("MEMBER");
     await getAlumniProfile("alumni_1");
 
     expect(mocks.alumni.findUnique).not.toHaveBeenCalled();
@@ -138,7 +138,7 @@ describe("detail reads cannot bypass visibility", () => {
   });
 
   it("return null for an empty id without querying", async () => {
-    signedInAs("VOLUNTEER");
+    signedInAs("MEMBER");
 
     expect(await getMember("")).toBeNull();
     expect(await getAlumniProfile("")).toBeNull();
@@ -147,7 +147,7 @@ describe("detail reads cannot bypass visibility", () => {
   });
 
   it("report missing and hidden identically, so 404 cannot be told from 403", async () => {
-    signedInAs("VOLUNTEER");
+    signedInAs("MEMBER");
     mocks.member.findFirst.mockResolvedValue(null);
 
     expect(await getMember("does_not_exist")).toBeNull();
@@ -157,7 +157,7 @@ describe("detail reads cannot bypass visibility", () => {
 
 describe("owner path", () => {
   it("looks the viewer up by their own user id and includes moderation state", async () => {
-    signedInAs("VOLUNTEER", "owner_9");
+    signedInAs("MEMBER", "owner_9");
     await getMyMemberProfile();
 
     const args = mocks.member.findUnique.mock.calls[0][0];

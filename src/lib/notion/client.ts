@@ -1,19 +1,17 @@
 import { Client } from "@notionhq/client";
 
-/**
- * Notion-backed directory pages (volunteers/partners/…) need NOTION_API_KEY.
- * Missing key must not crash the whole app module graph — getters already
- * catch fetch failures and return empty rows.
- */
-if (!process.env.NOTION_API_KEY) {
-  console.warn(
-    "NOTION_API_KEY is not set — Notion directory pages will show empty data"
-  );
-}
+let client: Client | undefined;
 
-export const notion = new Client({
-  auth: process.env.NOTION_API_KEY || "missing-notion-api-key",
-});
+// Created on first use so modules importing this file can load without the key.
+export function getNotionClient(): Client {
+  if (!client) {
+    if (!process.env.NOTION_API_KEY) {
+      throw new Error("NOTION_API_KEY environment variable is not set");
+    }
+    client = new Client({ auth: process.env.NOTION_API_KEY });
+  }
+  return client;
+}
 
 export const PROGRAMS_DATA_SOURCE_ID = "27b197ab-f07b-80ab-999b-000bc1682f4f";
 export const PROJECTS_DATA_SOURCE_ID = "27b197ab-f07b-80cf-8d0e-000b8507cb8f";

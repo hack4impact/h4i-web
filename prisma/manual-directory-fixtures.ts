@@ -46,7 +46,7 @@ async function cleanup() {
   const chapterId = requireEnv("CHAPTER_ID");
   const userIds = [
     requireEnv("NAT_ID"),
-    requireEnv("COD_ID"),
+    requireEnv("ADMIN2_ID"),
     requireEnv("OWNER_A_ID"),
     requireEnv("OWNER_B_ID"),
   ];
@@ -73,16 +73,16 @@ async function create() {
     data: { name: `Manual Fixture Chapter ${t}` },
   });
   const nationals = await db.user.create({
-    data: { email: `manual-nat-${t}@example.com`, role: "NATIONALS" },
+    data: { email: `manual-nat-${t}@example.com`, role: "NATIONAL_ADMIN" },
   });
-  const cod = await db.user.create({
-    data: { email: `manual-cod-${t}@example.com`, role: "COD" },
+  const admin2 = await db.user.create({
+    data: { email: `manual-admin2-${t}@example.com`, role: "NATIONAL_ADMIN" },
   });
   const ownerA = await db.user.create({
-    data: { email: `manual-owner-a-${t}@example.com`, role: "VOLUNTEER" },
+    data: { email: `manual-owner-a-${t}@example.com`, role: "MEMBER" },
   });
   const ownerB = await db.user.create({
-    data: { email: `manual-owner-b-${t}@example.com`, role: "VOLUNTEER" },
+    data: { email: `manual-owner-b-${t}@example.com`, role: "MEMBER" },
   });
 
   const member = await db.member.create({
@@ -126,7 +126,7 @@ async function create() {
   console.log(`export AID='${ownerA.id}'`);
   console.log(`export ALUMNI_ID='${alumni.id}'`);
   console.log(`export NAT_ID='${nationals.id}'`);
-  console.log(`export COD_ID='${cod.id}'`);
+  console.log(`export ADMIN2_ID='${admin2.id}'`);
   console.log(`export OWNER_A_ID='${ownerA.id}'`);
   console.log(`export OWNER_B_ID='${ownerB.id}'`);
   console.log(`export CHAPTER_ID='${chapter.id}'`);

@@ -3,16 +3,16 @@ import { canRunMemberToAlumniTransition } from "./workflows";
 import { hasDuplicateActiveDirectoryIdentities } from "./visibility";
 
 describe("canRunMemberToAlumniTransition", () => {
-  it("allows directory admins (COD and NATIONALS)", () => {
+  it("allows directory admins (NATIONAL_ADMIN)", () => {
     expect(
       canRunMemberToAlumniTransition({
-        actor: { userId: "admin", role: "COD" },
+        actor: { userId: "admin", role: "NATIONAL_ADMIN" },
         memberUserId: "owner",
       })
     ).toBe(true);
     expect(
       canRunMemberToAlumniTransition({
-        actor: { userId: "admin", role: "NATIONALS" },
+        actor: { userId: "admin", role: "NATIONAL_ADMIN" },
         memberUserId: null,
       })
     ).toBe(true);
@@ -21,13 +21,13 @@ describe("canRunMemberToAlumniTransition", () => {
   it("allows the profile owner and rejects other volunteers", () => {
     expect(
       canRunMemberToAlumniTransition({
-        actor: { userId: "owner", role: "VOLUNTEER" },
+        actor: { userId: "owner", role: "MEMBER" },
         memberUserId: "owner",
       })
     ).toBe(true);
     expect(
       canRunMemberToAlumniTransition({
-        actor: { userId: "other", role: "VOLUNTEER" },
+        actor: { userId: "other", role: "MEMBER" },
         memberUserId: "owner",
       })
     ).toBe(false);

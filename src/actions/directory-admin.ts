@@ -81,7 +81,7 @@ export async function adminAssignUserRole(
   targetUserId: string,
   nextRole: AppRole
 ) {
-  // Further COD asymmetry enforced in canAssignUserRole.
+  // Self-changes and unknown roles are rejected in canAssignUserRole.
   const session = await assertRole(DIRECTORY_ADMIN_ROLES);
   return assignUserRole(db, actorFromSession(session), targetUserId, nextRole);
 }

@@ -6,28 +6,83 @@ datasource db {
   provider = "postgresql"
 }
 
-// =============================================================================
-// Administrative permission roles (auth / authorization).
-// Distinct from DirectoryPosition (organizational project roles in the directory).
-//
-// Two administrator types (not a hierarchy — peer directory admins for Member/Alumni):
-//   COD / NATIONALS — same directory powers (approve, reject, manual create, claim
-//                     issuance, audit read, admin-driven transitions).
-//   Asymmetry: only NATIONALS may set a user's role TO COD or demote someone FROM COD.
-//
-// Former generic ADMIN was removed. Existing ADMIN rows are NOT auto-mapped to COD or
-// NATIONALS (see correction migration). Non-admin roles unchanged.
-// =============================================================================
-// Temporarily stored here until ops-api exposes role assignment endpoints.
-// TODO: once GET /volunteers?email= and GET /volunteers/:id/roles exist,
-// remove role + operationsChapterId and resolve dynamically at sign-in.
+// Permission roles. Cached on User until the ops-api can resolve them at
+// sign-in. Directory positions (PM, TL, ...) are a separate enum, not roles.
 enum Role {
-  COD
-  NATIONALS
+  NATIONAL_ADMIN
   CHAPTER_LEAD
   PROJECT_LEAD
-  VOLUNTEER
+  MEMBER
 }
+
+model User {
+  id           String  @id @default(cuid())
+  email        String  @unique
+  passwordHash String? // null for magic-link-only accounts
+  role         Role    @default(MEMBER)
+
+  // Volunteer record in the operations-api
+  operationsId String? @unique
+
+  // Home chapter; null for Nationals staff and unassigned sign-ups
+  chapterId String?
+  chapter   Chapter? @relation(fields: [chapterId], references: [id], onDelete: SetNull)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  sessions        Session[]
+  magicLinkTokens MagicLinkToken[]
+
+  // Directory profiles this user owns. A user may own both during a
+  // member-to-alumni transition; at most one is member-facing visible.
+  memberProfile      Member?
+  alumniProfile      Alumni?
+  adminAuditLogs     AdminAuditLog[]       @relation("AuditActor")
+  claimTokensCreated DirectoryClaimToken[] @relation("ClaimTokenCreator")
+
+  @@index([chapterId])
+}
+
+// Shared by every chapter-scoped feature. Seeded from prisma/seed/chapters.ts.
+model Chapter {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  region    String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  users            User[]
+  members          Member[]
+  alumni           Alumni[]
+  hackInvolvements AlumniHackInvolvement[]
+}
+
+// One row per signed-in device. id is a random token set by the auth routes.
+model Session {
+  id        String   @id @default(cuid())
+  userId    String
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// One-time sign-in tokens sent by email
+model MagicLinkToken {
+  id        String    @id @default(cuid())
+  email     String
+  userId    String?
+  expiresAt DateTime
+  usedAt    DateTime? // set on first use
+  createdAt DateTime  @default(now())
+
+  user User? @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// ---------------------------------------------------------------------------
+// Member & Alumni Directory
+// ---------------------------------------------------------------------------
 
 enum DirectoryAuditAction {
   PROFILE_APPROVED
@@ -80,71 +135,6 @@ enum DirectoryApprovalStatus {
   REJECTED
 }
 
-model User {
-  id           String  @id @default(cuid())
-  email        String  @unique
-  passwordHash String?
-  role         Role    @default(VOLUNTEER)
-  // Links this auth record to the volunteer record in the operations-api
-  operationsId String? @unique
-  // Cached from ops-api — the chapter this user belongs to
-  // TODO: remove once ops-api exposes role/assignment endpoints
-  operationsChapterId String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  sessions        Session[]
-  magicLinkTokens MagicLinkToken[]
-  adminAuditLogs  AdminAuditLog[]       @relation("AuditActor")
-  claimTokensCreated DirectoryClaimToken[] @relation("ClaimTokenCreator")
-
-  // Optional ownership of directory profiles (nullable on the profile side for
-  // unclaimed legacy/admin-created rows). Uniqueness is per profile table.
-  // Cross-table: a User may own both Member and Alumni during a transition;
-  // application invariant: at most ONE may be member-facing-visible at a time.
-  // Do not auto-claim by name or unverified email match.
-  memberProfile Member?
-  alumniProfile Alumni?
-}
-
-// Stores active login sessions — one row per logged-in device/browser
-model Session {
-  id        String   @id @default(cuid()) // opaque token sent as a cookie
-  userId    String
-  expiresAt DateTime
-  createdAt DateTime @default(now())
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-}
-
-// One-time tokens sent via magic link email
-model MagicLinkToken {
-  id        String    @id @default(cuid()) // token sent in the email link
-  email     String
-  userId    String?
-  expiresAt DateTime
-  usedAt    DateTime? // null until clicked; stamped on use to prevent reuse
-  createdAt DateTime  @default(now())
-
-  user User? @relation(fields: [userId], references: [id], onDelete: Cascade)
-}
-
-// =============================================================================
-// Shared chapter registry for directory profiles.
-// Canonical unique name; cuid IDs match User/Session. No fabricated chapter list
-// is seeded — chapters are created when known. Legacy profiles may omit chapterId.
-// =============================================================================
-model Chapter {
-  id        String   @id @default(cuid())
-  name      String   @unique
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  members          Member[]
-  alumni           Alumni[]
-  hackInvolvements AlumniHackInvolvement[]
-}
-
 // =============================================================================
 // Member directory profile (current / active members).
 // Kept separate from Alumni — do not merge into a single profile table.
@@ -157,8 +147,8 @@ model Chapter {
 //   AND approvalStatus = APPROVED
 //   AND directoryOptIn = true
 //   AND adminHidden = false
-// Claiming/owning does not approve or opt in. Owner and authorized NATIONALS
-// unpublished access is separate (later authz); do not assume COD has it.
+// Claiming/owning does not approve or opt in. Owner and National Admin
+// unpublished access is separate (later authz).
 // Unresolved PRD question: may admins edit another person’s profile?
 // =============================================================================
 model Member {
@@ -172,13 +162,13 @@ model Member {
   chapterId String?
   chapter   Chapter? @relation(fields: [chapterId], references: [id], onDelete: SetNull)
 
-  displayName String?
+  displayName  String?
   // Directory-shared contact — distinct from User.email (private account email).
-  contactEmail  String?
-  linkedInUrl   String?
-  githubUrl     String?
-  websiteUrl    String?
-  instagramUrl  String?
+  contactEmail String?
+  linkedInUrl  String?
+  githubUrl    String?
+  websiteUrl   String?
+  instagramUrl String?
 
   graduationYear Int?
   major          String?
@@ -214,13 +204,13 @@ model Alumni {
   chapterId String?
   chapter   Chapter? @relation(fields: [chapterId], references: [id], onDelete: SetNull)
 
-  displayName   String?
-  contactEmail  String?
-  linkedInUrl   String?
-  githubUrl     String?
-  websiteUrl    String?
+  displayName  String?
+  contactEmail String?
+  linkedInUrl  String?
+  githubUrl    String?
+  websiteUrl   String?
   // PRD: alumni Instagram links supported as shared directory contact.
-  instagramUrl  String?
+  instagramUrl String?
 
   graduationYear Int?
   major          String?
@@ -310,15 +300,15 @@ model AdminAuditLog {
 
 // One-time tokens for verified profile claiming (no auto-claim by email/name).
 model DirectoryClaimToken {
-  id              String                   @id @default(cuid())
-  token           String                   @unique
+  id              String                    @id @default(cuid())
+  token           String                    @unique
   profileKind     DirectoryClaimProfileKind
   profileId       String
   createdByUserId String
-  createdBy       User                     @relation("ClaimTokenCreator", fields: [createdByUserId], references: [id], onDelete: Cascade)
+  createdBy       User                      @relation("ClaimTokenCreator", fields: [createdByUserId], references: [id], onDelete: Cascade)
   expiresAt       DateTime
   usedAt          DateTime?
-  createdAt       DateTime                 @default(now())
+  createdAt       DateTime                  @default(now())
 
   @@index([profileKind, profileId])
   @@index([expiresAt])

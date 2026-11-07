@@ -2,8 +2,8 @@
  * Canonical directory organizational positions (DirectoryPosition enum) and
  * unambiguous label → enum mappings for alumni Hack involvement history.
  *
- * Administrative Role values (COD, NATIONALS, CHAPTER_LEAD, PROJECT_LEAD,
- * VOLUNTEER) are intentionally NOT mapped here — they are permission roles,
+ * Administrative Role values (NATIONAL_ADMIN, CHAPTER_LEAD, PROJECT_LEAD,
+ * MEMBER) are intentionally NOT mapped here — they are permission roles,
  * not directory positions.
  *
  * Ambiguous or chapter-leadership labels (e.g. "Chapter Lead", "Officer") are

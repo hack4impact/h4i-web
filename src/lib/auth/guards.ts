@@ -1,31 +1,28 @@
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { getCurrentSession } from "@/lib/auth/session";
+import { hasRole } from "@/lib/auth/roles";
 import type { AppRole } from "@/types";
 
 export {
-  COD_ROLES,
+  ADMIN_ROLES,
   DIRECTORY_ADMIN_ROLES,
+  CHAPTER_LEADERSHIP_ROLES,
   EDITOR_ROLES,
-  NATIONALS_ROLES,
+  canActForChapter,
+  hasRole,
   isDirectoryAdmin,
 } from "@/lib/auth/roles";
 
 /**
- * For server components (pages and layouts). Returns the session, or sends an
- * unauthenticated visitor to sign-in and never returns.
- *
- * This is the authoritative check: unlike proxy.ts it runs on the Node runtime,
- * so it really does look the session up in the database and verify it has not
- * expired.
+ * For pages and layouts. Redirects to sign-in when there is no valid session.
+ * Unlike proxy.ts this runs on Node and checks the Session row in the database.
  */
 export async function requireSession() {
   const session = await getCurrentSession();
 
   if (!session) {
-    // proxy.ts set x-pathname on the forwarded request. Carry it over so the
-    // visitor returns to where they were after signing in, instead of being
-    // dumped on the dashboard when a session quietly expires.
+    // Set by proxy.ts so the visitor can be sent back after signing in.
     const pathname = (await headers()).get("x-pathname");
     redirect(
       pathname
@@ -37,14 +34,11 @@ export async function requireSession() {
   return session;
 }
 
-/**
- * For server components that only certain roles may see. Signed-out visitors
- * go to sign-in; signed-in visitors without a listed role go to the dashboard.
- */
+/** For pages only certain roles may see. Wrong role goes to the dashboard. */
 export async function requireRole(allowed: readonly AppRole[]) {
   const session = await requireSession();
 
-  if (!allowed.includes(session.user.role as AppRole)) {
+  if (!hasRole(session.user.role, allowed)) {
     redirect("/dashboard");
   }
 
@@ -52,12 +46,8 @@ export async function requireRole(allowed: readonly AppRole[]) {
 }
 
 /**
- * For server actions and route handlers, which are called programmatically
- * rather than navigated to — redirecting them makes no sense, so this throws.
- *
- * Server actions are POST endpoints. A client can invoke one directly without
- * ever rendering the page it lives on, so layout protection does nothing for
- * them and each one needs its own check.
+ * For server actions and route handlers, which can be called without rendering
+ * a page, so layout protection does not cover them. Throws instead of redirecting.
  */
 export async function assertSession() {
   const session = await getCurrentSession();
@@ -69,13 +59,10 @@ export async function assertSession() {
   return session;
 }
 
-/**
- * For server actions: signed-in and role-allowed, or throw (never redirect).
- */
 export async function assertRole(allowed: readonly AppRole[]) {
   const session = await assertSession();
 
-  if (!allowed.includes(session.user.role as AppRole)) {
+  if (!hasRole(session.user.role, allowed)) {
     throw new Error("Forbidden");
   }
 

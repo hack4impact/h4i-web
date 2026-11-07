@@ -1,4 +1,4 @@
-// Runs against the seeded dev database (`pnpm prisma db seed`). Each test makes
+// Runs against the seeded dev database (`pnpm db:seed`). Each test makes
 // its own listings, which are deleted again in afterAll.
 import { afterAll, describe, expect, it } from "vitest";
 import { db } from "@/lib/db";
@@ -16,13 +16,13 @@ import { ADMIN, LEAD, run, VOLUNTEER, type GraphQLResult } from "./helpers";
 // LEAD (Berkeley) sources every listing here; these leaders claim them.
 const UIUC_LEAD: Viewer = {
   id: "seed-user-lead-uiuc",
-  role: "CHAPTER_LEADER",
-  chapterId: "seed-chapter-uiuc",
+  role: "CHAPTER_LEAD",
+  chapterId: "chapter-uiuc",
 };
 const GT_LEAD: Viewer = {
   id: "seed-user-lead-gt",
-  role: "CHAPTER_LEADER",
-  chapterId: "seed-chapter-gt",
+  role: "CHAPTER_LEAD",
+  chapterId: "chapter-gt",
 };
 
 const CLAIM_FIELDS = /* GraphQL */ `

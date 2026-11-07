@@ -3,6 +3,7 @@ import {
   type ClaimStatus,
   type SourcedProjectStatus,
 } from "@prisma/client";
+import { canActForChapter } from "@/lib/auth/roles";
 import { db } from "@/lib/db";
 import { emitClaimRequested } from "@/lib/sourced-projects/claim-events";
 import type { Viewer } from "@/lib/sourced-projects/contact-gating";
@@ -31,10 +32,7 @@ export const claimSelect = {
 } satisfies Prisma.ProjectClaimSelect;
 
 export type ClaimErrorCode =
-  | "BAD_USER_INPUT"
-  | "CONFLICT"
-  | "FORBIDDEN"
-  | "NOT_FOUND";
+  "BAD_USER_INPUT" | "CONFLICT" | "FORBIDDEN" | "NOT_FOUND";
 
 export class ClaimError extends Error {
   constructor(
@@ -64,9 +62,7 @@ export type ClaimAction = Exclude<Transition, "expire">;
 type ClaimParties = { sourcingChapterId: string; claimingChapterId: string };
 
 const isClaimant = (viewer: Viewer, claim: ClaimParties) =>
-  viewer.role === "ADMIN" ||
-  (viewer.role === "CHAPTER_LEADER" &&
-    viewer.chapterId === claim.claimingChapterId);
+  canActForChapter(viewer, claim.claimingChapterId);
 
 const isSourcer = (viewer: Viewer, claim: ClaimParties) =>
   canManageListing(viewer, claim.sourcingChapterId);
@@ -111,7 +107,7 @@ export async function requestClaim(
   listingId: string,
   rawMessage?: string | null
 ) {
-  if (viewer.role !== "CHAPTER_LEADER" || !viewer.chapterId) {
+  if (viewer.role !== "CHAPTER_LEAD" || !viewer.chapterId) {
     throw new ClaimError(
       "FORBIDDEN",
       "Only chapter leaders can claim listings"

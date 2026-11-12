@@ -3,10 +3,13 @@ import { notFound } from "next/navigation";
 import type { ReactNode } from "react";
 import { ArrowLeft, Check, ExternalLink } from "lucide-react";
 import { CauseBanner } from "@/components/exchange/CauseBanner";
+import { ListingManageActions } from "@/components/exchange/ListingManageActions";
 import { StatusBadge } from "@/components/exchange/StatusBadge";
 import { Card } from "@/components/ui/Card";
+import { getViewer } from "@/lib/graphql/handler";
 import { CAUSE_AREA_LABELS, formatDate } from "@/lib/sourced-projects/labels";
 import { listingsApi } from "@/lib/sourced-projects/listings-server";
+import { canManageListing } from "@/lib/sourced-projects/permissions";
 
 function Section({ title, children }: { title: string; children: ReactNode }) {
   return (
@@ -40,8 +43,13 @@ export default async function ListingPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const listing = await listingsApi.listing(id);
+  const [listing, viewer] = await Promise.all([
+    listingsApi.listing(id),
+    getViewer(),
+  ]);
   if (!listing) notFound();
+  const canManage =
+    viewer !== null && canManageListing(viewer, listing.sourcingChapter.id);
 
   return (
     <div className="h-full overflow-y-auto">
@@ -70,7 +78,10 @@ export default async function ListingPage({
                   </span>
                 </p>
               </div>
-              <StatusBadge status={listing.status} />
+              <div className="flex shrink-0 flex-col items-end gap-12">
+                <StatusBadge status={listing.status} />
+                {canManage && <ListingManageActions listingId={listing.id} />}
+              </div>
             </header>
 
             <hr className="my-24" />

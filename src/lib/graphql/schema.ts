@@ -187,6 +187,8 @@ const typeDefs = /* GraphQL */ `
       search: String
     ): ListingConnection!
     listing(id: ID!): Listing
+    "Every chapter, by name."
+    chapters: [Chapter!]!
   }
 
   "Restricted to chapter leaders of the sourcing chapter and admins."
@@ -356,6 +358,14 @@ export const schema = createSchema<GraphQLContext>({
           select: listingSelect(viewer),
         });
         return row ? toListingView(row, viewer) : null;
+      },
+
+      chapters(_, __, ctx) {
+        requireViewer(ctx);
+        return db.chapter.findMany({
+          select: { id: true, name: true, region: true },
+          orderBy: { name: "asc" },
+        });
       },
     },
 

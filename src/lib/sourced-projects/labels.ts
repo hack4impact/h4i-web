@@ -1,4 +1,4 @@
-import type { CauseArea, SourcedProjectStatus } from "@prisma/client";
+import type { CauseArea, LinkType, SourcedProjectStatus } from "@prisma/client";
 
 export const CAUSE_AREA_LABELS: Record<CauseArea, string> = {
   HEALTH: "Health",
@@ -19,6 +19,14 @@ export const STATUS_LABELS: Record<SourcedProjectStatus, string> = {
   IN_PROGRESS: "In progress",
   COMPLETED: "Completed",
   ARCHIVED: "Archived",
+};
+
+export const LINK_TYPE_LABELS: Record<LinkType, string> = {
+  REPO: "Repository",
+  SCOPING_DOC: "Scoping doc",
+  DESIGN_FILE: "Design file",
+  DELIVERABLE: "Deliverable",
+  OTHER: "Other",
 };
 
 // Fixed locale and time zone so server and client render the same string.

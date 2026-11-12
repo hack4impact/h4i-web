@@ -91,6 +91,7 @@ Listings are served over GraphQL at `/api/graphql` (GraphiQL is enabled outside 
 
 - `listings(first, after, filter, search)` returns paginated, non-withdrawn listings from every chapter, newest first. `filter` narrows by `status`, `causeArea`, and `sourcingChapterId`; `search` does a case-insensitive match on title, description, and scope.
 - `listing(id)` returns one listing.
+- `chapters` returns every chapter by name, for the filter panel and the admin chapter picker.
 - `createListing(input)`, `updateListing(id, input)`, and `withdrawListing(id)` are limited to chapter leaders of the sourcing chapter and admins (`FORBIDDEN` otherwise). Input is validated with zod (`src/lib/sourced-projects/listing-input.ts`); failures return `BAD_USER_INPUT` with per-field `issues`. Withdrawing sets `withdrawnAt`, and listings are never hard-deleted.
 
 Client contact fields and partner notes are exposed under `contact`. For anyone who isn't a `CHAPTER_LEADER` or `ADMIN`, they are never selected from the database and `contact` is `null` (see `src/lib/sourced-projects/contact-gating.ts`).
@@ -111,6 +112,12 @@ Every claim status change goes through `src/lib/sourced-projects/claims.ts`, whi
 - Pending claims expire after 14 days (`CLAIM_TIMEOUT_DAYS`) and the listing returns to `AVAILABLE`. Schedule `pnpm claims:expire` to run daily. A stale claim is also expired when another chapter requests the same listing.
 - Withdrawing a listing rejects its pending claim. A listing with an approved claim can't be withdrawn until the claim is abandoned.
 - New claims emit `claimRequested` on `claimEvents` (`src/lib/sourced-projects/claim-events.ts`) for notifications to subscribe to.
+
+### Pages
+
+- `/exchange` lists every chapter's projects. Search and filters (status, cause area, chapter) live in the URL as `q`, `status`, `cause`, and `chapter`, so a filtered view can be shared or reloaded. Unknown values are ignored.
+- `/exchange/[id]` is the detail page. Leaders of the sourcing chapter and admins also get Edit and Withdraw.
+- `/exchange/new` and `/exchange/[id]/edit` are the posting and edit form. It validates with the same zod schema as the API and warns, without blocking, when an email or phone number is typed into a field every member can read (`src/lib/sourced-projects/contact-detection.ts`).
 
 ## Tests
 

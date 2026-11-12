@@ -4,7 +4,7 @@ import { Field } from "@base-ui/react/field";
 import { Input as BaseInput } from "@base-ui/react/input";
 import { Form as BaseForm } from "@base-ui/react/form";
 import { cn } from "@/lib/utils";
-import type { ComponentPropsWithoutRef } from "react";
+import type { ComponentProps, ComponentPropsWithoutRef } from "react";
 
 type WithStringClassName<T> = Omit<T, "className"> & { className?: string };
 
@@ -13,13 +13,20 @@ type WithStringClassName<T> = Omit<T, "className"> & { className?: string };
 export function Form({
   className,
   ...props
-}: WithStringClassName<ComponentPropsWithoutRef<typeof BaseForm>>) {
+}: WithStringClassName<ComponentProps<typeof BaseForm>>) {
   return (
     <BaseForm className={cn("flex flex-col gap-16", className)} {...props} />
   );
 }
 
 // Field
+
+const controlClass = cn(
+  "border-separator bg-panel w-full border px-12",
+  "placeholder:text-gray-2",
+  "focus:border-(--accent) focus:outline-none",
+  "disabled:cursor-not-allowed disabled:opacity-50"
+);
 
 export function FormField({
   className,
@@ -47,16 +54,46 @@ export function FormInput({
   ...props
 }: WithStringClassName<ComponentPropsWithoutRef<typeof BaseInput>>) {
   return (
-    <BaseInput
-      className={cn(
-        "border-separator bg-panel h-32 w-full border px-12",
-        "placeholder:text-gray-2",
-        "focus:border-(--accent) focus:outline-none",
-        "disabled:cursor-not-allowed disabled:opacity-50",
-        className
-      )}
+    <BaseInput className={cn(controlClass, "h-32", className)} {...props} />
+  );
+}
+
+export function FormTextarea({
+  className,
+  rows = 4,
+  ...props
+}: WithStringClassName<ComponentPropsWithoutRef<typeof Field.Control>> & {
+  rows?: number;
+}) {
+  return (
+    <Field.Control
+      render={<textarea rows={rows} />}
+      className={cn(controlClass, "resize-y py-8 leading-18", className)}
       {...props}
     />
+  );
+}
+
+export function FormSelect({
+  className,
+  children,
+  ...props
+}: WithStringClassName<ComponentPropsWithoutRef<typeof Field.Control>>) {
+  return (
+    <Field.Control
+      render={<select>{children}</select>}
+      className={cn(controlClass, "h-32", className)}
+      {...props}
+    />
+  );
+}
+
+export function FormDescription({
+  className,
+  ...props
+}: WithStringClassName<ComponentPropsWithoutRef<typeof Field.Description>>) {
+  return (
+    <Field.Description className={cn("text-gray-3", className)} {...props} />
   );
 }
 

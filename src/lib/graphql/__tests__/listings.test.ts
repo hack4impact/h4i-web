@@ -190,3 +190,28 @@ describe("listing query", () => {
     expect((result.data as { listing: unknown }).listing).toBeNull();
   });
 });
+
+describe("chapters query", () => {
+  const CHAPTERS = /* GraphQL */ `
+    query {
+      chapters {
+        id
+        name
+      }
+    }
+  `;
+
+  it("returns every chapter by name", async () => {
+    const result = await run(CHAPTERS, VOLUNTEER);
+    const expected = await db.chapter.findMany({
+      select: { id: true, name: true },
+      orderBy: { name: "asc" },
+    });
+    expect((result.data as { chapters: unknown }).chapters).toEqual(expected);
+  });
+
+  it("rejects unauthenticated requests", async () => {
+    const result = await run(CHAPTERS, null);
+    expect(result.errors?.[0]?.extensions.code).toBe("UNAUTHENTICATED");
+  });
+});

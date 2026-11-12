@@ -11,3 +11,9 @@ export function canManageListing(
     viewer.role === "CHAPTER_LEADER" && viewer.chapterId === sourcingChapterId
   );
 }
+
+// Leaders post for their own chapter; admins pick the chapter.
+export function canPostListing(viewer: Viewer): boolean {
+  if (viewer.role === "ADMIN") return true;
+  return viewer.role === "CHAPTER_LEADER" && viewer.chapterId !== null;
+}

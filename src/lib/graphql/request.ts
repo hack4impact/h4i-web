@@ -3,15 +3,22 @@ export type GraphQLRequest = <TData>(
   variables?: Record<string, unknown>
 ) => Promise<TData>;
 
+export type GraphQLInputIssue = { path: string; message: string };
+
 type GraphQLResponse<TData> = {
   data?: TData | null;
-  errors?: { message: string; extensions?: { code?: string } }[];
+  errors?: {
+    message: string;
+    extensions?: { code?: string; issues?: GraphQLInputIssue[] };
+  }[];
 };
 
 export class GraphQLRequestError extends Error {
   constructor(
     message: string,
-    readonly code?: string
+    readonly code?: string,
+    // Per-field problems on a BAD_USER_INPUT error.
+    readonly issues: GraphQLInputIssue[] = []
   ) {
     super(message);
   }
@@ -35,7 +42,8 @@ async function send<TData>(
   if (error || !body.data) {
     throw new GraphQLRequestError(
       error?.message ?? `GraphQL request failed (${response.status})`,
-      error?.extensions?.code
+      error?.extensions?.code,
+      error?.extensions?.issues
     );
   }
   return body.data;

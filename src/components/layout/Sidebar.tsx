@@ -9,6 +9,7 @@ import {
   FolderOpen,
   Users,
   ChevronDown,
+  Compass,
 } from "lucide-react";
 import { credentialsSignOut } from "@/actions/auth";
 import { cn } from "@/lib/utils";
@@ -118,6 +119,11 @@ export function Sidebar() {
             href="/volunteers"
             label="Volunteers"
             icon={<Users size={15} strokeWidth={1.5} />}
+          />
+          <NavItem
+            href="/exchange"
+            label="Project Exchange"
+            icon={<Compass size={15} strokeWidth={1.5} />}
           />
         </nav>
       </div>

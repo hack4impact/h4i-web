@@ -25,5 +25,6 @@ export const config = {
     "/projects/:path*",
     "/volunteers/:path*",
     "/partners/:path*",
+    "/exchange/:path*",
   ],
 };

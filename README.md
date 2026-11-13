@@ -188,3 +188,9 @@ scripts/expire-claims.ts
 ## Contributing
 
 Branch off `develop` and open PRs into `develop`, not `main`. CI must pass before merging.
+
+## Project permissions and write APIs
+
+Project records now live in this app's PostgreSQL database and reference the local User and Chapter tables. Project APIs use the current database-backed session roles (`MEMBER`, `PROJECT_LEAD`, `CHAPTER_LEAD`, `NATIONAL_ADMIN`). Run `npm run db:generate` and `npm run db:deploy` to prepare the schema.
+
+See [Ticket 4 API setup, permissions, stage rules, examples and tests](docs/project-write-api.md). The endpoints support chapter-scoped draft creation, partial autosaves, validated publishing and National Admin deletion. Earlier project UI/read API work is absent on this branch; this ticket adds the write foundations against the new platform schema.

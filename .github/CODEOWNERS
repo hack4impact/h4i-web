@@ -1,0 +1,4 @@
+# Verify these logins before relying on it.
+prisma/            @zoey-j1n @khuhub
+src/lib/auth/      @zoey-j1n @khuhub
+.github/           @zoey-j1n @khuhub

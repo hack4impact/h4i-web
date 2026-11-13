@@ -2,7 +2,7 @@
 import { unstable_cache } from "next/cache";
 import { flattenNotionPage } from "./flatten";
 import {
-  notion,
+  getNotionClient,
   PROGRAMS_DATA_SOURCE_ID,
   PROJECTS_DATA_SOURCE_ID,
   PARTNERS_DATA_SOURCE_ID,
@@ -21,7 +21,9 @@ async function fetchAllPages(dataSourceId: string): Promise<any[]> {
   do {
     const query: any = { data_source_id: dataSourceId };
     if (cursor) query.start_cursor = cursor;
-    const response: any = await (notion as any).dataSources.query(query);
+    const response: any = await (getNotionClient() as any).dataSources.query(
+      query
+    );
     allResults.push(...response.results);
     cursor = response.has_more ? response.next_cursor : undefined;
   } while (cursor);

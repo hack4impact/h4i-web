@@ -1,3 +1,4 @@
+import { partnerFromNotion } from "@/lib/projects/partner-reference";
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { unstable_cache } from "next/cache";
 import { flattenNotionPage } from "./flatten";
@@ -70,4 +71,15 @@ export const getVolunteers = createGetter(
   "volunteers",
   VOLUNTEERS_DATA_SOURCE_ID,
   "notion-volunteers"
+);
+
+// Strict, minimal projection for the Partner Directory picker. Failures reach
+// the picker route so it can offer explicit free-text fallback.
+export const getPartnerReferences = unstable_cache(
+  async () => {
+    const pages = await fetchAllPages(PARTNERS_DATA_SOURCE_ID);
+    return pages.map(partnerFromNotion).filter((partner) => partner !== null);
+  },
+  ["notion-project-partner-references"],
+  { revalidate: 300 }
 );

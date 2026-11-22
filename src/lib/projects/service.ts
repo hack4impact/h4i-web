@@ -1,5 +1,6 @@
 import { Prisma } from "@prisma/client";
 import { db } from "@/lib/db";
+import { directoryDetailWhere } from "@/lib/directory/visibility";
 import { hasRole, ADMIN_ROLES } from "@/lib/auth/roles";
 import { authorizeProject, ProjectApiError } from "./http";
 import { canProjectAction, type ProjectViewer } from "./permissions";
@@ -67,8 +68,9 @@ function editable(project: StoredProject): ProjectPatch {
     goalStatement: project.goalStatement,
     solutionDescription: project.solutionDescription,
     demoMedia: project.demoMedia,
-    teamMembers: project.teamMembers.map(({ userId, role }) => ({
+    teamMembers: project.teamMembers.map(({ userId, memberId, role }) => ({
       userId,
+      memberId,
       role,
     })),
     resourceLinks: project.resourceLinks.map(({ type, url }) => ({
@@ -111,7 +113,12 @@ export function assertTargetChapter(
   authorizeProject(viewer, "create", viewer.chapterId);
   return viewer.chapterId;
 }
-async function checkReferences(tx: Tx, patch: ProjectPatch) {
+async function checkReferences(
+  tx: Tx,
+  patch: ProjectPatch,
+  viewer: ProjectViewer,
+  existing: ProjectPatch = {}
+) {
   if (
     patch.chapterId &&
     !(await tx.chapter.findUnique({
@@ -123,6 +130,28 @@ async function checkReferences(tx: Tx, patch: ProjectPatch) {
   if (patch.teamMembers) {
     const ids = [...new Set(patch.teamMembers.map((member) => member.userId))];
     const count = await tx.user.count({ where: { id: { in: ids } } });
+    for (const row of patch.teamMembers) {
+      if (!row.memberId) continue;
+      const retained = existing.teamMembers?.some(
+        (old) => old.userId === row.userId && old.memberId === row.memberId
+      );
+      const member = await tx.member.findFirst({
+        where: {
+          AND: [
+            { id: row.memberId, userId: row.userId },
+            retained
+              ? {}
+              : directoryDetailWhere({ userId: viewer.id, role: viewer.role }),
+          ],
+        },
+        select: { id: true },
+      });
+      if (!member)
+        throw new ProjectApiError(
+          400,
+          "Choose an accessible member record linked to this user"
+        );
+    }
     if (count !== ids.length)
       throw new ProjectApiError(
         400,
@@ -175,7 +204,7 @@ export async function createProject(
 ) {
   const chapterId = assertTargetChapter(viewer, patch.chapterId);
   return db.$transaction(async (tx) => {
-    await checkReferences(tx, { ...patch, chapterId });
+    await checkReferences(tx, { ...patch, chapterId }, viewer);
     const project = await tx.project.create({
       data: { name: patch.name!, chapterId, createdBy: viewer.id },
     });
@@ -195,7 +224,7 @@ export async function patchProject(
     const next = { ...current, ...patch };
     assertTargetChapter(viewer, next.chapterId);
     checkTimeline(next);
-    await checkReferences(tx, patch);
+    await checkReferences(tx, patch, viewer, current);
     if (project.isDraft) return response(await save(tx, id, patch), true);
     const changes = { ...pending(project), ...patch };
     const updated = await tx.project.update({
@@ -218,7 +247,7 @@ export async function publishProject(viewer: ProjectViewer, id: string) {
         missingFields,
       });
     checkTimeline(next);
-    await checkReferences(tx, next);
+    await checkReferences(tx, next, viewer, next);
     if (!project.isDraft && !project.pendingChanges) return response(project);
     if (project.pendingChanges) await save(tx, id, pending(project));
     return response(
@@ -282,6 +311,26 @@ export async function listProjects(
     include,
     orderBy: [{ createdAt: "desc" }, { id: "asc" }],
     take: 100,
+  });
+  return projects.map((project) => response(project));
+}
+
+export async function listDraftProjects(viewer: ProjectViewer) {
+  if (!hasRole(viewer.role, ADMIN_ROLES) && !viewer.chapterId) return [];
+  if (
+    !hasRole(viewer.role, ADMIN_ROLES) &&
+    !canProjectAction(viewer, "readDraft", viewer.chapterId!)
+  )
+    return [];
+  const projects = await db.project.findMany({
+    where: {
+      isDraft: true,
+      ...(hasRole(viewer.role, ADMIN_ROLES)
+        ? {}
+        : { chapterId: viewer.chapterId! }),
+    },
+    include,
+    orderBy: [{ updatedAt: "desc" }, { id: "asc" }],
   });
   return projects.map((project) => response(project));
 }

@@ -54,6 +54,7 @@ export const patchSchema = z
         z
           .object({
             userId: z.string().min(1).max(200),
+            memberId: z.string().min(1).max(200).nullable().optional(),
             role: z.string().trim().max(100),
           })
           .strict()

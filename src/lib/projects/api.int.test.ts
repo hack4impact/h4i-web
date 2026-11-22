@@ -1,3 +1,6 @@
+import { editorOptions } from "@/lib/projects/editor";
+import { listDraftProjects } from "@/lib/projects/service";
+import { GET as memberReferences } from "@/app/api/projects/references/members/route";
 import { randomUUID } from "node:crypto";
 import { mkdtemp, rm } from "node:fs/promises";
 import path from "node:path";
@@ -22,6 +25,8 @@ const own = `${prefix}-c1`,
 let fixtureSetupStarted = false;
 let uploadDirectory: string | undefined;
 const previousUploadDirectory = process.env.PROJECT_MEDIA_DIR;
+let visibleMemberId: string;
+let hiddenMemberId: string;
 const actors: Record<string, { id: string; cookie: string }> = {};
 const context = (id: string) => ({
   params: Promise.resolve({ projectId: id }),
@@ -102,6 +107,28 @@ beforeAll(async () => {
     });
     actors[name] = { id: user.id, cookie };
   }
+  const visible = await db.member.create({
+    data: {
+      userId: actors.member.id,
+      chapterId: own,
+      displayName: `${prefix} Shared Developer`,
+      approvalStatus: "APPROVED",
+    },
+  });
+  await db.member.update({
+    where: { id: visible.id },
+    data: { directoryOptIn: true },
+  });
+  visibleMemberId = visible.id;
+  const hidden = await db.member.create({
+    data: {
+      userId: actors.sameLead.id,
+      chapterId: own,
+      displayName: `${prefix} Hidden Person`,
+      adminHidden: true,
+    },
+  });
+  hiddenMemberId = hidden.id;
 });
 afterAll(async () => {
   if (!fixtureSetupStarted) {
@@ -109,6 +136,9 @@ afterAll(async () => {
     return;
   }
   await db.project.deleteMany({ where: { chapterId: { in: [own, other] } } });
+  await db.member.deleteMany({
+    where: { userId: { in: Object.values(actors).map((actor) => actor.id) } },
+  });
   await db.user.deleteMany({ where: { email: { startsWith: prefix } } });
   await db.chapter.deleteMany({ where: { id: { in: [own, other] } } });
   await db.$disconnect();
@@ -569,5 +599,155 @@ describe("project write APIs with real sessions and PostgreSQL", () => {
     const invalid = req("member");
     invalid.headers.set("range", "bytes=10000-");
     expect((await readMedia(invalid, mediaContext)).status).toBe(416);
+  });
+  it("uses canonical Member records while enforcing directory visibility for every role", async () => {
+    expect((await memberReferences(req(null))).status).toBe(401);
+    expect((await memberReferences(req("member"))).status).toBe(403);
+    for (const actor of ["lead", "admin"]) {
+      const result = await memberReferences(
+        req(actor, "GET", undefined, `?q=${prefix}`)
+      );
+      expect(result.status).toBe(200);
+      const json = await result.json();
+      expect(json.members).toHaveLength(1);
+      expect(json.members[0]).toMatchObject({
+        id: actors.member.id,
+        memberId: visibleMemberId,
+        name: `${prefix} Shared Developer`,
+      });
+      expect(JSON.stringify(json)).not.toContain("Hidden Person");
+      expect(JSON.stringify(json)).not.toContain("@example.org");
+    }
+    const project = await newDraft();
+    const row = {
+      userId: actors.member.id,
+      memberId: visibleMemberId,
+      role: "Developer",
+    };
+    expect(
+      (
+        await patch(
+          req("lead", "PATCH", { teamMembers: [row] }),
+          context(project.id)
+        )
+      ).status
+    ).toBe(200);
+    expect(
+      await db.projectTeamMember.findFirst({ where: { projectId: project.id } })
+    ).toMatchObject({ memberId: visibleMemberId });
+    expect(
+      (
+        await patch(
+          req("lead", "PATCH", {
+            teamMembers: [{ ...row, userId: actors.lead.id }],
+          }),
+          context(project.id)
+        )
+      ).status
+    ).toBe(400);
+    const hidden = {
+      userId: actors.sameLead.id,
+      memberId: hiddenMemberId,
+      role: "Designer",
+    };
+    expect(
+      (
+        await patch(
+          req("lead", "PATCH", { teamMembers: [hidden] }),
+          context(project.id)
+        )
+      ).status
+    ).toBe(400);
+    expect(
+      (
+        await patch(
+          req("admin", "PATCH", { teamMembers: [hidden] }),
+          context(project.id)
+        )
+      ).status
+    ).toBe(200);
+    // Existing hidden references can be retained, but their names stay private.
+    expect(
+      (
+        await patch(
+          req("lead", "PATCH", { teamMembers: [hidden] }),
+          context(project.id)
+        )
+      ).status
+    ).toBe(200);
+    const options = await editorOptions(
+      { id: actors.lead.id, role: "PROJECT_LEAD", chapterId: own },
+      [actors.sameLead.id]
+    );
+    expect(
+      options.members.find((member) => member.id === actors.sameLead.id)?.name
+    ).toBe("Member record unavailable");
+  });
+  it("keeps drafts off the default list and provides chapter-scoped resume lists", async () => {
+    const project = await newDraft();
+    for (const actor of ["lead", "admin", "member"]) {
+      const records = await (await list(req(actor))).json();
+      expect(records.some((row: { id: string }) => row.id === project.id)).toBe(
+        false
+      );
+    }
+    expect(
+      (
+        await listDraftProjects({
+          id: actors.lead.id,
+          role: "PROJECT_LEAD",
+          chapterId: own,
+        })
+      ).some((row) => row.id === project.id)
+    ).toBe(true);
+    expect(
+      (
+        await listDraftProjects({
+          id: actors.otherLead.id,
+          role: "PROJECT_LEAD",
+          chapterId: other,
+        })
+      ).some((row) => row.id === project.id)
+    ).toBe(false);
+  });
+  it("protects partner photos until their revision is published", async () => {
+    const project = await newDraft();
+    await patch(req("lead", "PATCH", complete()), context(project.id));
+    await publish(req("lead", "POST"), context(project.id));
+    const body = new FormData();
+    body.set(
+      "file",
+      new File(
+        [Uint8Array.from([137, 80, 78, 71, 13, 10, 26, 10])],
+        "logo.png",
+        { type: "image/png" }
+      )
+    );
+    const upload = new Request(
+      "http://localhost/api/projects/media?purpose=partner-photo",
+      {
+        method: "POST",
+        headers: { cookie: `${SESSION_COOKIE}=${actors.lead.cookie}` },
+        body,
+      }
+    );
+    const uploaded = await uploadMedia(upload, context(project.id));
+    expect(uploaded.status).toBe(201);
+    const { url } = await uploaded.json();
+    const fileContext = {
+      params: Promise.resolve({
+        projectId: project.id,
+        file: url.split("/").pop(),
+      }),
+    };
+    await patch(
+      req("lead", "PATCH", { nonprofitPartnerPhoto: url }),
+      context(project.id)
+    );
+    expect((await readMedia(req("member"), fileContext)).status).toBe(404);
+    await publish(req("lead", "POST"), context(project.id));
+    const photo = await readMedia(req("member"), fileContext);
+    expect(photo.status).toBe(200);
+    await photo.arrayBuffer();
   });
 });

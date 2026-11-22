@@ -1,11 +1,16 @@
 "use client";
 
-import { useState, type ReactNode } from "react";
+import { useState, type ReactNode, type MouseEvent } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useProjectDraft } from "./useProjectDraft";
+import { MemberPicker, PartnerPicker } from "./ReferencePickers";
+import type { MemberReference } from "@/lib/projects/references";
 import { Button } from "@/components/ui/Button";
 import {
-  formErrors,
-  formPayload,
+  draftErrors,
+  draftFieldPath,
+  errorSection,
   formValue,
   type ProjectFormValue,
 } from "@/lib/projects/form";
@@ -39,6 +44,16 @@ const labels: Record<string, string> = {
   resourceLinks: "Resource links",
   demoMedia: "Demo media",
 };
+function fieldLabel(field: string) {
+  const parts = field.split(".");
+  if (parts[0] === "teamMembers" && /^\d+$/.test(parts[1] || ""))
+    return parts[2] === "role"
+      ? `Role for team member ${Number(parts[1]) + 1}`
+      : `Team member ${Number(parts[1]) + 1}`;
+  if (parts[0] === "resourceLinks" && /^\d+$/.test(parts[1] || ""))
+    return `URL for resource link ${Number(parts[1]) + 1}`;
+  return labels[field] || "Project field";
+}
 function fieldId(name: string) {
   return `project-${name.replaceAll(".", "-")}`;
 }
@@ -78,16 +93,18 @@ function Section({
   id,
   title,
   children,
+  errors = {},
 }: {
   id: string;
   title: string;
+  errors?: Record<string, string>;
   children: ReactNode;
 }) {
   return (
     <section
       id={id}
       aria-labelledby={`${id}-title`}
-      className="border-separator rounded-6 scroll-mt-16 space-y-20 border p-20 sm:p-24"
+      className={`rounded-6 scroll-mt-16 space-y-20 border p-20 sm:p-24 ${Object.keys(errors).some((field) => errorSection(field) === Number(id.slice(-1))) ? "border-red" : "border-separator"}`}
     >
       <h2 id={`${id}-title`} className="text-xl">
         {title}
@@ -169,7 +186,7 @@ export function ProjectForm({
   projectId?: string | null;
   isDraft?: boolean;
   chapters: { id: string; name: string }[];
-  members: { id: string; name: string }[];
+  members: MemberReference[];
 }) {
   const [value, setValue] = useState(() =>
     formValue({
@@ -177,11 +194,14 @@ export function ProjectForm({
       ...initial,
     })
   );
-  const [projectId, setProjectId] = useState(initialId);
-  const [isDraft, setIsDraft] = useState(initialDraft);
+  const [memberOptions, setMemberOptions] = useState(members);
+  const isDraft = initialDraft;
+  const router = useRouter();
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState("");
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const draft = useProjectDraft(value, initialId, busy);
+  const projectId = draft.id;
   const required: readonly string[] = requiredByStage[value.stage];
   function update<K extends keyof ProjectFormValue>(
     name: K,
@@ -189,7 +209,7 @@ export function ProjectForm({
   ) {
     setValue((previous) => ({ ...previous, [name]: next }));
     setErrors({});
-    setMessage("Unsaved changes");
+    setMessage("");
   }
   function inputProps(name: keyof ProjectFormValue) {
     return {
@@ -206,10 +226,16 @@ export function ProjectForm({
       if (missing)
         setErrors(
           Object.fromEntries(
-            missing.map((key) => [
-              key,
-              `${labels[key] || key} is required to publish at ${stageLabels[value.stage]}.`,
-            ])
+            missing.map((key) => {
+              const field =
+                key === "nonprofitPartner"
+                  ? "nonprofitPartnerName"
+                  : draftFieldPath(value, key);
+              return [
+                field,
+                `${fieldLabel(field)} is required to publish at ${stageLabels[value.stage]}.`,
+              ];
+            })
           )
         );
       else if (error.details?.fieldErrors)
@@ -230,73 +256,106 @@ export function ProjectForm({
       );
   }
   async function save(publish: boolean) {
-    const invalid = formErrors(value);
+    const invalid = draftErrors(value);
     setErrors(invalid);
     if (Object.keys(invalid).length) {
       setMessage("Check the fields below. Your changes have not been saved.");
       return;
     }
+    draft.suspend();
     setBusy(true);
     setMessage(publish ? "Saving and publishing…" : "Saving draft…");
     try {
-      const saved = await projectClient.save(projectId, formPayload(value));
-      setProjectId(saved.id);
-      setValue(formValue(saved));
-      // Native history updates preserve in-progress UI state while making reload
-      // reopen the actual saved record, including after a publish validation error.
-      if (!initialId)
-        window.history.replaceState(
-          null,
-          "",
-          `/projects/${encodeURIComponent(saved.id)}/edit`
-        );
+      const saved = await draft.save();
       if (publish) {
-        await projectClient.publish(saved.id);
-        setIsDraft(false);
-        setMessage("Changes published.");
-      } else setMessage("Draft saved.");
+        await draft.publish();
+        if (draft.isActive()) {
+          router.push(`/projects/${encodeURIComponent(saved.id)}`);
+          router.refresh();
+        }
+      } else setMessage("");
     } catch (error) {
       report(error);
     } finally {
+      draft.resume();
       setBusy(false);
     }
   }
-  async function upload(files: FileList | null) {
+  async function upload(
+    files: FileList | null,
+    purpose: "demo" | "partner-photo" = "demo"
+  ) {
     if (!files?.length) return;
     const selectedFiles = Array.from(files);
     if (!value.name.trim() || !value.chapterId) {
       setMessage("Enter a project name and chapter before uploading media.");
       return;
     }
-    if (value.demoMedia.length + selectedFiles.length > 50) {
+    if (
+      purpose === "demo" &&
+      value.demoMedia.length + selectedFiles.length > 50
+    ) {
       setMessage("A project may have up to 50 media files.");
       return;
     }
+    draft.suspend();
     setBusy(true);
     setMessage("Uploading media…");
     const uploaded: string[] = [];
     try {
-      let id = projectId;
-      if (!id) {
-        const created = await projectClient.save(null, {
-          name: value.name,
-          chapterId: value.chapterId,
-          stage: value.stage,
-        });
-        id = created.id;
-        setProjectId(id);
-      }
+      const id = await draft.ensureId();
       for (const file of selectedFiles)
-        uploaded.push((await projectClient.upload(id, file)).url);
-      setMessage("Media uploaded. Save draft to keep your changes.");
+        uploaded.push((await projectClient.upload(id, file, purpose)).url);
+      setMessage("");
     } catch (error) {
       report(error);
     } finally {
       if (uploaded.length)
         setValue((previous) => ({
           ...previous,
-          demoMedia: [...previous.demoMedia, ...uploaded],
+          ...(purpose === "partner-photo"
+            ? { nonprofitPartnerPhoto: uploaded[0] }
+            : { demoMedia: [...previous.demoMedia, ...uploaded] }),
         }));
+      draft.resume();
+      setBusy(false);
+    }
+  }
+  async function leave(event: MouseEvent<HTMLAnchorElement>) {
+    if (
+      event.metaKey ||
+      event.ctrlKey ||
+      event.shiftKey ||
+      event.altKey ||
+      event.button !== 0
+    )
+      return;
+    event.preventDefault();
+    if (busy) return;
+    if (!draft.dirty) {
+      router.push("/projects");
+      return;
+    }
+    const invalid = draftErrors(value);
+    if (Object.keys(invalid).length) {
+      setErrors(invalid);
+      setMessage(
+        "Check these fields before leaving so your changes can be saved."
+      );
+      return;
+    }
+    draft.suspend();
+    setBusy(true);
+    try {
+      await draft.save();
+      if (draft.isActive()) {
+        router.push("/projects");
+        router.refresh();
+      }
+    } catch (error) {
+      report(error);
+    } finally {
+      draft.resume();
       setBusy(false);
     }
   }
@@ -316,7 +375,11 @@ export function ProjectForm({
           A National Admin must assign you a chapter before you can add
           projects.
         </p>
-        <Link href="/projects" className="underline">
+        <Link
+          href="/projects"
+          onClick={(event) => void leave(event)}
+          className="underline"
+        >
           Back to projects
         </Link>
       </div>
@@ -333,7 +396,11 @@ export function ProjectForm({
       >
         <header className="flex flex-wrap items-center justify-between gap-16">
           <div>
-            <Link href="/projects" className="text-gray-2 underline">
+            <Link
+              href="/projects"
+              onClick={(event) => void leave(event)}
+              className="text-gray-2 underline"
+            >
               ← Back to projects
             </Link>
             <h1 className="mt-12">
@@ -359,7 +426,10 @@ export function ProjectForm({
           </div>
         </header>
         <p role="status" aria-live="polite" className="text-gray-2 min-h-16">
-          {message}
+          {message ||
+            (draft.error
+              ? `${draft.status}: ${draft.error.message}`
+              : draft.status)}
         </p>
         {Object.keys(errors).length > 0 && (
           <div role="alert" className="border-red rounded-6 border p-16">
@@ -393,7 +463,7 @@ export function ProjectForm({
           ))}
         </nav>
         <fieldset disabled={busy} className="min-w-0 space-y-24">
-          <Section id="project-section-0" title="1. Basics">
+          <Section errors={errors} id="project-section-0" title="1. Basics">
             <div className="grid grid-cols-1 gap-20 sm:grid-cols-2">
               <Field
                 name="name"
@@ -497,26 +567,64 @@ export function ProjectForm({
               </Field>
             </div>
           </Section>
-          <Section id="project-section-1" title="2. Nonprofit & Timeline">
+          <Section
+            errors={errors}
+            id="project-section-1"
+            title="2. Nonprofit & Timeline"
+          >
             <Field
               name="nonprofitPartnerName"
               label="Nonprofit partner name"
               required
               error={errors.nonprofitPartner || errors.nonprofitPartnerName}
             >
-              <input
-                {...inputProps("nonprofitPartnerName")}
-                aria-required={true}
-                value={value.nonprofitPartnerName || ""}
-                maxLength={200}
-                onChange={(event) => {
-                  update("nonprofitPartnerName", event.target.value);
+              <PartnerPicker
+                id={fieldId("nonprofitPartnerName")}
+                name={value.nonprofitPartnerName || ""}
+                selectedId={value.nonprofitPartnerId}
+                error={errors.nonprofitPartnerName || errors.nonprofitPartner}
+                onChange={(partner) => {
                   setValue((previous) => ({
                     ...previous,
-                    nonprofitPartnerId: null,
+                    nonprofitPartnerId: partner.id || null,
+                    nonprofitPartnerName: partner.name,
+                    nonprofitPartnerPhoto: partner.id
+                      ? partner.photo
+                      : previous.nonprofitPartnerId
+                        ? null
+                        : previous.nonprofitPartnerPhoto,
                   }));
+                  setErrors({});
+                  setMessage("");
                 }}
               />
+            </Field>
+            <Field
+              name="nonprofitPartnerPhoto"
+              label="Partner photo (optional)"
+              error={errors.nonprofitPartnerPhoto}
+            >
+              <input
+                id={fieldId("nonprofitPartnerPhoto")}
+                type="file"
+                accept="image/png,image/jpeg,image/webp,image/gif"
+                className={control}
+                onChange={(event) => {
+                  void upload(event.target.files, "partner-photo");
+                  event.target.value = "";
+                }}
+              />
+              {value.nonprofitPartnerPhoto && (
+                <div className="mt-8 flex items-center gap-12">
+                  <MediaPreview src={value.nonprofitPartnerPhoto} index={-1} />
+                  <Button
+                    type="button"
+                    onClick={() => update("nonprofitPartnerPhoto", null)}
+                  >
+                    Remove partner photo
+                  </Button>
+                </div>
+              )}
             </Field>
             <div className="grid grid-cols-1 gap-20 sm:grid-cols-2">
               <Field
@@ -544,7 +652,11 @@ export function ProjectForm({
               </Field>
             </div>
           </Section>
-          <Section id="project-section-2" title="3. Project Goal">
+          <Section
+            errors={errors}
+            id="project-section-2"
+            title="3. Project Goal"
+          >
             <Field
               name="problemStatement"
               label="What problem were you solving?"
@@ -578,7 +690,11 @@ export function ProjectForm({
               />
             </Field>
           </Section>
-          <Section id="project-section-3" title="4. Team Members">
+          <Section
+            errors={errors}
+            id="project-section-3"
+            title="4. Team Members"
+          >
             <div id={fieldId("teamMembers")} className="space-y-16">
               <p>
                 Team roster{" "}
@@ -596,28 +712,32 @@ export function ProjectForm({
                     label={`Team member ${index + 1}`}
                     error={errors[`teamMembers.${index}.userId`]}
                   >
-                    <select
+                    <MemberPicker
                       id={fieldId(`teamMembers.${index}.userId`)}
-                      className={control}
                       value={member.userId}
-                      onChange={(event) =>
+                      options={memberOptions}
+                      error={errors[`teamMembers.${index}.userId`]}
+                      onSelect={(person) => {
+                        setMemberOptions((previous) =>
+                          previous.some((option) => option.id === person.id)
+                            ? previous
+                            : [...previous, person]
+                        );
                         update(
                           "teamMembers",
                           value.teamMembers.map((row, i) =>
                             i === index
-                              ? { ...row, userId: event.target.value }
+                              ? {
+                                  ...row,
+                                  userId: person.id,
+                                  memberId: person.memberId,
+                                  role: row.role || person.role,
+                                }
                               : row
                           )
-                        )
-                      }
-                    >
-                      <option value="">Select a member</option>
-                      {members.map((person) => (
-                        <option key={person.id} value={person.id}>
-                          {person.name}
-                        </option>
-                      ))}
-                    </select>
+                        );
+                      }}
+                    />
                   </Field>
                   <Field
                     name={`teamMembers.${index}.role`}
@@ -673,7 +793,7 @@ export function ProjectForm({
               </Button>
             </div>
           </Section>
-          <Section id="project-section-4" title="5. Solution">
+          <Section errors={errors} id="project-section-4" title="5. Solution">
             <Field
               name="solutionDescription"
               label="Explain your solution and its impact"
@@ -752,7 +872,11 @@ export function ProjectForm({
               ))}
             </ul>
           </Section>
-          <Section id="project-section-5" title="6. Resource Links">
+          <Section
+            errors={errors}
+            id="project-section-5"
+            title="6. Resource Links"
+          >
             <div id={fieldId("resourceLinks")} className="space-y-16">
               <p>
                 Project resources
@@ -860,7 +984,11 @@ export function ProjectForm({
           </Section>
         </fieldset>
         <footer className="border-separator flex flex-wrap items-center justify-between gap-12 border-t pt-20">
-          <Link href="/projects" className="underline">
+          <Link
+            href="/projects"
+            onClick={(event) => void leave(event)}
+            className="underline"
+          >
             Back to projects
           </Link>
           <div className="flex gap-8">
@@ -888,7 +1016,7 @@ function MediaPreview({ src, index }: { src: string; index: number }) {
     // eslint-disable-next-line @next/next/no-img-element
     <img
       src={src}
-      alt={`Demo photo ${index + 1}`}
+      alt={index < 0 ? "Partner photo" : `Demo photo ${index + 1}`}
       loading="lazy"
       className="bg-panel h-100 w-160 object-contain"
       onError={() => setFailed(true)}

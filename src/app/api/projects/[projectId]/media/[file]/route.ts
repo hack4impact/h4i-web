@@ -16,7 +16,10 @@ export async function GET(
     const { projectId, file } = await context.params;
     const project = await readProject(viewer, projectId);
     const url = `/api/projects/${encodeURIComponent(projectId)}/media/${file}`;
-    if (!project.demoMedia.includes(url)) {
+    if (
+      !project.demoMedia.includes(url) &&
+      project.nonprofitPartnerPhoto !== url
+    ) {
       // Scoped editors can preview a just-uploaded file before saving the form.
       try {
         await readProject(viewer, projectId, true);

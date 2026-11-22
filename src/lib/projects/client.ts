@@ -47,12 +47,31 @@ export const projectClient = {
       `/api/projects/${encodeURIComponent(id)}/publish`,
       { method: "POST" }
     ),
-  upload: (id: string, file: File) => {
+  upload: (
+    id: string,
+    file: File,
+    purpose: "demo" | "partner-photo" = "demo"
+  ) => {
     const body = new FormData();
     body.set("file", file);
     return request<{ url: string }>(
-      `/api/projects/${encodeURIComponent(id)}/media`,
+      `/api/projects/${encodeURIComponent(id)}/media?purpose=${purpose}`,
       { method: "POST", body }
     );
   },
 };
+
+export async function memberReferences(q: string, signal?: AbortSignal) {
+  return request<{ members: import("./references").MemberReference[] }>(
+    `/api/projects/references/members?q=${encodeURIComponent(q)}`,
+    { signal }
+  );
+}
+export async function partnerReferences(q: string, signal?: AbortSignal) {
+  return request<{
+    partners: import("./references").PartnerReference[];
+    available: boolean;
+  }>(`/api/projects/references/partners?q=${encodeURIComponent(q)}`, {
+    signal,
+  });
+}

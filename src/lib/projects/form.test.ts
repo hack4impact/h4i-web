@@ -55,3 +55,55 @@ describe("project form payloads", () => {
     ).toHaveProperty("endDate");
   });
 });
+
+describe("autosave placeholders and section errors", () => {
+  it("omits empty UI rows without dropping partially typed team roles", async () => {
+    const { autosaveValue } = await import("./form");
+    const value = formValue({
+      name: "Draft",
+      chapterId: "c",
+      teamMembers: [
+        { userId: "", role: "" },
+        { userId: "", role: "Designer" },
+      ],
+      resourceLinks: [{ type: "GitHub", url: "" }],
+    });
+    expect(autosaveValue(value).teamMembers).toEqual([
+      { userId: "", role: "Designer" },
+    ]);
+    expect(autosaveValue(value).resourceLinks).toEqual([]);
+    expect(formErrors(autosaveValue(value))).toHaveProperty(
+      "teamMembers.0.userId"
+    );
+  });
+  it("routes server field errors to the corresponding form section", async () => {
+    const { errorSection } = await import("./form");
+    expect(errorSection("nonprofitPartner")).toBe(1);
+    expect(errorSection("startDate")).toBe(1);
+    expect(errorSection("goalStatement")).toBe(2);
+    expect(errorSection("teamMembers.0.role")).toBe(3);
+    expect(errorSection("solutionDescription")).toBe(4);
+    expect(errorSection("resourceLinks.0.url")).toBe(5);
+  });
+});
+
+it("keeps server and client errors on the correct visible rows after blank placeholders", async () => {
+  const { draftFieldPath, draftErrors } = await import("./form");
+  const value = formValue({
+    name: "Draft",
+    chapterId: "c",
+    teamMembers: [
+      { userId: "", role: "" },
+      { userId: "person", role: "" },
+    ],
+    resourceLinks: [
+      { type: "GitHub", url: "" },
+      { type: "Other", url: "not a URL" },
+    ],
+  });
+  expect(draftFieldPath(value, "teamMembers.0.role")).toBe(
+    "teamMembers.1.role"
+  );
+  expect(draftErrors(value)).toHaveProperty("resourceLinks.1.url");
+  expect(draftErrors(value)).not.toHaveProperty("resourceLinks.0.url");
+});

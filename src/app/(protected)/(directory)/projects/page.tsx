@@ -11,7 +11,7 @@ export default async function ProjectsPage() {
   const { user } = await requireSession();
   const [{ rows }, records, chapters] = await Promise.all([
     getProjects(),
-    listProjects(user, true),
+    listProjects(user, false),
     db.chapter.findMany({ select: { id: true, name: true } }),
   ]);
 
@@ -25,6 +25,14 @@ export default async function ProjectsPage() {
         )}
       </PageHeader>
       <div className="min-h-0 flex-1 overflow-y-auto p-32">
+        {canProjectAction(user, "create", user.chapterId ?? undefined) && (
+          <Link
+            href="/projects/drafts"
+            className="mb-16 inline-block underline"
+          >
+            Resume a draft
+          </Link>
+        )}
         <section className="mb-24 space-y-12" aria-label="Project records">
           <h2 className="text-xl">Project records</h2>
           {records.length ? (

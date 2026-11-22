@@ -198,3 +198,9 @@ See [Ticket 4 API setup, permissions, stage rules, examples and tests](docs/proj
 ## Project Add/Edit form
 
 Authorized chapter/project leads and National Admins can use **Projects → Add Project** or **Edit** to fill out the six-section form and save through the project APIs. Stage-required markers update live; incomplete drafts may be saved. See [the Project API documentation](docs/project-write-api.md#ticket-5-addedit-form) for form and upload setup. Media defaults to a private Git-ignored `.data/project-media` folder; deployments must configure persistent writable storage with `PROJECT_MEDIA_DIR`.
+
+## Project drafts and references
+
+Project edits autosave after 750 ms, show a saved/paused/error indicator, and resume at the saved edit URL. **Publish Changes** validates the current snapshot and redirects to the published detail page. Drafts stay off the project dashboard; authorized editors use **Resume a draft** to manage them separately.
+
+Team selection searches approved, shared Member Directory records with initials avatars and editable project roles. Partner search uses the existing Notion-backed Partner Directory (`NOTION_API_KEY`), with free-text fallback and an optional uploaded display photo. Apply the new member-reference migration before running the app. See [Ticket 6 setup and verification](docs/project-write-api.md#ticket-6-autosave-publish-and-directory-references).

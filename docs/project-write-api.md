@@ -109,7 +109,7 @@ The six sections are Basics, Nonprofit & Timeline, Project Goal, Team Members, S
 
 Chapter options come from the existing Chapter table. Leads see their assigned chapter as a locked dropdown; National Admins may select any chapter. Team selections reference real local User IDs. Display names come from directory profiles the viewer may see, with member-ID labels when a name is unavailable or not shared; private account emails are not exposed by the selector. Partner entry is plain text for this ticket.
 
-Draft saving is manual in this ticket. Background autosave, conflict resolution and searchable partner/member selectors remain future work.
+Ticket 5 introduced manual draft saving. Ticket 6 adds debounced autosave and searchable member/partner selectors; concurrent-editor conflict resolution remains future work.
 
 ### Media uploads
 
@@ -120,3 +120,47 @@ Uploads support PNG, JPEG, WebP, GIF, MP4 and WebM, up to 20 MB per file and 50 
 Local files are stored under `.data/project-media` (ignored by Git), or `PROJECT_MEDIA_DIR` when configured. **Deployment requires a persistent writable directory/volume shared by all app instances.** Ephemeral serverless filesystems do not provide durable upload storage. No object storage service is configured. Removing a media item removes its project reference; unreferenced files remain on disk and require separate storage cleanup.
 
 Project APIs now use `assertSession` / `assertRole`, with an optional Request argument for route handlers and integration tests, and the shared role helpers. Existing no-argument server actions keep their previous behavior. Unit tests cover form payloads, dates, URL validation and media signatures. Database tests cover upload authorization, draft privacy, publishing media, byte ranges and invalid uploads.
+
+## Ticket 6: Autosave, publish and directory references
+
+The editor autosaves valid draft snapshots 750 ms after typing stops and shows **Draft saved · Just now** (then an elapsed-minute label). Blank, unused dynamic rows are treated as placeholders. Incomplete publish-required fields do not block autosave; invalid nonempty URLs, unresolved team rows, and missing create minimums pause it with a visible status. Save Draft retries a failed autosave. Requests are serialized, so uploads and autosave share one draft creation, older responses never replace newer typing, and publishing waits for the latest snapshot. A late response from an editor that has been left cannot change another editor's URL.
+
+The first save replaces `/projects/new` with the actual edit URL without clearing the form. Reloading that URL resumes the saved draft or unpublished revision. The form's Back links flush valid pending changes before leaving. Published-project edits remain in `pendingChanges` until publish validation succeeds; public detail and media never expose those changes.
+
+**Publish Changes** saves current edits, displays server errors inline in the matching section with a linked summary, and redirects to `/projects/:id` only after a successful publish. The detail view displays the published partner, timeline, member roster/roles, narratives, media and resources. Empty optional sections are hidden.
+
+The main `/projects` dashboard now requests published records only for every role. **Resume a draft** opens `/projects/drafts`, a separate authenticated editor-only list scoped to the lead's chapter or all chapters for National Admins. API `include_drafts=true` remains an explicit authorized management option; the default list excludes drafts.
+
+### Member references
+
+`GET /api/projects/references/members?q=...` is editor-only and searches real Member Directory profiles. Its query uses `directoryListWhere()` for all roles, including admins, so hidden, unapproved, opted-out and unclaimed profiles never leak through search. Existing selections use `directoryDetailWhere()` and redact inaccessible names. No private account email is returned.
+
+Selecting a member stores both the local User reference and an optional canonical `memberId` foreign key on ProjectTeamMember. The API validates that the Member record belongs to that User and is accessible before accepting a new reference. Legacy User-only team rows continue to work; existing hidden references may be retained without revealing private profile content. Each picker option and selected person has an initials avatar plus an editable project role. Member profiles currently have no photo field, so actual member photos are not invented or copied into project-owned storage.
+
+The migration was generated using `pnpm db:migrate --name project_member_reference`. Apply it and regenerate the client before running this version:
+
+```bash
+pnpm db:generate
+pnpm db:deploy
+pnpm dev
+```
+
+The normal auth seed does not create Member Directory profiles. For disposable local demos, the directory-owned fixture script can populate approved, opted-in profiles:
+
+```bash
+ALLOW_DIRECTORY_SEED=true pnpm db:seed:directory
+```
+
+That script must only be run on a local development database; see its own safety checks. Normal users can create/claim profiles through the Member Directory and complete its approval/consent workflow instead.
+
+### Partner search and display photo
+
+`GET /api/projects/references/partners?q=...` searches the existing Notion-backed Partner Directory and returns only ID, name and optional logo. Set `NOTION_API_KEY` for live results using the existing Partner Directory data source. No canonical Partner records are created or edited. An unavailable or unconfigured directory explicitly offers free-text entry; editing a selected name clears its old directory reference.
+
+A selected ID/name/logo is stored on the draft. Editors can upload, replace or remove a project-local partner photo using `POST /api/projects/:id/media?purpose=partner-photo` (images only). Uploaded partner photos use the same private storage as demo media and remain invisible to members until publication. Deployment still requires durable `PROJECT_MEDIA_DIR` storage.
+
+### Verification
+
+Unit coverage includes draft write ordering, one-time creation shared with uploads, snapshots, recovery after failed writes, empty-row handling, field/section mapping, partner projections and directory unavailability. Database coverage includes canonical Member foreign keys, user/member mismatches, directory visibility, scoped draft-resume lists, and private partner-photo publication.
+
+The end-to-end browser run exercises create → edit → publish for both a Project Lead and a National Admin. It holds the first create response while typing, checks a single draft is created, tests resume and retries, publishes immediately before a debounce fires, verifies the redirect and saved references, and repeats editing/publishing while keeping the live version unchanged. Actual PostgreSQL, auth, project, member-search and upload APIs are used. The Notion boundary is mocked for deterministic partner selection and offline fallback; adapter/route unit tests cover the real directory integration. Live Notion account connectivity is not asserted by this run.

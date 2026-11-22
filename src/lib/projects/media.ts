@@ -47,7 +47,9 @@ export function mediaKind(bytes: Uint8Array, mime: string): string | null {
 function folder(projectId: string) {
   if (!/^[\w-]+$/.test(projectId))
     throw new ProjectApiError(404, "Media not found");
+  // Uploads are runtime data on a persistent volume, never build artifacts.
   return path.join(
+    /* turbopackIgnore: true */
     process.env.PROJECT_MEDIA_DIR ||
       path.join(process.cwd(), ".data", "project-media"),
     projectId
@@ -103,7 +105,11 @@ export async function storeMedia(projectId: string, file: File) {
   const directory = folder(projectId);
   await mkdir(directory, { recursive: true });
   const name = `${randomUUID()}.${extension}`;
-  await writeFile(path.join(directory, name), bytes, { flag: "wx" });
+  await writeFile(
+    path.join(/* turbopackIgnore: true */ directory, name),
+    bytes,
+    { flag: "wx" }
+  );
   return {
     url: `/api/projects/${encodeURIComponent(projectId)}/media/${name}`,
   };
@@ -115,10 +121,10 @@ export async function serveMedia(
 ) {
   if (!/^[\da-f-]{36}\.(png|jpg|webp|gif|mp4|webm)$/.test(name))
     throw new ProjectApiError(404, "Media not found");
-  const file = path.join(folder(projectId), name);
+  const file = path.join(/* turbopackIgnore: true */ folder(projectId), name);
   let size: number;
   try {
-    size = (await stat(file)).size;
+    size = (await stat(/* turbopackIgnore: true */ file)).size;
   } catch (error) {
     if ((error as NodeJS.ErrnoException).code === "ENOENT")
       throw new ProjectApiError(404, "Media not found");
@@ -160,7 +166,7 @@ export async function serveMedia(
   }
   headers["Content-Length"] = String(end - start + 1);
   const stream = Readable.toWeb(
-    createReadStream(file, { start, end })
+    createReadStream(/* turbopackIgnore: true */ file, { start, end })
   ) as ReadableStream<Uint8Array>;
   return new Response(stream, { status: range ? 206 : 200, headers });
 }

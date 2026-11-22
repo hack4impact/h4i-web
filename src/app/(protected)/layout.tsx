@@ -12,9 +12,9 @@ export default async function DashboardLayout({
   const session = await requireSession();
 
   return (
-    <div className="flex h-screen">
+    <div className="flex h-dvh flex-col sm:flex-row">
       <Sidebar user={{ email: session.user.email, role: session.user.role }} />
-      <main className="flex-1 overflow-hidden">{children}</main>
+      <main className="min-h-0 min-w-0 flex-1 overflow-hidden">{children}</main>
     </div>
   );
 }

@@ -1,5 +1,6 @@
 import { Prisma } from "@prisma/client";
-import { getSessionFromRequest } from "@/lib/auth/session";
+import { assertSession, assertRole } from "@/lib/auth/guards";
+import type { AppRole } from "@/types";
 import {
   canProjectAction,
   type ProjectAction,
@@ -15,9 +16,22 @@ export class ProjectApiError extends Error {
     super(message);
   }
 }
-export async function projectViewer(request: Request): Promise<ProjectViewer> {
-  const session = await getSessionFromRequest(request);
-  if (!session) throw new ProjectApiError(401, "Unauthorized");
+export async function projectViewer(
+  request: Request,
+  allowed?: readonly AppRole[]
+): Promise<ProjectViewer> {
+  let session;
+  try {
+    session = await (allowed
+      ? assertRole(allowed, request)
+      : assertSession(request));
+  } catch (error) {
+    if (error instanceof Error && error.message === "Unauthorized")
+      throw new ProjectApiError(401, "Unauthorized");
+    if (error instanceof Error && error.message === "Forbidden")
+      throw new ProjectApiError(403, "Forbidden");
+    throw error;
+  }
   const { id, role, chapterId } = session.user;
   return { id, role, chapterId };
 }

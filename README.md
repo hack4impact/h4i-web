@@ -194,3 +194,7 @@ Branch off `develop` and open PRs into `develop`, not `main`. CI must pass befor
 Project records now live in this app's PostgreSQL database and reference the local User and Chapter tables. Project APIs use the current database-backed session roles (`MEMBER`, `PROJECT_LEAD`, `CHAPTER_LEAD`, `NATIONAL_ADMIN`). Run `npm run db:generate` and `npm run db:deploy` to prepare the schema.
 
 See [Ticket 4 API setup, permissions, stage rules, examples and tests](docs/project-write-api.md). The endpoints support chapter-scoped draft creation, partial autosaves, validated publishing and National Admin deletion. Earlier project UI/read API work is absent on this branch; this ticket adds the write foundations against the new platform schema.
+
+## Project Add/Edit form
+
+Authorized chapter/project leads and National Admins can use **Projects → Add Project** or **Edit** to fill out the six-section form and save through the project APIs. Stage-required markers update live; incomplete drafts may be saved. See [the Project API documentation](docs/project-write-api.md#ticket-5-addedit-form) for form and upload setup. Media defaults to a private Git-ignored `.data/project-media` folder; deployments must configure persistent writable storage with `PROJECT_MEDIA_DIR`.

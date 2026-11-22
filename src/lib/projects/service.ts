@@ -1,5 +1,6 @@
 import { Prisma } from "@prisma/client";
 import { db } from "@/lib/db";
+import { hasRole, ADMIN_ROLES } from "@/lib/auth/roles";
 import { authorizeProject, ProjectApiError } from "./http";
 import { canProjectAction, type ProjectViewer } from "./permissions";
 import {
@@ -94,7 +95,7 @@ export function assertTargetChapter(
   viewer: ProjectViewer,
   chapterId: string | undefined
 ): string {
-  if (viewer.role === "NATIONAL_ADMIN") {
+  if (hasRole(viewer.role, ADMIN_ROLES)) {
     if (!chapterId)
       throw new ProjectApiError(
         400,
@@ -268,7 +269,7 @@ export async function listProjects(
   includeDrafts: boolean
 ) {
   const visibility: Prisma.ProjectWhereInput[] = [{ isDraft: false }];
-  if (includeDrafts && viewer.role === "NATIONAL_ADMIN")
+  if (includeDrafts && hasRole(viewer.role, ADMIN_ROLES))
     visibility.push({ isDraft: true });
   else if (
     includeDrafts &&

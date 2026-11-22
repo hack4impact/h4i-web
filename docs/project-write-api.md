@@ -100,3 +100,23 @@ DATABASE_URL=postgresql://postgres:ticket4-local@127.0.0.1:55434/volunteer_ticke
 ```
 
 Tests cover wrong-chapter 403s, member denial, admin chapter reassignment/deletion, real member references, every publish stage, complete create/edit/publish visibility, revision isolation, role changes on existing sessions, and concurrent autosaves.
+
+## Ticket 5: Add/Edit form
+
+The Project Directory now shows database project records above the existing Notion list. Authorized editors see **Add Project** and **Edit** links. `/projects/new` and `/projects/:id/edit` use `requireRole(EDITOR_ROLES)`; edit pages also enforce chapter scope and load the pending revision with `readProject(..., true)`.
+
+The six sections are Basics, Nonprofit & Timeline, Project Goal, Team Members, Solution, and Resource Links. Stage-required markers use the same `requiredByStage` module as publish validation. Save Draft validates formats and the create minimum (name and permitted chapter), but allows incomplete publish fields at every stage. Publish Changes first saves the fields, then calls the publish endpoint and lists missing requirements. Dates, team rows, resources, tags and media reload on the edit page. Edits to published projects stay private until publishing succeeds.
+
+Chapter options come from the existing Chapter table. Leads see their assigned chapter as a locked dropdown; National Admins may select any chapter. Team selections reference real local User IDs. Display names come from directory profiles the viewer may see, with member-ID labels when a name is unavailable or not shared; private account emails are not exposed by the selector. Partner entry is plain text for this ticket.
+
+Draft saving is manual in this ticket. Background autosave, conflict resolution and searchable partner/member selectors remain future work.
+
+### Media uploads
+
+`POST /api/projects/:id/media` accepts a multipart `file` for a scoped editor and returns a media URL. The form creates a minimal draft first if an upload needs a project ID. Uploaded media is linked by Save Draft and becomes visible to members only after successful publication. Selected photos and videos can be previewed and removed from the proposed project.
+
+Uploads support PNG, JPEG, WebP, GIF, MP4 and WebM, up to 20 MB per file and 50 linked media items per project. The endpoint bounds request size, checks file signatures against the declared MIME type, uses generated filenames, and stores files outside `public/`. `GET /api/projects/:id/media/:file` authenticates access, hides draft/unpublished media from members, disables public caching, and supports byte ranges for video playback.
+
+Local files are stored under `.data/project-media` (ignored by Git), or `PROJECT_MEDIA_DIR` when configured. **Deployment requires a persistent writable directory/volume shared by all app instances.** Ephemeral serverless filesystems do not provide durable upload storage. No object storage service is configured. Removing a media item removes its project reference; unreferenced files remain on disk and require separate storage cleanup.
+
+Project APIs now use `assertSession` / `assertRole`, with an optional Request argument for route handlers and integration tests, and the shared role helpers. Existing no-argument server actions keep their previous behavior. Unit tests cover form payloads, dates, URL validation and media signatures. Database tests cover upload authorization, draft privacy, publishing media, byte ranges and invalid uploads.

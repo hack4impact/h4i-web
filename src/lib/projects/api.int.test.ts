@@ -1,4 +1,9 @@
 import { randomUUID } from "node:crypto";
+import { mkdtemp, rm } from "node:fs/promises";
+import path from "node:path";
+import { tmpdir } from "node:os";
+import { POST as uploadMedia } from "@/app/api/projects/[projectId]/media/route";
+import { GET as readMedia } from "@/app/api/projects/[projectId]/media/[file]/route";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { db } from "@/lib/db";
 import { SESSION_COOKIE } from "@/lib/auth/cookies";
@@ -15,6 +20,8 @@ const prefix = `ticket4-${randomUUID()}`;
 const own = `${prefix}-c1`,
   other = `${prefix}-c2`;
 let fixtureSetupStarted = false;
+let uploadDirectory: string | undefined;
+const previousUploadDirectory = process.env.PROJECT_MEDIA_DIR;
 const actors: Record<string, { id: string; cookie: string }> = {};
 const context = (id: string) => ({
   params: Promise.resolve({ projectId: id }),
@@ -64,6 +71,8 @@ beforeAll(async () => {
       "Use an isolated local DATABASE_URL whose database name contains _test or ticket4"
     );
   fixtureSetupStarted = true;
+  uploadDirectory = await mkdtemp(path.join(tmpdir(), "project-form-media-"));
+  process.env.PROJECT_MEDIA_DIR = uploadDirectory;
   await db.chapter.createMany({
     data: [
       { id: own, name: `${prefix} One` },
@@ -103,6 +112,11 @@ afterAll(async () => {
   await db.user.deleteMany({ where: { email: { startsWith: prefix } } });
   await db.chapter.deleteMany({ where: { id: { in: [own, other] } } });
   await db.$disconnect();
+  if (uploadDirectory)
+    await rm(uploadDirectory, { recursive: true, force: true });
+  if (previousUploadDirectory === undefined)
+    delete process.env.PROJECT_MEDIA_DIR;
+  else process.env.PROJECT_MEDIA_DIR = previousUploadDirectory;
 });
 
 describe("project write APIs with real sessions and PostgreSQL", () => {
@@ -473,5 +487,87 @@ describe("project write APIs with real sessions and PostgreSQL", () => {
     expect(
       await db.projectResourceLink.count({ where: { projectId: project.id } })
     ).toBe(0);
+  });
+  it("uploads real media with scoped previews, private publication, range support and validation", async () => {
+    const project = await newDraft();
+    const png = Buffer.from(
+      "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+aD1cAAAAASUVORK5CYII=",
+      "base64"
+    );
+    const uploadRequest = (
+      actor: string | null,
+      data: Uint8Array = png,
+      type = "image/png"
+    ) => {
+      const body = new FormData();
+      body.set("file", new File([data as BlobPart], "demo.png", { type }));
+      return new Request("http://localhost/api/projects/media", {
+        method: "POST",
+        headers: actor
+          ? { cookie: `${SESSION_COOKIE}=${actors[actor].cookie}` }
+          : {},
+        body,
+      });
+    };
+    expect(
+      (await uploadMedia(uploadRequest(null), context(project.id))).status
+    ).toBe(401);
+    expect(
+      (await uploadMedia(uploadRequest("member"), context(project.id))).status
+    ).toBe(403);
+    expect(
+      (await uploadMedia(uploadRequest("otherLead"), context(project.id)))
+        .status
+    ).toBe(404);
+    expect(
+      (
+        await uploadMedia(
+          uploadRequest("lead", Buffer.from("<html>fake</html>")),
+          context(project.id)
+        )
+      ).status
+    ).toBe(400);
+    const oversized = uploadRequest("lead");
+    oversized.headers.set("content-length", String(22 * 1024 * 1024));
+    expect((await uploadMedia(oversized, context(project.id))).status).toBe(
+      413
+    );
+    const uploaded = await uploadMedia(
+      uploadRequest("lead"),
+      context(project.id)
+    );
+    expect(uploaded.status).toBe(201);
+    const { url } = await uploaded.json();
+    const file = url.split("/").pop();
+    const mediaContext = {
+      params: Promise.resolve({ projectId: project.id, file }),
+    };
+    const preview = await readMedia(req("lead"), mediaContext);
+    expect(preview.status).toBe(200);
+    expect(preview.headers.get("content-type")).toBe("image/png");
+    expect(preview.headers.get("cache-control")).toBe("private, no-store");
+    expect(Buffer.from(await preview.arrayBuffer())).toEqual(png);
+    expect((await readMedia(req("member"), mediaContext)).status).toBe(404);
+    await patch(req("lead", "PATCH", complete()), context(project.id));
+    await publish(req("lead", "POST"), context(project.id));
+    // The upload is not published until its URL is explicitly saved and published.
+    expect((await readMedia(req("member"), mediaContext)).status).toBe(404);
+    await patch(
+      req("lead", "PATCH", { demoMedia: [url] }),
+      context(project.id)
+    );
+    expect((await readMedia(req("member"), mediaContext)).status).toBe(404);
+    await publish(req("lead", "POST"), context(project.id));
+    const publicMedia = await readMedia(req("member"), mediaContext);
+    expect(publicMedia.status).toBe(200);
+    await publicMedia.arrayBuffer();
+    const ranged = req("member");
+    ranged.headers.set("range", "bytes=0-7");
+    const response = await readMedia(ranged, mediaContext);
+    expect(response.status).toBe(206);
+    expect((await response.arrayBuffer()).byteLength).toBe(8);
+    const invalid = req("member");
+    invalid.headers.set("range", "bytes=10000-");
+    expect((await readMedia(invalid, mediaContext)).status).toBe(416);
   });
 });

@@ -1,3 +1,4 @@
+import { hasRole, ADMIN_ROLES, EDITOR_ROLES } from "@/lib/auth/roles";
 import {
   authorizeProject,
   projectResponse,
@@ -25,8 +26,8 @@ export async function GET(request: Request, context: Context) {
 }
 export async function PATCH(request: Request, context: Context) {
   return projectResponse(async () => {
-    const viewer = await projectViewer(request);
-    if (viewer.role !== "NATIONAL_ADMIN")
+    const viewer = await projectViewer(request, EDITOR_ROLES);
+    if (!hasRole(viewer.role, ADMIN_ROLES))
       authorizeProject(viewer, "edit", viewer.chapterId ?? undefined);
     return Response.json(
       await patchProject(
@@ -39,7 +40,7 @@ export async function PATCH(request: Request, context: Context) {
 }
 export async function DELETE(request: Request, context: Context) {
   return projectResponse(async () => {
-    const viewer = await projectViewer(request);
+    const viewer = await projectViewer(request, ADMIN_ROLES);
     await deleteProject(viewer, (await context.params).projectId);
     return new Response(null, { status: 204 });
   });

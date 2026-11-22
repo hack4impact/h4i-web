@@ -1,15 +1,9 @@
-import { requireRole, EDITOR_ROLES } from "@/lib/auth/guards";
-import { PageHeader } from "@/components/ui/PageHeader";
-import { Button } from "@/components/ui/Button";
+import { requireRole } from "@/lib/auth/guards";
+import { EDITOR_ROLES } from "@/lib/auth/roles";
+import { editorOptions } from "@/lib/projects/editor";
+import { ProjectForm } from "@/components/projects/ProjectForm";
 
 export default async function NewProjectPage() {
-  await requireRole(EDITOR_ROLES);
-  return (
-    <div>
-      <PageHeader title="Add Project">
-        <Button variant="secondary">Cancel</Button>
-        <Button>+ Add Project</Button>
-      </PageHeader>
-    </div>
-  );
+  const { user } = await requireRole(EDITOR_ROLES);
+  return <ProjectForm {...await editorOptions(user)} />;
 }

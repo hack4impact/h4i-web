@@ -1,6 +1,6 @@
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
-import { getCurrentSession } from "@/lib/auth/session";
+import { getSessionFromRequest, getCurrentSession } from "@/lib/auth/session";
 import { hasRole } from "@/lib/auth/roles";
 import type { AppRole } from "@/types";
 
@@ -49,8 +49,10 @@ export async function requireRole(allowed: readonly AppRole[]) {
  * For server actions and route handlers, which can be called without rendering
  * a page, so layout protection does not cover them. Throws instead of redirecting.
  */
-export async function assertSession() {
-  const session = await getCurrentSession();
+export async function assertSession(request?: Request) {
+  const session = await (request
+    ? getSessionFromRequest(request)
+    : getCurrentSession());
 
   if (!session) {
     throw new Error("Unauthorized");
@@ -59,8 +61,11 @@ export async function assertSession() {
   return session;
 }
 
-export async function assertRole(allowed: readonly AppRole[]) {
-  const session = await assertSession();
+export async function assertRole(
+  allowed: readonly AppRole[],
+  request?: Request
+) {
+  const session = await assertSession(request);
 
   if (!hasRole(session.user.role, allowed)) {
     throw new Error("Forbidden");

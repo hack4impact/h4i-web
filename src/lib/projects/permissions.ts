@@ -1,4 +1,5 @@
 import type { AppRole } from "@/types";
+import { ADMIN_ROLES, EDITOR_ROLES, hasRole } from "@/lib/auth/roles";
 
 export type ProjectViewer = {
   id: string;
@@ -15,11 +16,11 @@ export function canProjectAction(
   action: ProjectAction,
   chapterId?: string
 ): boolean {
-  if (viewer.role === "NATIONAL_ADMIN") return true;
+  if (hasRole(viewer.role, ADMIN_ROLES)) return true;
   if (action === "browse" || action === "read") return true;
   if (action === "delete") return false;
   return (
-    (viewer.role === "PROJECT_LEAD" || viewer.role === "CHAPTER_LEAD") &&
+    hasRole(viewer.role, EDITOR_ROLES) &&
     Boolean(viewer.chapterId) &&
     viewer.chapterId === chapterId
   );

@@ -11,7 +11,7 @@ const inclusiveSans = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "Hack for Impact",
+  title: "Hack4Impact",
   description: "Volunteer Platform",
 };
 

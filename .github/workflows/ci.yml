@@ -1,0 +1,75 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [develop, main]
+  push:
+    branches: [develop, main]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    name: Typecheck, lint, unit tests
+    runs-on: ubuntu-latest
+    env:
+      # read by prisma.config.ts at load; nothing in this job connects
+      DATABASE_URL: postgresql://unused:unused@localhost:5432/unused
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      # Org policy allows only GitHub-owned actions, so pnpm is installed with npm.
+      - run: npm install -g pnpm@10
+      - uses: actions/cache@v4
+        with:
+          path: ~/.local/share/pnpm/store
+          key: pnpm-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}
+          restore-keys: pnpm-${{ runner.os }}-
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm prisma generate
+      - run: pnpm typecheck
+      - run: pnpm lint
+      - run: pnpm test
+      - run: pnpm build
+
+  integration:
+    name: Migrations, seed, integration tests
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: volunteer_platform_test
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U postgres -d volunteer_platform_test"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/volunteer_platform_test
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      # Org policy allows only GitHub-owned actions, so pnpm is installed with npm.
+      - run: npm install -g pnpm@10
+      - uses: actions/cache@v4
+        with:
+          path: ~/.local/share/pnpm/store
+          key: pnpm-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}
+          restore-keys: pnpm-${{ runner.os }}-
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm prisma generate
+      - run: pnpm db:deploy
+      # fails if schema.prisma and the migrations disagree
+      - run: pnpm prisma migrate diff --from-config-datasource --to-schema prisma/schema.prisma --exit-code
+      - run: pnpm prisma db seed
+      - run: pnpm test:int

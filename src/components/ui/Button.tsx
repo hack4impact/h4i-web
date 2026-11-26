@@ -3,13 +3,20 @@
 import { Button as ButtonPrimitive } from "@base-ui/react/button";
 import { cn } from "@/lib/utils";
 
-type ButtonVariant = "default" | "ghost" | "high-contrast";
+type ButtonVariant =
+  | "default"
+  | "ghost"
+  | "high-contrast"
+  | "secondary"
+  | "dark";
 type ButtonSize = "xs" | "default" | "lg" | "xl";
 
 const variantClass: Record<ButtonVariant, string> = {
   default: "",
   ghost: "btn-ghost",
   "high-contrast": "btn-high-contrast",
+  secondary: "btn-secondary",
+  dark: "btn-dark",
 };
 
 const sizeClass: Record<ButtonSize, string> = {

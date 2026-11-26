@@ -1,8 +1,9 @@
+import { partnerFromNotion } from "@/lib/projects/partner-reference";
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { unstable_cache } from "next/cache";
 import { flattenNotionPage } from "./flatten";
 import {
-  notion,
+  getNotionClient,
   PROGRAMS_DATA_SOURCE_ID,
   PROJECTS_DATA_SOURCE_ID,
   PARTNERS_DATA_SOURCE_ID,
@@ -21,7 +22,9 @@ async function fetchAllPages(dataSourceId: string): Promise<any[]> {
   do {
     const query: any = { data_source_id: dataSourceId };
     if (cursor) query.start_cursor = cursor;
-    const response: any = await (notion as any).dataSources.query(query);
+    const response: any = await (getNotionClient() as any).dataSources.query(
+      query
+    );
     allResults.push(...response.results);
     cursor = response.has_more ? response.next_cursor : undefined;
   } while (cursor);
@@ -68,4 +71,15 @@ export const getVolunteers = createGetter(
   "volunteers",
   VOLUNTEERS_DATA_SOURCE_ID,
   "notion-volunteers"
+);
+
+// Strict, minimal projection for the Partner Directory picker. Failures reach
+// the picker route so it can offer explicit free-text fallback.
+export const getPartnerReferences = unstable_cache(
+  async () => {
+    const pages = await fetchAllPages(PARTNERS_DATA_SOURCE_ID);
+    return pages.map(partnerFromNotion).filter((partner) => partner !== null);
+  },
+  ["notion-project-partner-references"],
+  { revalidate: 300 }
 );

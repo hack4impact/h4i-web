@@ -1,0 +1,469 @@
+import { removeProjectMedia } from "./media";
+import { projectOrderBy, type ProjectListOptions } from "./sort";
+import { Prisma } from "@prisma/client";
+import { db } from "@/lib/db";
+import { directoryDetailWhere } from "@/lib/directory/visibility";
+import { hasRole, ADMIN_ROLES } from "@/lib/auth/roles";
+import { authorizeProject, ProjectApiError } from "./http";
+import { canProjectAction, type ProjectViewer } from "./permissions";
+import {
+  createSchema,
+  patchSchema,
+  normalizeInput,
+  missingPublishFields,
+  type ProjectPatch,
+} from "./validation";
+
+const include = { teamMembers: true, resourceLinks: true } as const;
+type StoredProject = Prisma.ProjectGetPayload<{ include: typeof include }>;
+type Tx = Prisma.TransactionClient;
+
+export async function parseProjectBody(
+  request: Request,
+  create = false
+): Promise<ProjectPatch> {
+  let raw: unknown;
+  try {
+    raw = normalizeInput(await request.json());
+  } catch (error) {
+    throw new ProjectApiError(
+      400,
+      error instanceof SyntaxError
+        ? "Invalid JSON"
+        : error instanceof Error
+          ? error.message
+          : "Invalid JSON"
+    );
+  }
+  const parsed = (create ? createSchema : patchSchema).safeParse(raw);
+  if (!parsed.success)
+    throw new ProjectApiError(
+      400,
+      "Invalid project fields",
+      parsed.error.flatten()
+    );
+  const patch = parsed.data;
+  if (patch.startDate && patch.endDate && patch.endDate < patch.startDate)
+    throw new ProjectApiError(400, "End date must not precede start date");
+  return patch;
+}
+
+function pending(project: StoredProject): ProjectPatch {
+  return project.pendingChanges
+    ? patchSchema.parse(project.pendingChanges)
+    : {};
+}
+function editable(project: StoredProject): ProjectPatch {
+  return {
+    name: project.name,
+    chapterId: project.chapterId,
+    stage: project.stage,
+    tagline: project.tagline,
+    techStack: project.techStack,
+    causeAreas: project.causeAreas,
+    nonprofitPartnerId: project.nonprofitPartnerId,
+    nonprofitPartnerName: project.nonprofitPartnerName,
+    nonprofitPartnerPhoto: project.nonprofitPartnerPhoto,
+    startDate: project.startDate?.toISOString().slice(0, 10) ?? null,
+    endDate: project.endDate?.toISOString().slice(0, 10) ?? null,
+    problemStatement: project.problemStatement,
+    goalStatement: project.goalStatement,
+    solutionDescription: project.solutionDescription,
+    demoMedia: project.demoMedia,
+    teamMembers: project.teamMembers.map(({ userId, memberId, role }) => ({
+      userId,
+      memberId,
+      role,
+    })),
+    resourceLinks: project.resourceLinks.map(({ type, url }) => ({
+      type,
+      url,
+    })),
+  };
+}
+function response(project: StoredProject, draft = false) {
+  const { pendingChanges, ...record } = project;
+  return {
+    ...record,
+    ...(draft
+      ? {
+          ...editable(project),
+          ...pending(project),
+          hasUnpublishedChanges: Boolean(pendingChanges),
+        }
+      : {}),
+  };
+}
+
+export function assertTargetChapter(
+  viewer: ProjectViewer,
+  chapterId: string | undefined
+): string {
+  if (hasRole(viewer.role, ADMIN_ROLES)) {
+    if (!chapterId)
+      throw new ProjectApiError(
+        400,
+        "chapterId is required for National Admins"
+      );
+    return chapterId;
+  }
+  if (
+    !viewer.chapterId ||
+    (chapterId !== undefined && chapterId !== viewer.chapterId)
+  )
+    throw new ProjectApiError(403, "Cannot post to another chapter");
+  authorizeProject(viewer, "create", viewer.chapterId);
+  return viewer.chapterId;
+}
+async function checkReferences(
+  tx: Tx,
+  patch: ProjectPatch,
+  viewer: ProjectViewer,
+  existing: ProjectPatch = {}
+) {
+  if (
+    patch.chapterId &&
+    !(await tx.chapter.findUnique({
+      where: { id: patch.chapterId },
+      select: { id: true },
+    }))
+  )
+    throw new ProjectApiError(400, "Unknown chapterId");
+  if (patch.teamMembers) {
+    const ids = [...new Set(patch.teamMembers.map((member) => member.userId))];
+    const count = await tx.user.count({ where: { id: { in: ids } } });
+    for (const row of patch.teamMembers) {
+      if (!row.memberId) continue;
+      const retained = existing.teamMembers?.some(
+        (old) => old.userId === row.userId && old.memberId === row.memberId
+      );
+      const member = await tx.member.findFirst({
+        where: {
+          AND: [
+            { id: row.memberId, userId: row.userId },
+            retained
+              ? {}
+              : directoryDetailWhere({ userId: viewer.id, role: viewer.role }),
+          ],
+        },
+        select: { id: true },
+      });
+      if (!member)
+        throw new ProjectApiError(
+          400,
+          "Choose an accessible member record linked to this user"
+        );
+    }
+    if (count !== ids.length)
+      throw new ProjectApiError(
+        400,
+        "Team members must reference existing users"
+      );
+  }
+}
+function checkTimeline(project: ProjectPatch) {
+  if (
+    project.startDate &&
+    project.endDate &&
+    project.endDate < project.startDate
+  )
+    throw new ProjectApiError(400, "End date must not precede start date");
+}
+async function save(tx: Tx, id: string, patch: ProjectPatch) {
+  const { teamMembers, resourceLinks, startDate, endDate, ...scalars } = patch;
+  return tx.project.update({
+    where: { id },
+    data: {
+      ...scalars,
+      ...(startDate !== undefined
+        ? { startDate: startDate ? new Date(`${startDate}T00:00:00Z`) : null }
+        : {}),
+      ...(endDate !== undefined
+        ? { endDate: endDate ? new Date(`${endDate}T00:00:00Z`) : null }
+        : {}),
+      ...(teamMembers !== undefined
+        ? { teamMembers: { deleteMany: {}, create: teamMembers } }
+        : {}),
+      ...(resourceLinks !== undefined
+        ? { resourceLinks: { deleteMany: {}, create: resourceLinks } }
+        : {}),
+    },
+    include,
+  });
+}
+async function lockedViewer(
+  tx: Tx,
+  viewer: ProjectViewer
+): Promise<ProjectViewer> {
+  // Keep the authorization snapshot valid until the write commits. Role/chapter
+  // updates wait for this shared row lock, and every project write locks in this order.
+  await tx.$queryRaw`SELECT id FROM "User" WHERE id = ${viewer.id} FOR SHARE`;
+  const actor = await tx.user.findUnique({
+    where: { id: viewer.id },
+    select: { id: true, role: true, chapterId: true },
+  });
+  if (!actor) throw new ProjectApiError(401, "Unauthorized");
+  return actor;
+}
+async function lockedProject(tx: Tx, id: string) {
+  // Serialize PATCH, publish and delete, preventing an autosave from being lost
+  // or becoming visible halfway through a concurrent publish.
+  await tx.$queryRaw`SELECT id FROM projects WHERE id = ${id} FOR UPDATE`;
+  const project = await tx.project.findUnique({ where: { id }, include });
+  if (!project) throw new ProjectApiError(404, "Project not found");
+  return project;
+}
+
+export async function createProject(
+  viewer: ProjectViewer,
+  patch: ProjectPatch
+) {
+  assertTargetChapter(viewer, patch.chapterId);
+  return db.$transaction(async (tx) => {
+    const actor = await lockedViewer(tx, viewer);
+    const targetChapter = assertTargetChapter(actor, patch.chapterId);
+    await checkReferences(tx, { ...patch, chapterId: targetChapter }, actor);
+    const project = await tx.project.create({
+      data: {
+        name: patch.name!,
+        chapterId: targetChapter,
+        createdBy: actor.id,
+      },
+    });
+    return response(
+      await save(tx, project.id, { ...patch, chapterId: targetChapter }),
+      true
+    );
+  });
+}
+export async function patchProject(
+  viewer: ProjectViewer,
+  id: string,
+  patch: ProjectPatch
+) {
+  return db.$transaction(async (tx) => {
+    const actor = await lockedViewer(tx, viewer);
+    const project = await lockedProject(tx, id);
+    authorizeProject(actor, "edit", project.chapterId);
+    const current = { ...editable(project), ...pending(project) };
+    assertTargetChapter(actor, current.chapterId);
+    const next = { ...current, ...patch };
+    assertTargetChapter(actor, next.chapterId);
+    checkTimeline(next);
+    await checkReferences(tx, patch, actor, current);
+    if (project.isDraft) return response(await save(tx, id, patch), true);
+    const changes = { ...pending(project), ...patch };
+    const updated = await tx.project.update({
+      where: { id },
+      data: { pendingChanges: changes as Prisma.InputJsonValue },
+      include,
+    });
+    return response(updated, true);
+  });
+}
+export async function publishProject(viewer: ProjectViewer, id: string) {
+  return db.$transaction(async (tx) => {
+    const actor = await lockedViewer(tx, viewer);
+    const project = await lockedProject(tx, id);
+    authorizeProject(actor, "publish", project.chapterId);
+    const next = { ...editable(project), ...pending(project) };
+    assertTargetChapter(actor, next.chapterId);
+    const missingFields = missingPublishFields(next);
+    if (missingFields.length)
+      throw new ProjectApiError(422, "Project is incomplete for its stage", {
+        missingFields,
+      });
+    checkTimeline(next);
+    await checkReferences(tx, next, actor, next);
+    if (!project.isDraft && !project.pendingChanges) return response(project);
+    if (project.pendingChanges) await save(tx, id, pending(project));
+    return response(
+      await tx.project.update({
+        where: { id },
+        data: {
+          isDraft: false,
+          lastUpdated: new Date(),
+          pendingChanges: Prisma.DbNull,
+        },
+        include,
+      })
+    );
+  });
+}
+export async function deleteProject(viewer: ProjectViewer, id: string) {
+  authorizeProject(viewer, "delete");
+  await db.$transaction(async (tx) => {
+    const actor = await lockedViewer(tx, viewer);
+    authorizeProject(actor, "delete");
+    await lockedProject(tx, id);
+    await tx.project.delete({ where: { id } });
+  });
+  try {
+    await removeProjectMedia(id);
+  } catch (error) {
+    console.error("Project deleted; private media cleanup needs retry", {
+      projectId: id,
+      error,
+    });
+  }
+}
+export async function readProject(
+  viewer: ProjectViewer,
+  id: string,
+  draft = false
+) {
+  const project = await db.project.findUnique({ where: { id }, include });
+  if (
+    !project ||
+    ((project.isDraft || draft) &&
+      !canProjectAction(viewer, "readDraft", project.chapterId))
+  )
+    throw new ProjectApiError(404, "Project not found");
+  if (
+    draft &&
+    !canProjectAction(
+      viewer,
+      "readDraft",
+      pending(project).chapterId ?? project.chapterId
+    )
+  )
+    throw new ProjectApiError(404, "Project not found");
+  return response(project, draft);
+}
+// Array-returning wrapper retained for existing consumers.
+export async function listProjects(
+  viewer: ProjectViewer,
+  includeDrafts: boolean,
+  options: ProjectListOptions = {}
+) {
+  return (
+    await searchProjects(viewer, includeDrafts, { pageSize: 100, ...options })
+  ).items;
+}
+export async function searchProjects(
+  viewer: ProjectViewer,
+  includeDrafts: boolean,
+  options: ProjectListOptions = {}
+) {
+  const visibility: Prisma.ProjectWhereInput[] = [{ isDraft: false }];
+  if (includeDrafts && hasRole(viewer.role, ADMIN_ROLES))
+    visibility.push({ isDraft: true });
+  else if (
+    includeDrafts &&
+    viewer.chapterId &&
+    canProjectAction(viewer, "readDraft", viewer.chapterId)
+  )
+    visibility.push({ isDraft: true, chapterId: viewer.chapterId });
+  const pageSize = Math.min(100, Math.max(1, options.pageSize ?? 12));
+  return db.$transaction(
+    async (tx) => {
+      const where: Prisma.ProjectWhereInput = {
+        AND: [{ OR: visibility }],
+        ...(options.chapterId ? { chapterId: options.chapterId } : {}),
+        ...(options.stage ? { stage: options.stage } : {}),
+        ...(options.impactArea
+          ? { causeAreas: { has: options.impactArea } }
+          : {}),
+      };
+      const and = where.AND as Prisma.ProjectWhereInput[];
+      if (options.q)
+        and.push({
+          OR: [
+            { name: { contains: options.q, mode: "insensitive" } },
+            { tagline: { contains: options.q, mode: "insensitive" } },
+            {
+              nonprofitPartnerName: {
+                contains: options.q,
+                mode: "insensitive",
+              },
+            },
+            { chapter: { name: { contains: options.q, mode: "insensitive" } } },
+          ],
+        });
+      if (options.projectLength) {
+        // Date subtraction in PostgreSQL yields an exact number of days. Missing
+        // dates are explicitly unknown rather than silently treated as ongoing.
+        const days = Prisma.sql`("end_date" - "start_date")`;
+        const condition =
+          options.projectLength === "short"
+            ? Prisma.sql`${days} BETWEEN 0 AND 180`
+            : options.projectLength === "medium"
+              ? Prisma.sql`${days} BETWEEN 181 AND 365`
+              : options.projectLength === "long"
+                ? Prisma.sql`${days} > 365`
+                : Prisma.sql`"start_date" IS NULL OR "end_date" IS NULL`;
+        const ids = await tx.$queryRaw<{ id: string }[]>(
+          Prisma.sql`SELECT id FROM projects WHERE ${condition}`
+        );
+        and.push({ id: { in: ids.map((row) => row.id) } });
+      }
+      const total = await tx.project.count({ where });
+      const pages = Math.max(1, Math.ceil(total / pageSize));
+      const page = Math.min(pages, Math.max(1, options.page ?? 1));
+      const projects = await tx.project.findMany({
+        where,
+        include,
+        orderBy: projectOrderBy(options.sort),
+        skip: (page - 1) * pageSize,
+        take: pageSize,
+      });
+      return {
+        items: projects.map((project) => response(project)),
+        total,
+        page,
+        pageSize,
+        pages,
+      };
+    },
+    { isolationLevel: Prisma.TransactionIsolationLevel.RepeatableRead }
+  );
+}
+
+export async function listDraftProjects(viewer: ProjectViewer) {
+  if (!hasRole(viewer.role, ADMIN_ROLES) && !viewer.chapterId) return [];
+  if (
+    !hasRole(viewer.role, ADMIN_ROLES) &&
+    !canProjectAction(viewer, "readDraft", viewer.chapterId!)
+  )
+    return [];
+  const projects = await db.project.findMany({
+    where: {
+      isDraft: true,
+      ...(hasRole(viewer.role, ADMIN_ROLES)
+        ? {}
+        : { chapterId: viewer.chapterId! }),
+    },
+    include,
+    orderBy: [{ updatedAt: "desc" }, { id: "asc" }],
+  });
+  return projects.map((project) => response(project));
+}
+
+export async function assertProjectWriteAccess(
+  viewer: ProjectViewer,
+  id: string
+) {
+  const project = await db.project.findUnique({
+    where: { id },
+    select: { chapterId: true, pendingChanges: true },
+  });
+  if (!project) throw new ProjectApiError(404, "Project not found");
+  authorizeProject(viewer, "edit", project.chapterId);
+  const changes = project.pendingChanges
+    ? patchSchema.parse(project.pendingChanges)
+    : {};
+  assertTargetChapter(viewer, changes.chapterId ?? project.chapterId);
+}
+export async function withProjectWriteAccess<T>(
+  viewer: ProjectViewer,
+  id: string,
+  write: () => Promise<T>
+): Promise<T> {
+  return db.$transaction(async (tx) => {
+    const actor = await lockedViewer(tx, viewer);
+    const project = await lockedProject(tx, id);
+    authorizeProject(actor, "edit", project.chapterId);
+    assertTargetChapter(actor, pending(project).chapterId ?? project.chapterId);
+    return write();
+  });
+}

@@ -1,13 +1,15 @@
-import { PageHeader } from "@/components/ui/PageHeader";
-import { Button } from "@/components/ui/Button";
+import { canProjectAction } from "@/lib/projects/permissions";
+import { requireRole } from "@/lib/auth/guards";
+import { EDITOR_ROLES } from "@/lib/auth/roles";
+import { editorOptions } from "@/lib/projects/editor";
+import { ProjectForm } from "@/components/projects/ProjectForm";
 
-export default function NewProjectPage() {
+export default async function NewProjectPage() {
+  const { user } = await requireRole(EDITOR_ROLES);
   return (
-    <div>
-      <PageHeader title="Add Project">
-        <Button variant="secondary">Cancel</Button>
-        <Button>+ Add Project</Button>
-      </PageHeader>
-    </div>
+    <ProjectForm
+      {...await editorOptions(user)}
+      canDelete={canProjectAction(user, "delete")}
+    />
   );
 }

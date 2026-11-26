@@ -1,4 +1,4 @@
-import { projectListQuery } from "@/lib/projects/sort";
+import { projectListQuery, projectListOptions } from "@/lib/projects/sort";
 import { hasRole, ADMIN_ROLES, EDITOR_ROLES } from "@/lib/auth/roles";
 import {
   authorizeProject,
@@ -8,7 +8,7 @@ import {
 } from "@/lib/projects/http";
 import {
   createProject,
-  listProjects,
+  searchProjects,
   parseProjectBody,
 } from "@/lib/projects/service";
 
@@ -18,13 +18,24 @@ export async function GET(request: Request) {
     const params = new URL(request.url).searchParams;
     const query = projectListQuery.safeParse(Object.fromEntries(params));
     if (!query.success)
-      throw new ProjectApiError(400, "Invalid project sort or chapter");
-    return Response.json(
-      await listProjects(viewer, params.get("include_drafts") === "true", {
-        sort: query.data.sort,
-        chapterId: query.data.chapter_id,
-      })
+      throw new ProjectApiError(
+        400,
+        "Invalid project search, filters or pagination"
+      );
+    const results = await searchProjects(
+      viewer,
+      params.get("include_drafts") === "true",
+      projectListOptions(query.data)
     );
+    return Response.json(results.items, {
+      headers: {
+        "X-Total-Count": String(results.total),
+        "X-Page": String(results.page),
+        "X-Page-Size": String(results.pageSize),
+        "X-Total-Pages": String(results.pages),
+        "Cache-Control": "private, no-store",
+      },
+    });
   });
 }
 export async function POST(request: Request) {

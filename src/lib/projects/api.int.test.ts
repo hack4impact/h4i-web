@@ -998,3 +998,233 @@ describe("upload authorization races", () => {
     }
   );
 });
+
+describe("Ticket 8 combined filtering, pagination and privacy", () => {
+  const marker = `${prefix}-browse`;
+  const fixtures: Record<string, string> = {};
+  beforeAll(async () => {
+    const base = {
+      chapterId: own,
+      createdBy: actors.admin.id,
+      isDraft: false,
+      stage: "development" as const,
+      causeAreas: ["Education"],
+      startDate: new Date("2026-01-01"),
+      endDate: new Date("2026-04-01"),
+      tagline: "Community tool",
+      nonprofitPartnerName: "Local Partner",
+    };
+    const variants = [
+      { key: "match", data: {} },
+      { key: "chapter", data: { chapterId: other } },
+      { key: "stage", data: { stage: "design" as const } },
+      { key: "length", data: { endDate: new Date("2027-04-01") } },
+      { key: "impact", data: { causeAreas: ["Health"] } },
+      { key: "draft", data: { isDraft: true } },
+      {
+        key: "pending",
+        data: {
+          stage: "design" as const,
+          pendingChanges: {
+            stage: "development",
+            name: `${marker} Secret revision`,
+            causeAreas: ["Secret impact"],
+          },
+        },
+      },
+    ];
+    for (const variant of variants) {
+      const row = await db.project.create({
+        data: { ...base, name: `${marker} ${variant.key}`, ...variant.data },
+      });
+      fixtures[variant.key] = row.id;
+    }
+  });
+  const browse = (actor = "member", params: Record<string, string> = {}) =>
+    list(
+      req(
+        actor,
+        "GET",
+        undefined,
+        `?${new URLSearchParams({ q: marker, page_size: "100", ...params })}`
+      )
+    );
+  it("ANDs chapter, stage, length, impact and search, with exact total counts", async () => {
+    const filters = {
+      chapter_id: own,
+      stage: "development",
+      project_length: "short",
+      impact_area: "Education",
+    };
+    const expected: Record<string, string[]> = {
+      chapter_id: ["match", "stage", "length", "impact", "pending"],
+      stage: ["match", "chapter", "length", "impact"],
+      project_length: ["match", "chapter", "stage", "impact", "pending"],
+      impact_area: ["match", "chapter", "stage", "length", "pending"],
+    };
+    for (const [key, value] of Object.entries(filters)) {
+      const response = await browse("member", { [key]: value });
+      expect(
+        (await response.json()).map((p: { id: string }) => p.id).sort()
+      ).toEqual(expected[key].map((k) => fixtures[k]).sort());
+    }
+    const response = await browse("member", filters);
+    expect(response.headers.get("x-total-count")).toBe("1");
+    expect((await response.json()).map((p: { id: string }) => p.id)).toEqual([
+      fixtures.match,
+    ]);
+    const empty = await browse("member", {
+      ...filters,
+      impact_area: "No such area",
+    });
+    expect(empty.headers.get("x-total-count")).toBe("0");
+    expect(await empty.json()).toEqual([]);
+  });
+  it("never exposes draft fields through search, filters or default lists for any role", async () => {
+    for (const actor of ["member", "lead", "chapterLead", "admin"]) {
+      const rows = await (await browse(actor)).json();
+      expect(rows.some((p: { id: string }) => p.id === fixtures.draft)).toBe(
+        false
+      );
+      expect(
+        rows.every(
+          (p: { pendingChanges?: unknown }) => !("pendingChanges" in p)
+        )
+      ).toBe(true);
+      expect(
+        await (await browse(actor, { q: `${marker} Secret revision` })).json()
+      ).toEqual([]);
+      expect(
+        await (await browse(actor, { impact_area: "Secret impact" })).json()
+      ).toEqual([]);
+    }
+    expect(
+      (await (await browse("lead", { include_drafts: "true" })).json()).some(
+        (p: { id: string }) => p.id === fixtures.draft
+      )
+    ).toBe(true);
+    expect(
+      (
+        await (await browse("otherLead", { include_drafts: "true" })).json()
+      ).some((p: { id: string }) => p.id === fixtures.draft)
+    ).toBe(false);
+    expect(
+      (await (await browse("member", { include_drafts: "true" })).json()).some(
+        (p: { id: string }) => p.id === fixtures.draft
+      )
+    ).toBe(false);
+  });
+  it("searches chapter names case-insensitively and searches partner/tagline without leaking pending values", async () => {
+    const chapterSearch = await list(
+      req(
+        "member",
+        "GET",
+        undefined,
+        `?q=${encodeURIComponent(`${prefix} ONE`.toUpperCase())}&page_size=100`
+      )
+    );
+    expect(
+      (await chapterSearch.json()).every(
+        (p: { chapterId: string }) => p.chapterId === own
+      )
+    ).toBe(true);
+    const byPartner = await browse("member", {
+      q: "Local Partner",
+      chapter_id: own,
+    });
+    expect(
+      (await byPartner.json()).some(
+        (p: { id: string }) => p.id === fixtures.match
+      )
+    ).toBe(true);
+    const byTagline = await browse("member", {
+      q: "community TOOL",
+      chapter_id: own,
+    });
+    expect(
+      (await byTagline.json()).some(
+        (p: { id: string }) => p.id === fixtures.match
+      )
+    ).toBe(true);
+  });
+  it("paginates without duplicates, retains totals, and clamps stale page numbers", async () => {
+    const all = await (await browse("member", { sort: "name" })).json();
+    const seen: string[] = [];
+    for (let page = 1; page <= 3; page++) {
+      const response = await browse("member", {
+        sort: "name",
+        page: String(page),
+        page_size: "2",
+      });
+      expect(response.headers.get("x-total-count")).toBe("6");
+      expect(response.headers.get("x-total-pages")).toBe("3");
+      seen.push(...(await response.json()).map((p: { id: string }) => p.id));
+    }
+    expect(seen).toEqual(all.map((p: { id: string }) => p.id));
+    expect(new Set(seen).size).toBe(6);
+    const stale = await browse("member", { page: "999", page_size: "2" });
+    expect(stale.headers.get("x-page")).toBe("3");
+  });
+  it("defines exact length boundaries and excludes missing dates from known lengths", async () => {
+    const lengthMarker = `${prefix}-length`;
+    const start = new Date("2026-01-01");
+    for (const days of [0, 180, 181, 365, 366, null])
+      await db.project.create({
+        data: {
+          name: `${lengthMarker} ${days}`,
+          chapterId: own,
+          createdBy: actors.admin.id,
+          isDraft: false,
+          startDate: start,
+          endDate:
+            days === null ? null : new Date(start.getTime() + days * 86400000),
+        },
+      });
+    for (const [length, names] of [
+      ["short", [0, 180]],
+      ["medium", [181, 365]],
+      ["long", [366]],
+      ["unknown", [null]],
+    ] as const) {
+      const rows = await (
+        await browse("member", { q: lengthMarker, project_length: length })
+      ).json();
+      expect(rows.map((p: { name: string }) => p.name).sort()).toEqual(
+        names.map((n) => `${lengthMarker} ${n}`).sort()
+      );
+    }
+  });
+  it.each([
+    "stage=draft",
+    "project_length=forever",
+    "page=0",
+    "page=-1",
+    "page=1.5",
+    "page=NaN",
+    "page_size=0",
+    "page_size=101",
+    "page_size=2.5",
+    `q=${"x".repeat(201)}`,
+    `impact_area=${"x".repeat(101)}`,
+  ])("rejects invalid query %s", async (query) => {
+    expect(
+      (await list(req("member", "GET", undefined, `?${query}`))).status
+    ).toBe(400);
+  });
+  it.each(["null", "[]", "{broken"])(
+    "rejects malformed create payload %s",
+    async (body) => {
+      const response = await create(
+        new Request("http://localhost/api/projects", {
+          method: "POST",
+          headers: {
+            cookie: `${SESSION_COOKIE}=${actors.lead.cookie}`,
+            "content-type": "application/json",
+          },
+          body,
+        })
+      );
+      expect(response.status).toBe(400);
+    }
+  );
+});

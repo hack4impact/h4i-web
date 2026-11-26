@@ -23,7 +23,8 @@
     "db:verify:directory-workflows": "tsx prisma/verify-directory-workflows.ts",
     "db:reset": "prisma migrate reset",
     "claims:expire": "tsx scripts/expire-claims.ts",
-    "prepare": "husky"
+    "prepare": "husky",
+    "test:e2e:projects": "vitest run --config vitest.browser.config.mts"
   },
   "dependencies": {
     "@base-ui/react": "^1.9.0",
@@ -63,6 +64,7 @@
     "eslint-config-prettier": "^10.1.8",
     "husky": "^9.1.7",
     "lint-staged": "^17.6.0",
+    "playwright": "1.65.1",
     "prettier": "^3.9.10",
     "prettier-plugin-tailwindcss": "^0.8.1",
     "tailwindcss": "^4.3.3",

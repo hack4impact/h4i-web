@@ -330,7 +330,17 @@ export async function readProject(
     throw new ProjectApiError(404, "Project not found");
   return response(project, draft);
 }
+// Array-returning wrapper retained for existing consumers.
 export async function listProjects(
+  viewer: ProjectViewer,
+  includeDrafts: boolean,
+  options: ProjectListOptions = {}
+) {
+  return (
+    await searchProjects(viewer, includeDrafts, { pageSize: 100, ...options })
+  ).items;
+}
+export async function searchProjects(
   viewer: ProjectViewer,
   includeDrafts: boolean,
   options: ProjectListOptions = {}
@@ -344,16 +354,69 @@ export async function listProjects(
     canProjectAction(viewer, "readDraft", viewer.chapterId)
   )
     visibility.push({ isDraft: true, chapterId: viewer.chapterId });
-  const projects = await db.project.findMany({
-    where: {
-      OR: visibility,
-      ...(options.chapterId ? { chapterId: options.chapterId } : {}),
+  const pageSize = Math.min(100, Math.max(1, options.pageSize ?? 12));
+  return db.$transaction(
+    async (tx) => {
+      const where: Prisma.ProjectWhereInput = {
+        AND: [{ OR: visibility }],
+        ...(options.chapterId ? { chapterId: options.chapterId } : {}),
+        ...(options.stage ? { stage: options.stage } : {}),
+        ...(options.impactArea
+          ? { causeAreas: { has: options.impactArea } }
+          : {}),
+      };
+      const and = where.AND as Prisma.ProjectWhereInput[];
+      if (options.q)
+        and.push({
+          OR: [
+            { name: { contains: options.q, mode: "insensitive" } },
+            { tagline: { contains: options.q, mode: "insensitive" } },
+            {
+              nonprofitPartnerName: {
+                contains: options.q,
+                mode: "insensitive",
+              },
+            },
+            { chapter: { name: { contains: options.q, mode: "insensitive" } } },
+          ],
+        });
+      if (options.projectLength) {
+        // Date subtraction in PostgreSQL yields an exact number of days. Missing
+        // dates are explicitly unknown rather than silently treated as ongoing.
+        const days = Prisma.sql`("end_date" - "start_date")`;
+        const condition =
+          options.projectLength === "short"
+            ? Prisma.sql`${days} BETWEEN 0 AND 180`
+            : options.projectLength === "medium"
+              ? Prisma.sql`${days} BETWEEN 181 AND 365`
+              : options.projectLength === "long"
+                ? Prisma.sql`${days} > 365`
+                : Prisma.sql`"start_date" IS NULL OR "end_date" IS NULL`;
+        const ids = await tx.$queryRaw<{ id: string }[]>(
+          Prisma.sql`SELECT id FROM projects WHERE ${condition}`
+        );
+        and.push({ id: { in: ids.map((row) => row.id) } });
+      }
+      const total = await tx.project.count({ where });
+      const pages = Math.max(1, Math.ceil(total / pageSize));
+      const page = Math.min(pages, Math.max(1, options.page ?? 1));
+      const projects = await tx.project.findMany({
+        where,
+        include,
+        orderBy: projectOrderBy(options.sort),
+        skip: (page - 1) * pageSize,
+        take: pageSize,
+      });
+      return {
+        items: projects.map((project) => response(project)),
+        total,
+        page,
+        pageSize,
+        pages,
+      };
     },
-    include,
-    orderBy: projectOrderBy(options.sort),
-    take: 100,
-  });
-  return projects.map((project) => response(project));
+    { isolationLevel: Prisma.TransactionIsolationLevel.RepeatableRead }
+  );
 }
 
 export async function listDraftProjects(viewer: ProjectViewer) {

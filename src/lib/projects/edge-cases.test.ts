@@ -33,6 +33,8 @@ describe("archive edge-case input boundaries", () => {
   it("accepts only whitelisted sort values and treats the empty chapter option as all chapters", () => {
     expect(projectListQuery.parse({ chapter_id: "" })).toEqual({
       sort: "last_updated",
+      page: 1,
+      page_size: 12,
     });
     expect(
       projectListQuery.safeParse({ sort: "name; DROP TABLE projects" }).success

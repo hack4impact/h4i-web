@@ -428,7 +428,7 @@ export function ProjectForm({
               required to publish. Partial drafts can be saved.
             </p>
           </div>
-          <div className="flex gap-8">
+          <div className="flex flex-wrap gap-8">
             {canDelete && projectId && (
               <DeleteProject
                 id={projectId}
@@ -1021,7 +1021,7 @@ export function ProjectForm({
           >
             Back to projects
           </Link>
-          <div className="flex gap-8">
+          <div className="flex flex-wrap gap-8">
             <Button type="submit" disabled={locked}>
               Save Draft
             </Button>

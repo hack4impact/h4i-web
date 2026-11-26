@@ -44,7 +44,7 @@ function req(actor: string | null, method = "GET", body?: unknown, query = "") {
 async function newDraft(actor = "lead", chapterId?: string) {
   const response = await create(
     req(actor, "POST", {
-      name: "A new project",
+      name: `${prefix}-${randomUUID()}`,
       ...(chapterId ? { chapterId } : {}),
     })
   );
@@ -227,17 +227,20 @@ describe("project write APIs with real sessions and PostgreSQL", () => {
           (await remove(req(actor, "DELETE"), context(project.id))).status
         ).toBe(403);
     }
-    const drafts = await (
-      await list(req("sameLead", "GET", undefined, "?include_drafts=true"))
-    ).json();
-    expect(drafts.some((p: { id: string }) => p.id === project.id)).toBe(true);
+    // Visibility assertions target this fixture, not page 1 of unrelated seed
+    // data. Published rows sort ahead of new drafts with no lastUpdated value.
+    const draftQuery = `?include_drafts=true&q=${encodeURIComponent(project.name)}`;
+    const draftResponse = await list(
+      req("sameLead", "GET", undefined, draftQuery)
+    );
+    expect(draftResponse.headers.get("x-total-count")).toBe("1");
+    expect(
+      (await draftResponse.json()).map((p: { id: string }) => p.id)
+    ).toEqual([project.id]);
     for (const actor of ["otherLead", "member"]) {
-      const visible = await (
-        await list(req(actor, "GET", undefined, "?include_drafts=true"))
-      ).json();
-      expect(visible.some((p: { id: string }) => p.id === project.id)).toBe(
-        false
-      );
+      const response = await list(req(actor, "GET", undefined, draftQuery));
+      expect(response.headers.get("x-total-count")).toBe("0");
+      expect(await response.json()).toEqual([]);
     }
     expect(
       (await remove(req("admin", "DELETE"), context(project.id))).status
@@ -687,7 +690,11 @@ describe("project write APIs with real sessions and PostgreSQL", () => {
   it("keeps drafts off the default list and provides chapter-scoped resume lists", async () => {
     const project = await newDraft();
     for (const actor of ["lead", "admin", "member"]) {
-      const records = await (await list(req(actor))).json();
+      const records = await (
+        await list(
+          req(actor, "GET", undefined, `?q=${encodeURIComponent(project.name)}`)
+        )
+      ).json();
       expect(records.some((row: { id: string }) => row.id === project.id)).toBe(
         false
       );
@@ -1227,4 +1234,42 @@ describe("Ticket 8 combined filtering, pagination and privacy", () => {
       expect(response.status).toBe(400);
     }
   );
+});
+
+describe("authorized draft pagination regression", () => {
+  it("keeps a readable draft on its later page when published records fill page one", async () => {
+    const name = `${prefix}-draft-pagination`;
+    await db.project.createMany({
+      data: Array.from({ length: 12 }, (_, index) => ({
+        name: `${name} published ${index}`,
+        chapterId: own,
+        createdBy: actors.admin.id,
+        isDraft: false,
+        lastUpdated: new Date("2026-01-01"),
+      })),
+    });
+    const draft = await create(req("lead", "POST", { name: `${name} draft` }));
+    expect(draft.status).toBe(201);
+    const { id } = await draft.json();
+    const query = `?include_drafts=true&q=${encodeURIComponent(name)}`;
+    const first = await list(req("sameLead", "GET", undefined, query));
+    expect(first.headers.get("x-total-count")).toBe("13");
+    expect(first.headers.get("x-total-pages")).toBe("2");
+    const firstPage = await first.json();
+    expect(firstPage).toHaveLength(12);
+    expect(firstPage.some((p: { id: string }) => p.id === id)).toBe(false);
+    const second = await list(
+      req("sameLead", "GET", undefined, `${query}&page=2`)
+    );
+    expect((await second.json()).map((p: { id: string }) => p.id)).toEqual([
+      id,
+    ]);
+    const member = await list(
+      req("member", "GET", undefined, `${query}&page=2`)
+    );
+    expect(member.headers.get("x-total-count")).toBe("12");
+    expect(
+      (await member.json()).every((p: { isDraft: boolean }) => !p.isDraft)
+    ).toBe(true);
+  });
 });

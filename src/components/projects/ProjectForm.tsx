@@ -2,6 +2,7 @@
 
 import { useState, type ReactNode, type MouseEvent } from "react";
 import Link from "next/link";
+import { DeleteProject } from "./DeleteProject";
 import { useRouter } from "next/navigation";
 import { useProjectDraft } from "./useProjectDraft";
 import { MemberPicker, PartnerPicker } from "./ReferencePickers";
@@ -181,12 +182,14 @@ export function ProjectForm({
   isDraft: initialDraft = true,
   chapters,
   members,
+  canDelete = false,
 }: {
   initial?: ProjectPatch;
   projectId?: string | null;
   isDraft?: boolean;
   chapters: { id: string; name: string }[];
   members: MemberReference[];
+  canDelete?: boolean;
 }) {
   const [value, setValue] = useState(() =>
     formValue({
@@ -198,10 +201,17 @@ export function ProjectForm({
   const isDraft = initialDraft;
   const router = useRouter();
   const [busy, setBusy] = useState(false);
+  const [deleteOpen, setDeleteOpen] = useState(false);
+  const [accessLost, setAccessLost] = useState(false);
   const [message, setMessage] = useState("");
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const draft = useProjectDraft(value, initialId, busy);
+  const draft = useProjectDraft(
+    value,
+    initialId,
+    busy || deleteOpen || accessLost
+  );
   const projectId = draft.id;
+  const locked = busy || deleteOpen || draft.blocked || accessLost;
   const required: readonly string[] = requiredByStage[value.stage];
   function update<K extends keyof ProjectFormValue>(
     name: K,
@@ -222,6 +232,13 @@ export function ProjectForm({
   }
   function report(error: unknown) {
     if (error instanceof ProjectRequestError) {
+      if ([401, 403, 404].includes(error.status)) {
+        setAccessLost(true);
+        setMessage(
+          "Your access changed or this project is no longer available. Changes were not saved. Reload to refresh your access."
+        );
+        return;
+      }
       const missing = error.details?.missingFields;
       if (missing)
         setErrors(
@@ -332,7 +349,7 @@ export function ProjectForm({
       return;
     event.preventDefault();
     if (busy) return;
-    if (!draft.dirty) {
+    if (draft.blocked || accessLost || !draft.dirty) {
       router.push("/projects");
       return;
     }
@@ -412,13 +429,26 @@ export function ProjectForm({
             </p>
           </div>
           <div className="flex gap-8">
-            <Button type="submit" disabled={busy}>
+            {canDelete && projectId && (
+              <DeleteProject
+                id={projectId}
+                name={value.name}
+                disabled={busy || draft.blocked || accessLost}
+                beforeDelete={draft.waitForSaves}
+                onOpenChange={(open) => {
+                  if (open) draft.suspend();
+                  else draft.resume();
+                  setDeleteOpen(open);
+                }}
+              />
+            )}
+            <Button type="submit" disabled={locked}>
               Save Draft
             </Button>
             <Button
               type="button"
               variant="high-contrast"
-              disabled={busy}
+              disabled={locked}
               onClick={() => void save(true)}
             >
               Publish Changes
@@ -427,7 +457,7 @@ export function ProjectForm({
         </header>
         <p role="status" aria-live="polite" className="text-gray-2 min-h-16">
           {message ||
-            (draft.error
+            (draft.error && !draft.blocked
               ? `${draft.status}: ${draft.error.message}`
               : draft.status)}
         </p>
@@ -462,7 +492,7 @@ export function ProjectForm({
             </a>
           ))}
         </nav>
-        <fieldset disabled={busy} className="min-w-0 space-y-24">
+        <fieldset disabled={locked} className="min-w-0 space-y-24">
           <Section errors={errors} id="project-section-0" title="1. Basics">
             <div className="grid grid-cols-1 gap-20 sm:grid-cols-2">
               <Field
@@ -549,7 +579,7 @@ export function ProjectForm({
                 <Tags
                   name="techStack"
                   value={value.techStack}
-                  disabled={busy}
+                  disabled={locked}
                   onChange={(tags) => update("techStack", tags)}
                 />
               </Field>
@@ -561,7 +591,7 @@ export function ProjectForm({
                 <Tags
                   name="causeAreas"
                   value={value.causeAreas}
-                  disabled={busy}
+                  disabled={locked}
                   onChange={(tags) => update("causeAreas", tags)}
                 />
               </Field>
@@ -992,13 +1022,13 @@ export function ProjectForm({
             Back to projects
           </Link>
           <div className="flex gap-8">
-            <Button type="submit" disabled={busy}>
+            <Button type="submit" disabled={locked}>
               Save Draft
             </Button>
             <Button
               type="button"
               variant="high-contrast"
-              disabled={busy}
+              disabled={locked}
               onClick={() => void save(true)}
             >
               Publish Changes

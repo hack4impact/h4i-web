@@ -1,3 +1,5 @@
+import { removeProjectMedia } from "./media";
+import { projectOrderBy, type ProjectListOptions } from "./sort";
 import { Prisma } from "@prisma/client";
 import { db } from "@/lib/db";
 import { directoryDetailWhere } from "@/lib/directory/visibility";
@@ -189,6 +191,20 @@ async function save(tx: Tx, id: string, patch: ProjectPatch) {
     include,
   });
 }
+async function lockedViewer(
+  tx: Tx,
+  viewer: ProjectViewer
+): Promise<ProjectViewer> {
+  // Keep the authorization snapshot valid until the write commits. Role/chapter
+  // updates wait for this shared row lock, and every project write locks in this order.
+  await tx.$queryRaw`SELECT id FROM "User" WHERE id = ${viewer.id} FOR SHARE`;
+  const actor = await tx.user.findUnique({
+    where: { id: viewer.id },
+    select: { id: true, role: true, chapterId: true },
+  });
+  if (!actor) throw new ProjectApiError(401, "Unauthorized");
+  return actor;
+}
 async function lockedProject(tx: Tx, id: string) {
   // Serialize PATCH, publish and delete, preventing an autosave from being lost
   // or becoming visible halfway through a concurrent publish.
@@ -202,13 +218,22 @@ export async function createProject(
   viewer: ProjectViewer,
   patch: ProjectPatch
 ) {
-  const chapterId = assertTargetChapter(viewer, patch.chapterId);
+  assertTargetChapter(viewer, patch.chapterId);
   return db.$transaction(async (tx) => {
-    await checkReferences(tx, { ...patch, chapterId }, viewer);
+    const actor = await lockedViewer(tx, viewer);
+    const targetChapter = assertTargetChapter(actor, patch.chapterId);
+    await checkReferences(tx, { ...patch, chapterId: targetChapter }, actor);
     const project = await tx.project.create({
-      data: { name: patch.name!, chapterId, createdBy: viewer.id },
+      data: {
+        name: patch.name!,
+        chapterId: targetChapter,
+        createdBy: actor.id,
+      },
     });
-    return response(await save(tx, project.id, { ...patch, chapterId }), true);
+    return response(
+      await save(tx, project.id, { ...patch, chapterId: targetChapter }),
+      true
+    );
   });
 }
 export async function patchProject(
@@ -217,14 +242,15 @@ export async function patchProject(
   patch: ProjectPatch
 ) {
   return db.$transaction(async (tx) => {
+    const actor = await lockedViewer(tx, viewer);
     const project = await lockedProject(tx, id);
-    authorizeProject(viewer, "edit", project.chapterId);
+    authorizeProject(actor, "edit", project.chapterId);
     const current = { ...editable(project), ...pending(project) };
-    assertTargetChapter(viewer, current.chapterId);
+    assertTargetChapter(actor, current.chapterId);
     const next = { ...current, ...patch };
-    assertTargetChapter(viewer, next.chapterId);
+    assertTargetChapter(actor, next.chapterId);
     checkTimeline(next);
-    await checkReferences(tx, patch, viewer, current);
+    await checkReferences(tx, patch, actor, current);
     if (project.isDraft) return response(await save(tx, id, patch), true);
     const changes = { ...pending(project), ...patch };
     const updated = await tx.project.update({
@@ -237,17 +263,18 @@ export async function patchProject(
 }
 export async function publishProject(viewer: ProjectViewer, id: string) {
   return db.$transaction(async (tx) => {
+    const actor = await lockedViewer(tx, viewer);
     const project = await lockedProject(tx, id);
-    authorizeProject(viewer, "publish", project.chapterId);
+    authorizeProject(actor, "publish", project.chapterId);
     const next = { ...editable(project), ...pending(project) };
-    assertTargetChapter(viewer, next.chapterId);
+    assertTargetChapter(actor, next.chapterId);
     const missingFields = missingPublishFields(next);
     if (missingFields.length)
       throw new ProjectApiError(422, "Project is incomplete for its stage", {
         missingFields,
       });
     checkTimeline(next);
-    await checkReferences(tx, next, viewer, next);
+    await checkReferences(tx, next, actor, next);
     if (!project.isDraft && !project.pendingChanges) return response(project);
     if (project.pendingChanges) await save(tx, id, pending(project));
     return response(
@@ -266,9 +293,19 @@ export async function publishProject(viewer: ProjectViewer, id: string) {
 export async function deleteProject(viewer: ProjectViewer, id: string) {
   authorizeProject(viewer, "delete");
   await db.$transaction(async (tx) => {
+    const actor = await lockedViewer(tx, viewer);
+    authorizeProject(actor, "delete");
     await lockedProject(tx, id);
     await tx.project.delete({ where: { id } });
   });
+  try {
+    await removeProjectMedia(id);
+  } catch (error) {
+    console.error("Project deleted; private media cleanup needs retry", {
+      projectId: id,
+      error,
+    });
+  }
 }
 export async function readProject(
   viewer: ProjectViewer,
@@ -295,7 +332,8 @@ export async function readProject(
 }
 export async function listProjects(
   viewer: ProjectViewer,
-  includeDrafts: boolean
+  includeDrafts: boolean,
+  options: ProjectListOptions = {}
 ) {
   const visibility: Prisma.ProjectWhereInput[] = [{ isDraft: false }];
   if (includeDrafts && hasRole(viewer.role, ADMIN_ROLES))
@@ -307,9 +345,12 @@ export async function listProjects(
   )
     visibility.push({ isDraft: true, chapterId: viewer.chapterId });
   const projects = await db.project.findMany({
-    where: { OR: visibility },
+    where: {
+      OR: visibility,
+      ...(options.chapterId ? { chapterId: options.chapterId } : {}),
+    },
     include,
-    orderBy: [{ createdAt: "desc" }, { id: "asc" }],
+    orderBy: projectOrderBy(options.sort),
     take: 100,
   });
   return projects.map((project) => response(project));
@@ -333,4 +374,33 @@ export async function listDraftProjects(viewer: ProjectViewer) {
     orderBy: [{ updatedAt: "desc" }, { id: "asc" }],
   });
   return projects.map((project) => response(project));
+}
+
+export async function assertProjectWriteAccess(
+  viewer: ProjectViewer,
+  id: string
+) {
+  const project = await db.project.findUnique({
+    where: { id },
+    select: { chapterId: true, pendingChanges: true },
+  });
+  if (!project) throw new ProjectApiError(404, "Project not found");
+  authorizeProject(viewer, "edit", project.chapterId);
+  const changes = project.pendingChanges
+    ? patchSchema.parse(project.pendingChanges)
+    : {};
+  assertTargetChapter(viewer, changes.chapterId ?? project.chapterId);
+}
+export async function withProjectWriteAccess<T>(
+  viewer: ProjectViewer,
+  id: string,
+  write: () => Promise<T>
+): Promise<T> {
+  return db.$transaction(async (tx) => {
+    const actor = await lockedViewer(tx, viewer);
+    const project = await lockedProject(tx, id);
+    authorizeProject(actor, "edit", project.chapterId);
+    assertTargetChapter(actor, pending(project).chapterId ?? project.chapterId);
+    return write();
+  });
 }

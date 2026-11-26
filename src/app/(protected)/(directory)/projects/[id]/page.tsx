@@ -1,3 +1,4 @@
+import { DeleteProject } from "@/components/projects/DeleteProject";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { requireSession } from "@/lib/auth/guards";
@@ -87,14 +88,20 @@ export default async function ProjectPage({
               ))}
             </div>
           </div>
-          {canProjectAction(user, "edit", project.chapterId) && (
-            <Link
-              href={`/projects/${encodeURIComponent(id)}/edit`}
-              className="btn btn-high-contrast"
-            >
-              Edit
-            </Link>
-          )}
+          <div className="flex gap-8">
+            {" "}
+            {canProjectAction(user, "edit", project.chapterId) && (
+              <Link
+                href={`/projects/${encodeURIComponent(id)}/edit`}
+                className="btn btn-high-contrast"
+              >
+                Edit
+              </Link>
+            )}
+            {canProjectAction(user, "delete", project.chapterId) && (
+              <DeleteProject id={id} name={project.name} />
+            )}
+          </div>
         </header>
         <section
           aria-label="Nonprofit partner and timeline"

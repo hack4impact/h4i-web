@@ -1,3 +1,4 @@
+import { allowedProjectOrigin } from "./security";
 import { Prisma } from "@prisma/client";
 import { assertSession, assertRole } from "@/lib/auth/guards";
 import type { AppRole } from "@/types";
@@ -20,6 +21,11 @@ export async function projectViewer(
   request: Request,
   allowed?: readonly AppRole[]
 ): Promise<ProjectViewer> {
+  if (!allowedProjectOrigin(request, process.env.PUBLIC_URL))
+    throw new ProjectApiError(
+      403,
+      "Cross-origin project writes are not allowed"
+    );
   let session;
   try {
     session = await (allowed

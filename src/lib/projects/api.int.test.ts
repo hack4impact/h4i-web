@@ -2,7 +2,7 @@ import { editorOptions } from "@/lib/projects/editor";
 import { listDraftProjects } from "@/lib/projects/service";
 import { GET as memberReferences } from "@/app/api/projects/references/members/route";
 import { randomUUID } from "node:crypto";
-import { mkdtemp, rm } from "node:fs/promises";
+import { mkdtemp, rm, stat } from "node:fs/promises";
 import path from "node:path";
 import { tmpdir } from "node:os";
 import { POST as uploadMedia } from "@/app/api/projects/[projectId]/media/route";
@@ -92,6 +92,7 @@ beforeAll(async () => {
     ["otherLead", "PROJECT_LEAD", other],
     ["unassigned", "PROJECT_LEAD", null],
     ["member", "MEMBER", own],
+    ["revokedLead", "PROJECT_LEAD", own],
   ];
   for (const [name, role, chapterId] of fixtures) {
     const user = await db.user.create({
@@ -548,7 +549,7 @@ describe("project write APIs with real sessions and PostgreSQL", () => {
     expect(
       (await uploadMedia(uploadRequest("otherLead"), context(project.id)))
         .status
-    ).toBe(404);
+    ).toBe(403);
     expect(
       (
         await uploadMedia(
@@ -750,4 +751,250 @@ describe("project write APIs with real sessions and PostgreSQL", () => {
     expect(photo.status).toBe(200);
     await photo.arrayBuffer();
   });
+});
+
+describe("Ticket 7 security audit", () => {
+  it.each(["lead", "chapterLead"])(
+    "blocks every foreign-chapter write by %s",
+    async (actor) => {
+      for (const published of [false, true]) {
+        const project = await newDraft("otherLead");
+        if (published) {
+          await patch(
+            req("otherLead", "PATCH", complete()),
+            context(project.id)
+          );
+          expect(
+            (await publish(req("otherLead", "POST"), context(project.id)))
+              .status
+          ).toBe(200);
+        }
+        const before = await db.project.findUniqueOrThrow({
+          where: { id: project.id },
+        });
+        const responses = [
+          await create(req(actor, "POST", { name: "Spoof", chapterId: other })),
+          await patch(
+            req(actor, "PATCH", { name: "Stolen", chapterId: own }),
+            context(project.id)
+          ),
+          await publish(req(actor, "POST"), context(project.id)),
+          await remove(req(actor, "DELETE"), context(project.id)),
+        ];
+        for (const purpose of ["demo", "partner-photo"]) {
+          const form = new FormData();
+          form.set(
+            "file",
+            new File(["invalid"], "image.png", { type: "image/png" })
+          );
+          responses.push(
+            await uploadMedia(
+              new Request(
+                `http://localhost/api/projects/media?purpose=${purpose}`,
+                {
+                  method: "POST",
+                  headers: {
+                    cookie: `${SESSION_COOKIE}=${actors[actor].cookie}`,
+                  },
+                  body: form,
+                }
+              ),
+              context(project.id)
+            )
+          );
+        }
+        expect(responses.map((r) => r.status)).toEqual([
+          403, 403, 403, 403, 403, 403,
+        ]);
+        expect(
+          await db.project.findUniqueOrThrow({ where: { id: project.id } })
+        ).toEqual(before);
+        expect((await read(req(actor), context(project.id))).status).toBe(
+          published ? 200 : 404
+        );
+        await expect(
+          stat(path.join(uploadDirectory!, project.id))
+        ).rejects.toMatchObject({ code: "ENOENT" });
+      }
+    }
+  );
+  it("revokes existing-session write access immediately without removing projects", async () => {
+    const project = await newDraft("revokedLead");
+    await db.user.update({
+      where: { id: actors.revokedLead.id },
+      data: { role: "MEMBER" },
+    });
+    const responses = await Promise.all([
+      create(req("revokedLead", "POST", { name: "No" })),
+      patch(req("revokedLead", "PATCH", { name: "No" }), context(project.id)),
+      publish(req("revokedLead", "POST"), context(project.id)),
+      remove(req("revokedLead", "DELETE"), context(project.id)),
+    ]);
+    expect(responses.map((r) => r.status)).toEqual([403, 403, 403, 403]);
+    expect((await read(req("revokedLead"), context(project.id))).status).toBe(
+      404
+    );
+    expect((await read(req("admin"), context(project.id))).status).toBe(200);
+  });
+  it("rejects cross-origin writes before any side effects", async () => {
+    const project = await newDraft();
+    const evil = (method: string, body?: unknown) => {
+      const request = req("admin", method, body);
+      request.headers.set("origin", "https://untrusted.example");
+      return request;
+    };
+    expect(
+      (await create(evil("POST", { name: "No", chapterId: own }))).status
+    ).toBe(403);
+    expect(
+      (await patch(evil("PATCH", { name: "No" }), context(project.id))).status
+    ).toBe(403);
+    expect((await publish(evil("POST"), context(project.id))).status).toBe(403);
+    expect((await remove(evil("DELETE"), context(project.id))).status).toBe(
+      403
+    );
+    expect((await read(req("lead"), context(project.id))).status).toBe(200);
+  });
+  it("removes private files and handles repeated deletion without resurrection", async () => {
+    const project = await newDraft();
+    const { mkdir, writeFile } = await import("node:fs/promises");
+    const directory = path.join(uploadDirectory!, project.id);
+    await mkdir(directory, { recursive: true });
+    await writeFile(path.join(directory, "private.png"), "private");
+    expect(
+      (await remove(req("admin", "DELETE"), context(project.id))).status
+    ).toBe(204);
+    await expect(stat(directory)).rejects.toMatchObject({ code: "ENOENT" });
+    expect(
+      (await remove(req("admin", "DELETE"), context(project.id))).status
+    ).toBe(404);
+    expect(
+      (
+        await patch(
+          req("lead", "PATCH", { name: "Resurrect" }),
+          context(project.id)
+        )
+      ).status
+    ).toBe(404);
+  });
+  it("sorts public results before applying the limit and excludes drafts", async () => {
+    const ids: string[] = [];
+    for (const [name, startDate, lastUpdated] of [
+      ["Zulu", null, "2026-03-01"],
+      ["Alpha", "2026-01-01", "2026-02-01"],
+      ["Beta", "2025-01-01", "2026-01-01"],
+    ] as const) {
+      const p = await db.project.create({
+        data: {
+          name,
+          chapterId: other,
+          createdBy: actors.admin.id,
+          isDraft: false,
+          startDate: startDate ? new Date(startDate) : null,
+          lastUpdated: new Date(lastUpdated),
+        },
+      });
+      ids.push(p.id);
+    }
+    for (const [sort, expected] of [
+      ["name", [ids[1], ids[2], ids[0]]],
+      ["year", [ids[1], ids[2], ids[0]]],
+      ["last_updated", ids],
+    ] as const) {
+      const response = await list(
+        req("member", "GET", undefined, `?chapter_id=${other}&sort=${sort}`)
+      );
+      expect(response.status).toBe(200);
+      const items = await response.json();
+      expect(
+        items
+          .filter((p: { id: string }) => ids.includes(p.id))
+          .map((p: { id: string }) => p.id)
+      ).toEqual(expected);
+      expect(items.every((p: { isDraft: boolean }) => !p.isDraft)).toBe(true);
+    }
+    expect(
+      (await list(req("member", "GET", undefined, "?sort=unsafe"))).status
+    ).toBe(400);
+  });
+});
+
+describe("upload authorization races", () => {
+  it.each(["chapter", "role"])(
+    "rechecks %s access after receiving a slow upload",
+    async (change) => {
+      await db.user.update({
+        where: { id: actors.revokedLead.id },
+        data: { role: "PROJECT_LEAD", chapterId: own },
+      });
+      const project = await newDraft("revokedLead");
+      const form = new FormData();
+      form.set(
+        "file",
+        new File(
+          [
+            Buffer.from(
+              "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+aD1cAAAAASUVORK5CYII=",
+              "base64"
+            ),
+          ],
+          "demo.png",
+          { type: "image/png" }
+        )
+      );
+      const encoded = new Request("http://localhost", {
+        method: "POST",
+        body: form,
+      });
+      const bytes = new Uint8Array(await encoded.arrayBuffer());
+      let began!: () => void;
+      let release!: () => void;
+      const reading = new Promise<void>((resolve) => {
+        began = resolve;
+      });
+      const gate = new Promise<void>((resolve) => {
+        release = resolve;
+      });
+      const body = new ReadableStream(
+        {
+          async pull(controller) {
+            began();
+            await gate;
+            controller.enqueue(bytes);
+            controller.close();
+          },
+        },
+        { highWaterMark: 0 }
+      );
+      const request = new Request("http://localhost/api/projects/media", {
+        method: "POST",
+        headers: {
+          cookie: `${SESSION_COOKIE}=${actors.revokedLead.cookie}`,
+          "content-type": encoded.headers.get("content-type")!,
+        },
+        body,
+        duplex: "half",
+      } as RequestInit);
+      const result = uploadMedia(request, context(project.id));
+      await reading;
+      try {
+        if (change === "chapter")
+          await db.project.update({
+            where: { id: project.id },
+            data: { chapterId: other },
+          });
+        else
+          await db.user.update({
+            where: { id: actors.revokedLead.id },
+            data: { role: "MEMBER" },
+          });
+      } finally {
+        release();
+      }
+      expect((await result).status).toBe(403);
+      await expect(
+        stat(path.join(uploadDirectory!, project.id))
+      ).rejects.toMatchObject({ code: "ENOENT" });
+    }
+  );
 });

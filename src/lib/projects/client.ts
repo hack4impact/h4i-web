@@ -47,6 +47,10 @@ export const projectClient = {
       `/api/projects/${encodeURIComponent(id)}/publish`,
       { method: "POST" }
     ),
+  remove: (id: string) =>
+    request<void>(`/api/projects/${encodeURIComponent(id)}`, {
+      method: "DELETE",
+    }),
   upload: (
     id: string,
     file: File,

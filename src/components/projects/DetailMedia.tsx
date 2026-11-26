@@ -6,13 +6,15 @@ export function DetailImage({
   src,
   alt,
   className,
+  fallback = "Image unavailable",
 }: {
   src: string;
   alt: string;
   className?: string;
+  fallback?: string;
 }) {
-  const [failed, setFailed] = useState(false);
-  if (failed) return <span className="text-gray-3">Image unavailable</span>;
+  const [failedSrc, setFailedSrc] = useState<string | null>(null);
+  if (failedSrc === src) return <span className="text-gray-3">{fallback}</span>;
   return (
     // eslint-disable-next-line @next/next/no-img-element
     <img
@@ -20,21 +22,29 @@ export function DetailImage({
       alt={alt}
       className={className}
       loading="lazy"
-      onError={() => setFailed(true)}
+      onError={() => setFailedSrc(src)}
     />
   );
 }
 export function DetailMedia({ src, index }: { src: string; index: number }) {
+  const [failedSrc, setFailedSrc] = useState<string | null>(null);
   return (
     <figure className="border-separator rounded-6 overflow-hidden border">
       {/\.(mp4|webm)(?:[?#]|$)/i.test(src) ? (
-        <video
-          src={src}
-          controls
-          preload="metadata"
-          className="bg-panel aspect-video w-full"
-          aria-label={`Demo video ${index + 1}`}
-        />
+        failedSrc === src ? (
+          <p className="text-gray-3 p-20">
+            Video unavailable. You can try opening the original below.
+          </p>
+        ) : (
+          <video
+            src={src}
+            onError={() => setFailedSrc(src)}
+            controls
+            preload="metadata"
+            className="bg-panel aspect-video w-full"
+            aria-label={`Demo video ${index + 1}`}
+          />
+        )
       ) : (
         <DetailImage
           src={src}

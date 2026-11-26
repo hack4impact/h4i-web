@@ -31,6 +31,9 @@ export class DraftQueue {
       return this.id;
     });
   }
+  wait() {
+    return this.tail.then(() => undefined);
+  }
   run<T>(work: (id: string) => Promise<T>) {
     return this.enqueue(() => {
       if (!this.id) throw new Error("Save this draft first.");

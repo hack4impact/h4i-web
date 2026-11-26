@@ -1,3 +1,4 @@
+import { canProjectAction } from "@/lib/projects/permissions";
 import { notFound } from "next/navigation";
 import { requireRole } from "@/lib/auth/guards";
 import { EDITOR_ROLES } from "@/lib/auth/roles";
@@ -43,6 +44,7 @@ export default async function EditProjectPage({
       projectId={id}
       initial={initial}
       isDraft={project.isDraft}
+      canDelete={canProjectAction(user, "delete", project.chapterId)}
       {...options}
     />
   );

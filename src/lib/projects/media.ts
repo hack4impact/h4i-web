@@ -1,6 +1,6 @@
 import path from "node:path";
 import { randomUUID } from "node:crypto";
-import { mkdir, stat, writeFile } from "node:fs/promises";
+import { mkdir, rm, stat, writeFile } from "node:fs/promises";
 import { createReadStream } from "node:fs";
 import { Readable } from "node:stream";
 import { ProjectApiError } from "./http";
@@ -169,4 +169,11 @@ export async function serveMedia(
     createReadStream(/* turbopackIgnore: true */ file, { start, end })
   ) as ReadableStream<Uint8Array>;
   return new Response(stream, { status: range ? 206 : 200, headers });
+}
+
+export async function removeProjectMedia(projectId: string) {
+  await rm(/* turbopackIgnore: true */ folder(projectId), {
+    recursive: true,
+    force: true,
+  });
 }

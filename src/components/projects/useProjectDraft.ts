@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { DraftQueue } from "@/lib/projects/draft-queue";
-import { projectClient } from "@/lib/projects/client";
+import { projectClient, ProjectRequestError } from "@/lib/projects/client";
 import {
   autosaveValue,
   formErrors,
@@ -36,6 +36,9 @@ export function useProjectDraft(
     };
   }, []);
   const dirty = ack.key !== key;
+  const blocked =
+    error instanceof ProjectRequestError &&
+    [401, 403, 404].includes(error.status);
   const recordId = useCallback((id: string) => {
     if (!mounted.current) return;
     setAck((previous) => ({ ...previous, id }));
@@ -73,13 +76,13 @@ export function useProjectDraft(
     [queue, recordId]
   );
   useEffect(() => {
-    if (disabled || suspended.current || !dirty || invalid) return;
+    if (disabled || blocked || suspended.current || !dirty || invalid) return;
     const timer = setTimeout(() => {
       if (!suspended.current)
         void persist(JSON.parse(key), key).catch(() => undefined);
     }, 750);
     return () => clearTimeout(timer);
-  }, [key, disabled, dirty, invalid, persist]);
+  }, [key, disabled, dirty, invalid, blocked, persist]);
   useEffect(() => {
     if (!ack.savedAt) return;
     const timer = setInterval(() => setNow(Date.now()), 30000);
@@ -96,23 +99,27 @@ export function useProjectDraft(
   const minutes = ack.savedAt
     ? Math.max(0, Math.floor((now - ack.savedAt) / 60000))
     : 0;
-  const status = pending
-    ? "Saving draft…"
-    : dirty && invalid
-      ? "Autosave paused · Check incomplete or invalid fields"
-      : error
-        ? "Draft not saved · Retry Save Draft"
-        : dirty
-          ? "Unsaved changes"
-          : ack.savedAt
-            ? `Draft saved · ${minutes ? `${minutes} min ago` : "Just now"}`
-            : initialId
-              ? "Draft loaded"
-              : "Start typing to save a draft";
+  const status = blocked
+    ? "Access changed · Unsaved changes were not saved. Reload to refresh your access."
+    : pending
+      ? "Saving draft…"
+      : dirty && invalid
+        ? "Autosave paused · Check incomplete or invalid fields"
+        : error
+          ? "Draft not saved · Retry Save Draft"
+          : dirty
+            ? "Unsaved changes"
+            : ack.savedAt
+              ? `Draft saved · ${minutes ? `${minutes} min ago` : "Just now"}`
+              : initialId
+                ? "Draft loaded"
+                : "Start typing to save a draft";
   return {
     isActive: () => mounted.current,
     id: ack.id,
     status,
+    blocked,
+    waitForSaves: () => queue.wait(),
     error,
     dirty,
     suspend: () => {

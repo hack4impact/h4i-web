@@ -1,8 +1,10 @@
+import { projectListQuery } from "@/lib/projects/sort";
 import { hasRole, ADMIN_ROLES, EDITOR_ROLES } from "@/lib/auth/roles";
 import {
   authorizeProject,
   projectResponse,
   projectViewer,
+  ProjectApiError,
 } from "@/lib/projects/http";
 import {
   createProject,
@@ -13,11 +15,15 @@ import {
 export async function GET(request: Request) {
   return projectResponse(async () => {
     const viewer = await projectViewer(request);
+    const params = new URL(request.url).searchParams;
+    const query = projectListQuery.safeParse(Object.fromEntries(params));
+    if (!query.success)
+      throw new ProjectApiError(400, "Invalid project sort or chapter");
     return Response.json(
-      await listProjects(
-        viewer,
-        new URL(request.url).searchParams.get("include_drafts") === "true"
-      )
+      await listProjects(viewer, params.get("include_drafts") === "true", {
+        sort: query.data.sort,
+        chapterId: query.data.chapter_id,
+      })
     );
   });
 }

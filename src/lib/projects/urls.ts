@@ -10,3 +10,15 @@ export function projectUrl(
     return null;
   }
 }
+
+export function projectThumbnail(
+  media: string[],
+  partnerPhoto: string | null | undefined
+): string | null {
+  const preview = media.find(
+    (url) =>
+      /\.(png|jpe?g|webp|gif|avif)(?:[?#]|$)/i.test(url) &&
+      projectUrl(url, true)
+  );
+  return projectUrl(preview || partnerPhoto, true);
+}
